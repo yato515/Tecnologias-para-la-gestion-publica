@@ -358,17 +358,21 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			window.location.href = '/ciudadano/login';
 		} else {
 			// Remove seed/mock data if present (one-time migration to clean state)
-			const _sd = JSON.parse(localStorage.getItem('civicflow_dossier') || '[]');
-			if (_sd.some(d => d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf')) localStorage.removeItem('civicflow_dossier');
+			const token = localStorage.getItem('jwt_token');
+			if (!token || token === 'mock-jwt-token-demo' || token === 'N/A') {
+				localStorage.removeItem('civicflow_dossier');
+			} else {
+				const _sd = JSON.parse(localStorage.getItem('civicflow_dossier') || '[]');
+				if (_sd.some(d => d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf')) localStorage.removeItem('civicflow_dossier');
+			}
 			const _sr = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
 			if (_sr.some(r => r.folio === 'TRM-2026-00104')) localStorage.removeItem('civicflow_requests');
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
 			
-			const tokenVal = localStorage.getItem('jwt_token');
 			const tokenEl = document.getElementById('lbl-token');
-			if (tokenVal && tokenVal !== 'mock-jwt-token-demo') {
-				tokenEl.textContent = tokenVal;
+			if (token && token !== 'mock-jwt-token-demo') {
+				tokenEl.textContent = token;
 				tokenEl.title = "Ver completo (Haga clic)";
 			} else {
 				tokenEl.textContent = "N/A (No generado)";
