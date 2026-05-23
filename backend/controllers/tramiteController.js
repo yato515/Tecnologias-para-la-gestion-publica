@@ -1,5 +1,27 @@
 import { supabase } from '../config/supabase.service.js';
 
+const ensureBucketExists = async () => {
+  try {
+    const { data: buckets, error: getError } = await supabase.storage.listBuckets();
+    if (getError) throw getError;
+    const exists = buckets.some(b => b.name === 'documentos');
+    if (!exists) {
+      const { error: createError } = await supabase.storage.createBucket('documentos', {
+        public: false,
+        allowedMimeTypes: ['application/pdf', 'image/jpeg', 'image/png'],
+        fileSizeLimit: 5242880 // 5MB
+      });
+      if (createError) throw createError;
+      console.log("Bucket 'documentos' creado exitosamente.");
+    }
+  } catch (err) {
+    console.error("Error al asegurar la existencia del bucket 'documentos':", err.message);
+  }
+};
+
+// Ejecutar al iniciar
+ensureBucketExists();
+
 export const TramiteController = {
 
   // GET /api/tramites/catalogo
@@ -74,9 +96,18 @@ export const TramiteController = {
         });
       }
 
+      const targetSolicitudId = (id && id !== 'null' && id !== 'undefined') ? id : null;
+
       const { data, error } = await supabase
         .from('documentos')
-        .insert([{ solicitud_id: id, nombre, storage_path, subido_por }])
+        .insert([{ 
+          solicitud_id: targetSolicitudId, 
+          nombre, 
+          storage_path, 
+          subido_por,
+          usuario_id: req.user ? req.user.id : subido_por,
+          vigente: true
+        }])
         .select()
         .single();
       if (error) throw error;
