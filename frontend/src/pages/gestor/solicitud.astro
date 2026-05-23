@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Detalle de Solicitud">
@@ -258,58 +259,70 @@ import Layout from '../../layouts/Layout.astro';
 		</div>
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
 		const gestorLogged = localStorage.getItem('gestor_logged');
 		if (gestorLogged !== 'true') {
 			window.location.href = '/gestor';
 		} else {
-			const params = new URLSearchParams(window.location.search);
-			const folio = params.get('id');
+            const init = async () => {
+			    const params = new URLSearchParams(window.location.search);
+			    const folio = params.get('id');
 
-			const role = localStorage.getItem('gestor_role') || 'Revisor';
-			document.getElementById('lbl-role-status').textContent = `${role} (${localStorage.getItem('gestor_email')})`;
+			    const role = localStorage.getItem('gestor_role') || 'Revisor';
+                const userEmail = localStorage.getItem('gestor_email');
+			    document.getElementById('lbl-role-status').textContent = `${role} (${userEmail})`;
 
-			// Load requested request
-			const localRequests = localStorage.getItem('civicflow_requests') || '[]';
-			const requests = JSON.parse(localRequests);
-			const reqIdx = requests.findIndex(r => r.folio === folio);
+                // Load request from Backend
+                const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${folio}`);
+                const json = await res.json();
 
-			if (reqIdx === -1) {
-				document.getElementById('solicitud-workspace').classList.add('hidden');
-				window.showToast("Folio no encontrado en base de datos", "error");
-			} else {
-				const req = requests[reqIdx];
+			    if (!json.success || !json.data) {
+				    document.getElementById('solicitud-workspace').classList.add('hidden');
+				    window.showToast("Folio no encontrado en base de datos", "error");
+                    return;
+			    }
+			    const req = json.data;
+                const reqId = req.id;
+
+				const statusMap = {
+					'recibido': 'Recibido',
+					'en_revision': 'En revisión',
+					'documentacion_incompleta': 'Documentación incompleta',
+					'aprobado': 'Aprobado',
+					'rechazado': 'Rechazado'
+				};
+				const displayStatus = statusMap[req.estado] || req.estado;
 
 				// Fill labels
 				document.getElementById('lbl-solicitud-folio').textContent = req.folio;
-				document.getElementById('lbl-citizen-name').textContent = req.citizen_fullname || 'N/A';
-				document.getElementById('lbl-citizen-curp').textContent = req.citizen_curp || 'N/A';
-				document.getElementById('lbl-citizen-email').textContent = req.citizen_email || 'N/A';
-				document.getElementById('lbl-citizen-phone').textContent = req.citizen_phone || 'N/A';
-				document.getElementById('lbl-citizen-address').textContent = req.citizen_address || 'N/A';
+				document.getElementById('lbl-citizen-name').textContent = req.ciudadano?.nombre_completo || 'N/A';
+				document.getElementById('lbl-citizen-curp').textContent = req.ciudadano?.curp || 'N/A';
+				document.getElementById('lbl-citizen-email').textContent = req.campos_respuesta?.email || 'N/A';
+				document.getElementById('lbl-citizen-phone').textContent = req.campos_respuesta?.telefono || 'N/A';
+				document.getElementById('lbl-citizen-address').textContent = req.campos_respuesta?.direccion || 'N/A';
 				
-				document.getElementById('lbl-file-ine-name').textContent = req.files?.ine || 'ine_ciudadano.pdf';
-				document.getElementById('lbl-file-dom-name').textContent = req.files?.dom || 'comprobante_dom.pdf';
+				document.getElementById('lbl-file-ine-name').textContent = 'ine_ciudadano.pdf';
+				document.getElementById('lbl-file-dom-name').textContent = 'comprobante_dom.pdf';
 
 				// Set status badge
 				const statusBadge = document.getElementById('lbl-solicitud-status-badge');
-				statusBadge.textContent = req.status;
+				statusBadge.textContent = displayStatus;
 				let badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
-				if (req.status === 'En revisión') badgeClass = 'bg-amber-500/15 text-amber-500 border border-amber-500/20';
-				else if (req.status === 'Aprobado') badgeClass = 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/20';
-				else if (req.status === 'Documentación incompleta') badgeClass = 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
-				else if (req.status === 'Rechazado') badgeClass = 'bg-red-500/15 text-red-500 border border-red-500/20';
-				else if (req.status === 'Recibido') badgeClass = 'bg-blue-500/15 text-blue-500 border border-blue-500/20';
+				if (req.estado === 'en_revision') badgeClass = 'bg-amber-500/15 text-amber-500 border border-amber-500/20';
+				else if (req.estado === 'aprobado') badgeClass = 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/20';
+				else if (req.estado === 'documentacion_incompleta') badgeClass = 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
+				else if (req.estado === 'rechazado') badgeClass = 'bg-red-500/15 text-red-500 border border-red-500/20';
+				else if (req.estado === 'recibido') badgeClass = 'bg-blue-500/15 text-blue-500 border border-blue-500/20';
 				statusBadge.className = `px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
 
 				// Render review controls based on roles and current status
 				const btnReview = document.getElementById('btn-mark-reviewed');
 				const signPanel = document.getElementById('approver-sign-panel');
 
-				if (role === 'Revisor' && req.status === 'Recibido') {
+				if (role === 'Revisor' && req.estado === 'recibido') {
 					btnReview.classList.remove('hidden');
-				} else if (role === 'Aprobador' && (req.status === 'En revisión' || req.status === 'Recibido')) {
+				} else if (role === 'Aprobador' && (req.estado === 'en_revision' || req.estado === 'recibido')) {
 					signPanel.classList.remove('hidden');
 				}
 
@@ -338,31 +351,34 @@ import Layout from '../../layouts/Layout.astro';
 					});
 				});
 
+                const updateEstadoBackend = async (estadoNuevo, notas) => {
+					try {
+						const response = await fetch(`${API_URL}/api/gestores/solicitudes/${reqId}/estado`, {
+							method: 'PATCH',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								estado_nuevo: estadoNuevo,
+								notas: notas || '',
+								usuario_id: userEmail, // Using email as identifier for mock setup
+								ip: '192.168.1.104'
+							})
+						});
+						const j = await response.json();
+						if(!j.success) throw new Error(j.message);
+						return true;
+					} catch (e) {
+						window.showToast("Error conectando al backend: " + e.message, "error");
+						return false;
+					}
+				};
+
 				// Revisor mark reviewed action
-				btnReview.addEventListener('click', () => {
-					const prevStatus = req.status;
-					req.status = 'En revisión';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: "Revisor",
-						estado_anterior: prevStatus,
-						estado_nuevo: 'En revisión',
-						comentario: "Revisión técnica de documentos completada. Se avanza expediente para firma y dictamen del Director.",
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					window.showToast("Marcar como revisado completado con éxito", "success");
-
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
+				btnReview.addEventListener('click', async () => {
+					const success = await updateEstadoBackend('en_revision', 'Revisión técnica de documentos completada. Se avanza expediente para firma y dictamen del Director.');
+                    if(success) {
+					    window.showToast("Marcar como revisado completado con éxito", "success");
+					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+                    }
 				});
 
 				// Correction Drawer handling
@@ -381,36 +397,18 @@ import Layout from '../../layouts/Layout.astro';
 					triggerCorrection.classList.remove('hidden');
 				});
 
-				submitCorrection.addEventListener('click', () => {
+				submitCorrection.addEventListener('click', async () => {
 					const comment = document.getElementById('txt-correction-comment').value.trim();
 					if(!comment) {
 						window.showToast("Ingrese el motivo de corrección", "error");
 						return;
 					}
 
-					const prevStatus = req.status;
-					req.status = 'Documentación incompleta';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: role,
-						estado_anterior: prevStatus,
-						estado_nuevo: 'Documentación incompleta',
-						comentario: `Corrección solicitada: ${comment}`,
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					window.showToast("Notificación enviada al ciudadano", "success");
-					
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
+					const success = await updateEstadoBackend('documentacion_incompleta', `Corrección solicitada: ${comment}`);
+                    if(success) {
+					    window.showToast("Notificación enviada al ciudadano", "success");
+					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+                    }
 				});
 
 				// Rejection modal trigger
@@ -439,36 +437,18 @@ import Layout from '../../layouts/Layout.astro';
 					});
 				});
 
-				submitReject.addEventListener('click', () => {
+				submitReject.addEventListener('click', async () => {
 					const comment = rejectComment.value.trim();
 					if(!comment) {
 						window.showToast("Seleccione una plantilla o escriba el motivo de rechazo", "error");
 						return;
 					}
 
-					const prevStatus = req.status;
-					req.status = 'Rechazado';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: role,
-						estado_anterior: prevStatus,
-						estado_nuevo: 'Rechazado',
-						comentario: `Trámite rechazado de forma definitiva: ${comment}`,
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					window.showToast("Trámite rechazado definitivamente", "error");
-
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
+                    const success = await updateEstadoBackend('rechazado', `Trámite rechazado de forma definitiva: ${comment}`);
+                    if(success) {
+					    window.showToast("Trámite rechazado definitivamente", "error");
+					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+                    }
 				});
 
 				// Approver Canvas Drawing signature logic
@@ -525,34 +505,17 @@ import Layout from '../../layouts/Layout.astro';
 				});
 
 				// Approver dictaminate approval
-				document.getElementById('btn-dictaminate-approve').addEventListener('click', () => {
+				document.getElementById('btn-dictaminate-approve').addEventListener('click', async () => {
 					// Verify canvas is signed (simple check if pixels altered)
-					const prevStatus = req.status;
-					req.status = 'Aprobado';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: "Aprobador",
-						estado_anterior: prevStatus,
-						estado_nuevo: 'Aprobado',
-						comentario: "Trámite validado, firmado y aprobado con firma autógrafa digitalizada.",
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					window.showToast("Trámite aprobado y firmado digitalmente", "success");
-
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
+					const success = await updateEstadoBackend('aprobado', "Trámite validado, firmado y aprobado con firma autógrafa digitalizada.");
+                    if(success) {
+					    window.showToast("Trámite aprobado y firmado digitalmente", "success");
+					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+                    }
 				});
 
-			}
+			}; // End of init async function
+            init(); // Call the init function
 		}
 	</script>
 </Layout>

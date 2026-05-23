@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import SolicitudCard from '../../components/SolicitudCard.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Mesa de Trabajo del Gestor - In óolal Yucatan">
@@ -206,7 +207,7 @@ import SolicitudCard from '../../components/SolicitudCard.astro';
 	<!-- ChartJS Script CDN -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js" is:inline></script>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
 		const gestorLogged = localStorage.getItem('gestor_logged');
 		const overlay = document.getElementById('gestor-overlay');
@@ -239,23 +240,41 @@ import SolicitudCard from '../../components/SolicitudCard.astro';
 				}, 600);
 			});
 
-			const defaultRequests = [
-				{ folio: "TRM-2026-00201", name: "Licencia de Conducir y Placas", dept: "Secretaría de Seguridad Pública (SSP)", date: "2026-05-18", status: "Recibido", citizen_fullname: "Eduardo Chan", token: "TK-128491", delegation: "Mérida Centro", algorithmic_result: "Aprobado" },
-				{ folio: "TRM-2026-00202", name: "Inscripción en el RFC (SAT)", dept: "Hacienda / SAT", date: "2026-05-15", status: "En revisión", citizen_fullname: "Marisela Puc", token: "TK-992381", delegation: "Progreso Ventanilla Puerto", algorithmic_result: "Declinado" },
-				{ folio: "TRM-2026-00104", name: "Trámite de Pasaporte Mexicano", dept: "Secretaría de Relaciones Exteriores (SRE)", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech", token: "TK-849201", delegation: "Valladolid Palacio", algorithmic_result: "Aprobado" }
-			];
-
-			const getRequests = () => {
-				const local = localStorage.getItem('civicflow_requests');
-				if (!local) {
-					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
-					return defaultRequests;
-				}
-				return JSON.parse(local);
+			const statusMap = {
+				'recibido': 'Recibido',
+				'en_revision': 'En revisión',
+				'documentacion_incompleta': 'Documentación incompleta',
+				'aprobado': 'Aprobado',
+				'rechazado': 'Rechazado'
 			};
 
-			const renderDashboard = () => {
-				const reqs = getRequests();
+			const getRequests = async () => {
+				try {
+					const res = await fetch(`${API_URL}/api/gestores/solicitudes`);
+					const json = await res.json();
+					if (json.success) {
+						return json.data.map(r => ({
+							id: r.id,
+							folio: r.folio,
+							name: r.tramite?.nombre || 'Trámite Genérico',
+							dept: r.dependencia?.nombre || 'Dependencia',
+							date: r.created_at ? r.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+							status: statusMap[r.estado] || r.estado,
+							citizen_fullname: r.ciudadano?.nombre_completo || 'Ciudadano',
+							token: r.id ? `TK-${r.id.substring(0, 6).toUpperCase()}` : 'TK-0000',
+							delegation: 'Mérida Centro',
+							algorithmic_result: r.estado === 'aprobado' ? 'Aprobado' : (r.estado === 'rechazado' ? 'Declinado' : 'Pendiente')
+						}));
+					}
+					return [];
+				} catch (e) {
+					console.error(e);
+					return [];
+				}
+			};
+
+			const renderDashboard = async () => {
+				const reqs = await getRequests();
 				const currentDate = new Date('2026-05-22'); // system reference date
 
 				// Filter calculations
@@ -410,16 +429,16 @@ import SolicitudCard from '../../components/SolicitudCard.astro';
 
 			renderDashboard();
 
-			// Storage Event listener for Live Sync
+			// Storage Event listener for Live Sync (now handled differently or just disabled for mock)
 			window.addEventListener('storage', (e) => {
-				if (e.key === 'civicflow_requests') {
+				if (e.key === 'civicflow_refresh') {
 					renderDashboard();
-					window.showToast("Bandeja sincronizada en tiempo real", "info");
+					window.showToast("Bandeja actualizada", "info");
 				}
 			});
 
 			// Render Analytics
-			const renderCharts = () => {
+			const renderCharts = async () => {
 				const resCtx = document.getElementById('chart-resolution-time').getContext('2d');
 				const distCtx = document.getElementById('chart-distribution').getContext('2d');
 
@@ -447,7 +466,7 @@ import SolicitudCard from '../../components/SolicitudCard.astro';
 				});
 
 				// Doughnut chart (approved vs declinado algorithms)
-				const reqs = getRequests();
+				const reqs = await getRequests();
 				const approvedCount = reqs.filter(r => r.algorithmic_result === 'Aprobado').length;
 				const declinadoCount = reqs.filter(r => r.algorithmic_result === 'Declinado').length;
 
