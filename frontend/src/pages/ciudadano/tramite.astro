@@ -97,7 +97,7 @@ import Layout from '../../layouts/Layout.astro';
 								<div class="p-4 rounded-xl border border-yuc-green/20 bg-yuc-green/5 dark:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 									<div>
 										<h4 class="font-bold text-xs text-slate-850 dark:text-slate-200">¿Desea agilizar su trámite?</h4>
-										<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Puede importar automáticamente los documentos validados desde su Expediente Digital de CivicFlow.</p>
+										<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Puede importar automáticamente los documentos validados desde su Expediente Digital de In óolal Yucatan.</p>
 									</div>
 									<button type="button" id="btn-import-from-dossier" class="px-3.5 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm flex items-center gap-1.5 border border-yuc-green-light">
 										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -259,7 +259,7 @@ import Layout from '../../layouts/Layout.astro';
 						</div>
 						<div>
 							<div class="flex items-center gap-1.5">
-								<h4 class="font-extrabold text-sm leading-tight">Asistente AI CivicFlow</h4>
+								<h4 class="font-extrabold text-sm leading-tight">Asistente AI In óolal Yucatan</h4>
 								<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
 							</div>
 							<p class="text-[10px] text-slate-400">Preguntas y respuestas sobre requisitos</p>
@@ -576,7 +576,7 @@ import Layout from '../../layouts/Layout.astro';
 			};
 
 			// Initial Bot Message
-			appendMessage(`¡Hola! Soy tu Asistente Digital CivicFlow para el trámite de <strong>${currentProcedure.title}</strong>. Pregúntame qué documentos necesitas, costos, plazos o dudas de llenado.`, 'bot');
+			appendMessage(`¡Hola! Soy tu Asistente Digital In óolal Yucatan para el trámite de <strong>${currentProcedure.title}</strong>. Pregúntame qué documentos necesitas, costos, plazos o dudas de llenado.`, 'bot');
 
 			chatForm.addEventListener('submit', (e) => {
 				e.preventDefault();

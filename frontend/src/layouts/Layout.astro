@@ -8,7 +8,7 @@ interface Props {
 	description?: string;
 }
 
-const { title, description = "CivicFlow - Plataforma de Automatización de Trámites del Gobierno del Estado de Yucatán" } = Astro.props;
+const { title, description = "In óolal Yucatan - Plataforma de Automatización de Trámites del Gobierno del Estado de Yucatán" } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -18,7 +18,7 @@ const { title, description = "CivicFlow - Plataforma de Automatización de Trám
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{title} | CivicFlow - Gobierno del Estado de Yucatán</title>
+		<title>{title} | In óolal Yucatan - Gobierno del Estado de Yucatán</title>
 		<meta name="description" content={description} />
 		
 		<!-- Google Fonts -->
@@ -57,7 +57,7 @@ const { title, description = "CivicFlow - Plataforma de Automatización de Trám
 					</div>
 					<div>
 						<div class="flex items-center gap-1.5">
-							<span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-800">Civic<span class="text-yuc-green">Flow</span></span>
+							<span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-800">In óolal <span class="text-yuc-green">Yucatan</span></span>
 							<span class="px-1.5 py-0.5 rounded bg-yuc-gold/15 text-yuc-gold-dark font-bold text-[9px] uppercase tracking-wider">Yucatán</span>
 						</div>
 						<p class="text-[10px] text-slate-500 font-medium leading-none mt-0.5">Ventanilla Única Digital de Trámites</p>
@@ -100,7 +100,7 @@ const { title, description = "CivicFlow - Plataforma de Automatización de Trám
 									<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
 								</svg>
 							</div>
-							<span class="font-extrabold text-white text-lg tracking-tight">Civic<span class="text-yuc-green-light">Flow</span></span>
+							<span class="font-extrabold text-white text-lg tracking-tight">In óolal <span class="text-yuc-green-light">Yucatan</span></span>
 						</div>
 						<p class="text-sm text-slate-400 pr-4">
 							Plataforma digital para la automatización y transparencia de trámites gubernamentales del Estado de Yucatán. Diseñada para agilizar la interacción entre la ciudadanía y la administración pública sin intermediarios y con total trazabilidad.
@@ -109,27 +109,18 @@ const { title, description = "CivicFlow - Plataforma de Automatización de Trám
 					<div>
 						<h4 class="font-bold text-white text-sm tracking-wider uppercase mb-4">Enlaces Oficiales</h4>
 						<ul class="space-y-2 text-sm">
-							<li><a href="https://yucatan.gob.mx" class="hover:text-white transition-colors">Gobierno del Estado</a></li>
-							<li><a href="https://tramites.yucatan.gob.mx" class="hover:text-white transition-colors">Ventanilla Estatal</a></li>
-							<li><a href="#" class="hover:text-white transition-colors">Transparencia Yucatán</a></li>
-							<li><a href="#" class="hover:text-white transition-colors">Aviso de Privacidad</a></li>
-						</ul>
-					</div>
-					<div>
-						<h4 class="font-bold text-white text-sm tracking-wider uppercase mb-4">Ayuda e Inclusión</h4>
-						<ul class="space-y-2 text-sm">
-							<li><a href="#" class="hover:text-white transition-colors">Centro de Soporte</a></li>
-							<li><a href="#" class="hover:text-white transition-colors">Manual de Accesibilidad</a></li>
-							<li><a href="#" class="hover:text-white transition-colors">Directorio de Dependencias</a></li>
-							<li><span class="text-xs px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">A11y Nivel AA</span></li>
+							<li><a href="https://www.yucatan.gob.mx/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Gobierno del Estado</a></li>
+							<li><a href="https://www.yucatan.gob.mx/ventanillaunica/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Ventanilla Estatal</a></li>
+							<li><a href="https://www.yucatan.gob.mx/gobierno/dependencias.php" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Directorio de Dependencias</a></li>
+							<li><a href="/aviso-privacidad" class="hover:text-white transition-colors">Aviso de Privacidad</a></li>
 						</ul>
 					</div>
 				</div>
 				<div class="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs gap-4">
 					<p>&copy; {new Date().getFullYear()} Gobierno del Estado de Yucatán. Todos los derechos reservados. Desarrollado para HackaTec 2026.</p>
 					<div class="flex gap-4">
-						<a href="#" class="hover:text-white transition-colors">Términos de Uso</a>
-						<a href="#" class="hover:text-white transition-colors">Contacto</a>
+						<a href="/aviso-privacidad" class="hover:text-white transition-colors">Aviso de Privacidad</a>
+						<a href="https://www.yucatan.gob.mx/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">Contacto</a>
 					</div>
 				</div>
 			</div>
