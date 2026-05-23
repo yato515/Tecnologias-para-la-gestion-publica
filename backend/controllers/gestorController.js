@@ -130,7 +130,7 @@ export const GestorController = {
       let query = supabase.from('solicitudes').select(`
         *,
         tramite:tramites_catalogo(nombre),
-        ciudadano:perfiles!ciudadano_id(nombre_completo)
+        ciudadano:perfiles!ciudadano_id(nombre_completo, email)
       `);
       if (isUUID) {
         query = query.eq('id', id);
@@ -173,7 +173,7 @@ export const GestorController = {
 
       // Enviar correo de confirmación de aprobación con Mailjet
       if (estado_nuevo === 'aprobado') {
-        let recipientEmail = correo_destinatario;
+        let recipientEmail = correo_destinatario || solicitud.ciudadano?.email;
         let recipientName = nombre_destinatario || solicitud.ciudadano?.nombre_completo || 'Ciudadano';
 
         // Intentar obtener email si no se envió en el body y supabaseAdmin está configurado
@@ -186,6 +186,12 @@ export const GestorController = {
           } catch (e) {
             console.error("Error al obtener email del ciudadano en Auth:", e);
           }
+        }
+
+        // --- FALLBACK PARA PRUEBAS LOCALES ---
+        // Si no se encuentra un correo en Supabase (ej. datos de prueba), usamos uno temporal de prueba.
+        if (!recipientEmail && process.env.MAILJET_TEST_EMAIL) {
+          recipientEmail = process.env.MAILJET_TEST_EMAIL;
         }
 
         // Si tenemos un correo válido, enviamos la notificación
