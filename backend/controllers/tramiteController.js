@@ -145,11 +145,19 @@ export const TramiteController = {
   getSolicitudByFolio: async (req, res) => {
     try {
       const { folio } = req.params;
-      const { data, error } = await supabase
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(folio);
+      
+      let query = supabase
         .from('solicitudes')
-        .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo, curp)')
-        .eq('folio', folio)
-        .maybeSingle();
+        .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo, curp, email)');
+        
+      if (isUUID) {
+        query = query.eq('id', folio);
+      } else {
+        query = query.eq('folio', folio);
+      }
+      
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       if (!data) return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
       return res.status(200).json({ success: true, data });

@@ -365,7 +365,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							status: statusMap[r.estado] || r.estado,
 							citizen_fullname: r.ciudadano?.nombre_completo || 'Ciudadano',
 							token: r.id ? `TK-${r.id.substring(0, 6).toUpperCase()}` : 'TK-0000',
-							delegation: 'Mérida Centro',
+							delegation: r.campos_respuesta?.municipio || r.ciudadano?.municipio || 'Mérida Centro',
 							algorithmic_result: r.estado === 'aprobado' ? 'Aprobado' : (r.estado === 'rechazado' ? 'Declinado' : 'Pendiente')
 						}));
 					}
@@ -525,10 +525,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							<span class="${r.status === 'Aprobado' ? 'text-emerald-500' : (r.status === 'Rechazado' || r.status === 'Declinado' ? 'text-red-500' : 'text-slate-600')}">${r.status}</span>
 						</div>
 					\`;
-					grid.appendChild(card);
-				});an>
-						</div>
-					`;
 					grid.appendChild(card);
 				});
 

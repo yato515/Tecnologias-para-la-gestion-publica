@@ -234,7 +234,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								ciudadano_id: ciudadanoId,
 								tramite_id: tramiteData.id,
 								dependencia_id: tramiteData.dependencia_id,
-								campos_respuesta: { token_expediente: tokenInput }
+								campos_respuesta: { 
+									token_expediente: tokenInput,
+									municipio: localStorage.getItem('citizen_pob') || 'Mérida Centro'
+								}
 							})
 						});
 						const json = await res.json();

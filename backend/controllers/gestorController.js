@@ -32,6 +32,22 @@ export const GestorController = {
       if (error) throw error;
 
       let mappedData = data;
+
+      // Filtrar en memoria por municipio y tipo_solicitud si están presentes
+      if (tipo_solicitud && tipo_solicitud !== 'null' && tipo_solicitud !== 'undefined') {
+        const tipoLower = tipo_solicitud.toLowerCase();
+        mappedData = mappedData.filter(r => 
+          r.tramite && r.tramite.nombre && r.tramite.nombre.toLowerCase().includes(tipoLower)
+        );
+      }
+
+      if (municipio && municipio !== 'null' && municipio !== 'undefined') {
+        const muniLower = municipio.toLowerCase();
+        mappedData = mappedData.filter(r => {
+          const resp = JSON.stringify(r.campos_respuesta || {}).toLowerCase();
+          return resp.includes(muniLower);
+        });
+      }
       if (supabaseAdmin) {
         try {
           const { data: userData, error: userError } = await supabaseAdmin.auth.admin.listUsers();
