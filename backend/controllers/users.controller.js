@@ -1,4 +1,5 @@
 import { UsersService } from '../services/users.service.js';
+import { supabase } from '../config/supabase.service.js'; 
 
 export const UsersController = {
   getUsers: async (req, res) => {
@@ -64,20 +65,36 @@ export const UsersController = {
 
   registerCitizen: async (req, res) => {
     try {
-      const { curp, email, nombre_completo } = req.body;
-      if (!curp || !nombre_completo) {
-        return res.status(400).json({ success: false, message: 'curp y nombre_completo son requeridos' });
+      const { curp, email, nombre_completo, password } = req.body;
+      
+      if (!curp || !nombre_completo || !email) {
+        return res.status(400).json({ success: false, message: 'curp, email y nombre_completo son requeridos' });
       }
+
       const existing = await UsersService.getByCurp(curp);
       if (existing) return res.status(200).json({ success: true, data: existing });
 
-      const { randomUUID } = await import('crypto');
+      // Si el formulario no envía contraseña separada, usamos la CURP como contraseña por defecto
+      const contraseñaSegura = password || curp; 
+
+      // 1. Crear la cuenta real en Supabase Autenticación
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email,
+        password: contraseñaSegura,
+      });
+
+      if (authError || !authData.user) {
+        return res.status(400).json({ success: false, message: authError.message });
+      }
+
+      // 2. Insertar en tu tabla 'perfiles' usando el ID real que generó Supabase Auth
       const newUser = await UsersService.create({
-        id: randomUUID(),
+        id: authData.user.id, 
         nombre_completo,
         curp,
         rol: 'ciudadano'
       });
+
       return res.status(201).json({ success: true, data: newUser });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
