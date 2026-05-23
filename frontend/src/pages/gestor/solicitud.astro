@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Detalle de Solicitud">
@@ -336,13 +337,38 @@ import Layout from '../../layouts/Layout.astro';
 		</div>
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
 		const gestorLogged = localStorage.getItem('gestor_logged');
 		if (gestorLogged !== 'true') {
 			window.location.href = '/gestor';
 		} else {
 			const params = new URLSearchParams(window.location.search);
+			
+			// Helper para actualizar estado en el servidor
+			async function actualizarEstadoEnServidor(estadoNuevo, notas) {
+				const targetId = req.id || req.folio;
+				if (!targetId) return false;
+				try {
+					const res = await fetch(`${API_URL}/api/gestores/solicitudes/${targetId}/estado`, {
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							estado_nuevo: estadoNuevo,
+							notas: notas,
+							usuario_id: localStorage.getItem('gestor_id') || 'demo-gestor-id',
+							ip: '192.168.1.104',
+							correo_destinatario: req.citizen_email || null,
+							nombre_destinatario: req.citizen_fullname || null
+						})
+					});
+					const data = await res.json();
+					return data.success;
+				} catch (e) {
+					console.warn("No se pudo sincronizar el cambio de estado con el servidor:", e);
+					return false;
+				}
+			}
 			const folio = params.get('id');
 
 			const role = localStorage.getItem('gestor_role') || 'Revisor';
@@ -418,12 +444,13 @@ import Layout from '../../layouts/Layout.astro';
 				});
 
 				// Revisor mark reviewed action
-				btnReview.addEventListener('click', () => {
+				btnReview.addEventListener('click', async () => {
 					const prevStatus = req.status;
 					req.status = 'En revisión';
 					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
 
 					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
+					const comment = "Revisión técnica de documentos completada. Se avanza expediente para firma y dictamen del Director.";
 					auditLogs.push({
 						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
 						folio: folio,
@@ -431,11 +458,14 @@ import Layout from '../../layouts/Layout.astro';
 						rol: "Revisor",
 						estado_anterior: prevStatus,
 						estado_nuevo: 'En revisión',
-						comentario: "Revisión técnica de documentos completada. Se avanza expediente para firma y dictamen del Director.",
+						comentario: comment,
 						ip: "192.168.1.104",
 						timestamp: new Date().toLocaleString()
 					});
 					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
+
+					// Llamar al backend
+					await actualizarEstadoEnServidor('en_revision', comment);
 
 					window.showToast("Marcar como revisado completado con éxito", "success");
 
@@ -460,7 +490,7 @@ import Layout from '../../layouts/Layout.astro';
 					triggerCorrection.classList.remove('hidden');
 				});
 
-				submitCorrection.addEventListener('click', () => {
+				submitCorrection.addEventListener('click', async () => {
 					const comment = document.getElementById('txt-correction-comment').value.trim();
 					if(!comment) {
 						window.showToast("Ingrese el motivo de corrección", "error");
@@ -472,6 +502,7 @@ import Layout from '../../layouts/Layout.astro';
 					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
 
 					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
+					const fullComment = `Corrección solicitada: ${comment}`;
 					auditLogs.push({
 						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
 						folio: folio,
@@ -479,11 +510,14 @@ import Layout from '../../layouts/Layout.astro';
 						rol: role,
 						estado_anterior: prevStatus,
 						estado_nuevo: 'Documentación incompleta',
-						comentario: `Corrección solicitada: ${comment}`,
+						comentario: fullComment,
 						ip: "192.168.1.104",
 						timestamp: new Date().toLocaleString()
 					});
 					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
+
+					// Llamar al backend
+					await actualizarEstadoEnServidor('documentacion_incompleta', fullComment);
 
 					window.showToast("Notificación enviada al ciudadano", "success");
 					
@@ -518,7 +552,7 @@ import Layout from '../../layouts/Layout.astro';
 					});
 				});
 
-				submitReject.addEventListener('click', () => {
+				submitReject.addEventListener('click', async () => {
 					const comment = rejectComment.value.trim();
 					if(!comment) {
 						window.showToast("Seleccione una plantilla o escriba el motivo de rechazo", "error");
@@ -530,6 +564,7 @@ import Layout from '../../layouts/Layout.astro';
 					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
 
 					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
+					const fullComment = `Trámite rechazado de forma definitiva: ${comment}`;
 					auditLogs.push({
 						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
 						folio: folio,
@@ -537,11 +572,14 @@ import Layout from '../../layouts/Layout.astro';
 						rol: role,
 						estado_anterior: prevStatus,
 						estado_nuevo: 'Rechazado',
-						comentario: `Trámite rechazado de forma definitiva: ${comment}`,
+						comentario: fullComment,
 						ip: "192.168.1.104",
 						timestamp: new Date().toLocaleString()
 					});
 					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
+
+					// Llamar al backend
+					await actualizarEstadoEnServidor('rechazado', fullComment);
 
 					window.showToast("Trámite rechazado definitivamente", "error");
 
@@ -604,13 +642,14 @@ import Layout from '../../layouts/Layout.astro';
 				});
 
 				// Approver dictaminate approval
-				document.getElementById('btn-dictaminate-approve').addEventListener('click', () => {
+				document.getElementById('btn-dictaminate-approve').addEventListener('click', async () => {
 					// Verify canvas is signed (simple check if pixels altered)
 					const prevStatus = req.status;
 					req.status = 'Aprobado';
 					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
 
 					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
+					const comment = "Trámite validado, firmado y aprobado con firma autógrafa digitalizada.";
 					auditLogs.push({
 						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
 						folio: folio,
@@ -618,11 +657,14 @@ import Layout from '../../layouts/Layout.astro';
 						rol: "Aprobador",
 						estado_anterior: prevStatus,
 						estado_nuevo: 'Aprobado',
-						comentario: "Trámite validado, firmado y aprobado con firma autógrafa digitalizada.",
+						comentario: comment,
 						ip: "192.168.1.104",
 						timestamp: new Date().toLocaleString()
 					});
 					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
+
+					// Llamar al backend
+					await actualizarEstadoEnServidor('aprobado', comment);
 
 					window.showToast("Trámite aprobado y firmado digitalmente", "success");
 

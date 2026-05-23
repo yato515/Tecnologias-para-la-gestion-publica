@@ -121,13 +121,22 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					}
 					const json = await res.json();
 					if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+						const mapEstado = {
+							'recibido': 'Recibido',
+							'en_revision': 'En revisión',
+							'documentacion_incompleta': 'Documentación incompleta',
+							'aprobado': 'Aprobado',
+							'rechazado': 'Rechazado'
+						};
 						cachedRequests = json.data.map(s => ({
+							id: s.id,
 							folio: s.folio || s.id,
 							name: s.tramite?.nombre || 'Trámite',
 							dept: s.dependencia?.nombre || '-',
 							date: (s.created_at || '').split('T')[0],
-							status: s.estado || 'recibido',
-							citizen_fullname: s.ciudadano?.nombre_completo || 'N/A'
+							status: mapEstado[s.estado] || s.estado || 'Recibido',
+							citizen_fullname: s.ciudadano?.nombre_completo || 'N/A',
+							citizen_email: s.ciudadano?.email || 'N/A'
 						}));
 						return cachedRequests;
 					}

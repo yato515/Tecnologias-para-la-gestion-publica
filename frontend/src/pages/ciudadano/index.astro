@@ -6,7 +6,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 <Layout title="Mi Portal Ciudadano">
 	
 	<!-- Top Welcome banner -->
-	<section class="bg-yuc-green text-white py-10 border-b border-yuc-gold/30">
+	<section class="bg-yuc-green-dark text-white py-10 border-b border-yuc-gold/30">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 			<div>
 				<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider font-display">GOBIERNO DEL ESTADO DE YUCATÁN</span>
@@ -89,7 +89,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					<input 
 						id="txt-search"
 						type="text" 
-						class="block w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
+						class="block w-full pl-10 pr-4 py-3 rounded-xl border border-slate-800 bg-slate-900 focus:ring-2 focus:ring-yuc-gold focus:border-yuc-gold text-sm text-white placeholder-slate-500"
 						placeholder="Buscar trámite por palabra clave (ej: residencia, henequén)..."
 					/>
 				</div>
@@ -98,96 +98,96 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				<div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					
 					<!-- Card 1: SSP (Licencias y Placas) -->
-					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="ssp licencias placas conducir vehiculo seguridad publica yucatan">
+					<div class="catalog-card bg-slate-900 border border-yuc-green/20 hover:border-yuc-gold/30 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between" data-title="ssp licencias placas conducir vehiculo seguridad publica yucatan">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase font-display">SEGURIDAD PÚBLICA (SSP)</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-green/15 text-yuc-gold font-bold text-[10px] uppercase font-display">SEGURIDAD PÚBLICA (SSP)</span>
 								<span class="text-xs text-slate-400 font-medium">Resolución: 1 día</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">Licencia de Conducir y Placas</h3>
-							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-white mt-3 font-display">Licencia de Conducir y Placas</h3>
+							<p class="text-xs text-slate-400 mt-2 leading-relaxed">
 								Trámite oficial para expedición, renovación y duplicado de licencias para conducir, así como alta, reemplacamiento e inspección de placas vehiculares en el Estado.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500">• Identificación oficial (INE) • Comprobante de domicilio reciente • Pago de derechos</p>
+								<h4 class="text-[10px] font-bold text-slate-300 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-400">• Identificación oficial (INE) • Comprobante de domicilio reciente • Pago de derechos</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green font-display">Costo: Variable</span>
-							<a href="/ciudadano/tramite?id=ssp" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+						<div class="pt-6 border-t border-slate-800 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-gold font-display">Costo: Variable</span>
+							<a href="/ciudadano/tramite?id=ssp" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all font-display shadow-md">
 								Iniciar Trámite
 							</a>
 						</div>
 					</div>
 
 					<!-- Card 2: SAT (Alta de RFC y Citas) -->
-					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="sat rfc fiscal contribuyente hacienda citas alta cedula">
+					<div class="catalog-card bg-slate-900 border border-yuc-green/20 hover:border-yuc-gold/30 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between" data-title="sat rfc fiscal contribuyente hacienda citas alta cedula">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-gold/10 text-yuc-gold-dark font-bold text-[10px] uppercase font-display">HACIENDA / SAT</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-gold/15 text-yuc-gold font-bold text-[10px] uppercase font-display">HACIENDA / SAT</span>
 								<span class="text-xs text-slate-400 font-medium">Resolución: Redirección</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">Inscripción en el RFC (SAT)</h3>
-							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-white mt-3 font-display">Inscripción en el RFC (SAT)</h3>
+							<p class="text-xs text-slate-400 mt-2 leading-relaxed">
 								Alta y obtención de la Cédula de Identificación Fiscal. Requiere validación de homoclave ante el SAT para la facturación y trámites estatales de fomento.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500">• CURP oficial • Cuenta de correo • e.firma vigente</p>
+								<h4 class="text-[10px] font-bold text-slate-300 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-400">• CURP oficial • Cuenta de correo • e.firma vigente</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green font-display">Costo: Gratuito</span>
-							<button id="btn-sat-tramite" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+						<div class="pt-6 border-t border-slate-800 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-gold font-display">Costo: Gratuito</span>
+							<button id="btn-sat-tramite" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all font-display shadow-md">
 								Iniciar Trámite
 							</button>
 						</div>
 					</div>
 
 					<!-- Card 3: Pasaportes (SRE) -->
-					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="sre pasaporte mexicano cita relaciones exteriores viaje internacional">
+					<div class="catalog-card bg-slate-900 border border-yuc-green/20 hover:border-yuc-gold/30 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between" data-title="sre pasaporte mexicano cita relaciones exteriores viaje internacional">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase font-display">RELACIONES EXTERIORES (SRE)</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-green/15 text-yuc-gold font-bold text-[10px] uppercase font-display">RELACIONES EXTERIORES (SRE)</span>
 								<span class="text-xs text-slate-400 font-medium">Resolución: 1 día (Cita)</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">Trámite de Pasaporte Mexicano</h3>
-							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-white mt-3 font-display">Trámite de Pasaporte Mexicano</h3>
+							<p class="text-xs text-slate-400 mt-2 leading-relaxed">
 								Pre-cotejo de requisitos y solicitud de cita oficial para la emisión de pasaporte por primera vez o renovación en las delegaciones de Yucatán.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500">• Acta de nacimiento certificada • INE vigente • Pago de derechos</p>
+								<h4 class="text-[10px] font-bold text-slate-300 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-400">• Acta de nacimiento certificada • INE vigente • Pago de derechos</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green font-display">Costo: Estatal + Federal</span>
-							<a href="/ciudadano/tramite?id=pasaporte" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+						<div class="pt-6 border-t border-slate-800 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-gold font-display">Costo: Estatal + Federal</span>
+							<a href="/ciudadano/tramite?id=pasaporte" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all font-display shadow-md">
 								Iniciar Trámite
 							</a>
 						</div>
 					</div>
 
 					<!-- Card 4: INE / Registro Civil (CURP y Actas) -->
-					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="ine registro civil curp actas nacimiento defuncion matrimonio yucatan copias">
+					<div class="catalog-card bg-slate-900 border border-yuc-green/20 hover:border-yuc-gold/30 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between" data-title="ine registro civil curp actas nacimiento defuncion matrimonio yucatan copias">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase font-display">REGISTRO CIVIL / INE</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-green/15 text-yuc-gold font-bold text-[10px] uppercase font-display">REGISTRO CIVIL / INE</span>
 								<span class="text-xs text-slate-400 font-medium">Resolución: Inmediato</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">CURP y Actas Certificadas</h3>
-							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-white mt-3 font-display">CURP y Actas Certificadas</h3>
+							<p class="text-xs text-slate-400 mt-2 leading-relaxed">
 								Búsqueda y expedición oficial de la clave CURP y copias certificadas del acta de nacimiento, matrimonio o actas registrales del estado civil de las personas.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500">• CURP o datos registrales completos • Pago por copia</p>
+								<h4 class="text-[10px] font-bold text-slate-300 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-400">• CURP o datos registrales completos • Pago por copia</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green font-display">Costo: Gratuito / Variable</span>
-							<a href="/ciudadano/tramite?id=ine" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+						<div class="pt-6 border-t border-slate-800 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-gold font-display">Costo: Gratuito / Variable</span>
+							<a href="/ciudadano/tramite?id=ine" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all font-display shadow-md">
 								Iniciar Trámite
 							</a>
 						</div>
@@ -198,55 +198,51 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				<!-- No results message -->
 				<div id="no-results-msg" class="hidden text-center py-12 bg-white border border-slate-200 rounded-xl space-y-3">
 					<p class="text-slate-500 text-sm">No se encontraron trámites con esos términos.</p>
-					<button id="btn-clear-search" class="text-xs font-bold text-yuc-green hover:underline font-display">Limpiar búsqueda</button>
-				</div>
-			</div>
-
-			<!-- SAT RFC Warning Modal -->
+					<button id="btn-clear-search" class="text-xs font-bold text-yuc-green hover:underline 			<!-- SAT RFC Warning Modal -->
 			<div id="sat-rfc-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
 				<!-- Backdrop -->
-				<div class="absolute inset-0 bg-slate-950/40" id="sat-modal-close-bg"></div>
+				<div class="absolute inset-0 bg-slate-950/70" id="sat-modal-close-bg"></div>
 				<!-- Card content -->
-				<div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-lg relative z-10 space-y-6">
-					<div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+				<div class="bg-slate-900 border border-yuc-gold/30 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl relative z-10 space-y-6 text-white">
+					<div class="w-12 h-12 rounded-xl bg-yuc-gold/20 text-yuc-gold flex items-center justify-center">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
 						</svg>
 					</div>
 					
 					<div class="space-y-2">
-						<h3 class="text-xl font-bold text-slate-800 font-display">Requisito Fiscal: RFC Faltante</h3>
-						<p class="text-sm text-slate-505 leading-relaxed">
+						<h3 class="text-xl font-bold text-white font-display">Requisito Fiscal: RFC Faltante</h3>
+						<p class="text-sm text-slate-300 leading-relaxed">
 							Para realizar trámites relacionados con el SAT en CivicFlow, es obligatorio tener registrado su RFC con Homoclave. El sistema detecta que su perfil no cuenta con esta clave.
 						</p>
 					</div>
 
 					<!-- Simulate configuration option -->
-					<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
-						<label for="sat-rfc-input" class="block text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Configurar RFC en este dispositivo (Demo)</label>
+					<div class="p-4 bg-slate-955 rounded-xl border border-slate-800 space-y-2.5">
+						<label for="sat-rfc-input" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider font-display">Configurar RFC en este dispositivo (Demo)</label>
 						<div class="flex gap-2">
 							<input 
 								type="text" 
 								id="sat-rfc-input" 
 								maxlength="13" 
-								class="block w-full px-3 py-2 rounded-lg border border-slate-250 bg-white text-xs font-mono uppercase" 
+								class="block w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-800 text-xs text-white font-mono uppercase focus:ring-yuc-gold focus:border-yuc-gold" 
 								placeholder="XAXX010101000" 
 							/>
 							<button 
 								type="button" 
 								id="btn-save-rfc" 
-								class="px-3.5 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors border border-yuc-green-light shrink-0 font-display"
+								class="px-3.5 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/25 transition-colors shrink-0 font-display shadow-md"
 							>
 								Guardar
 							</button>
 						</div>
 					</div>
 
-					<div class="flex flex-col sm:flex-row gap-3 sm:justify-end text-xs font-bold pt-2 border-t border-slate-100">
+					<div class="flex flex-col sm:flex-row gap-3 sm:justify-end text-xs font-bold pt-2 border-t border-slate-800">
 						<button 
 							type="button" 
 							id="btn-close-sat-modal" 
-							class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-250/50 transition-colors font-display"
+							class="px-4 py-2.5 bg-slate-800 hover:bg-slate-750 text-white rounded-lg border border-slate-700 transition-colors font-display"
 						>
 							Cancelar
 						</button>
@@ -255,7 +251,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							target="_blank" 
 							rel="noopener noreferrer" 
 							id="btn-go-to-sat"
-							class="px-4 py-2.5 bg-yuc-gold hover:bg-yuc-gold-light text-white rounded-lg text-center transition-colors shadow-sm font-display"
+							class="px-4 py-2.5 bg-yuc-gold hover:bg-yuc-gold-light text-slate-950 rounded-lg text-center transition-colors shadow-lg font-display"
 						>
 							Entendido, ir al SAT
 						</a>
@@ -266,14 +262,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			<!-- TAB 2: INBOX (MY REQUESTS) -->
 			<div id="tab-content-inbox" class="hidden space-y-6">
 				
-				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-					<div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+				<div class="bg-slate-900 border border-yuc-gold/20 rounded-xl overflow-hidden shadow-2xl">
+					<div class="p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 						<div>
-							<h3 class="text-lg font-bold text-slate-800 font-display">Historial de Trámites Solicitados</h3>
+							<h3 class="text-lg font-bold text-white font-display">Historial de Trámites Solicitados</h3>
 							<p class="text-xs text-slate-400 mt-1">Lista completa de trámites asociados a su cuenta y su estado actual en tiempo real.</p>
 						</div>
 						<div>
-							<button id="btn-refresh-inbox" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-200/50 font-display">
+							<button id="btn-refresh-inbox" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-750 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700 font-display shadow-md">
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
 								<span>Actualizar</span>
 							</button>
@@ -283,7 +279,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					<div class="overflow-x-auto">
 						<table class="w-full text-left border-collapse">
 							<thead>
-								<tr class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b border-slate-200 font-display">
+								<tr class="bg-slate-950 text-slate-300 text-[10px] font-bold uppercase tracking-wider border-b border-slate-800 font-display">
 									<th class="px-6 py-4">Folio de Seguimiento</th>
 									<th class="px-6 py-4">Trámite</th>
 									<th class="px-6 py-4">Dependencia</th>
@@ -292,7 +288,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 									<th class="px-6 py-4 text-right">Acciones</th>
 								</tr>
 							</thead>
-							<tbody id="inbox-tbody" class="divide-y divide-slate-200/60 text-sm text-slate-700">
+							<tbody id="inbox-tbody" class="divide-y divide-slate-800/60 text-sm text-slate-300">
 								<!-- Rendered dynamically from JS -->
 							</tbody>
 						</table>
@@ -300,10 +296,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 					<!-- Empty tray message -->
 					<div id="inbox-empty-msg" class="hidden text-center py-16 space-y-3">
-						<div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+						<div class="w-12 h-12 rounded-full bg-slate-950 text-slate-500 flex items-center justify-center mx-auto border border-slate-800">
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path></svg>
 						</div>
-						<p class="text-slate-500 text-xs">No tiene trámites registrados aún en su historial.</p>
+						<p class="text-slate-400 text-xs">No tiene trámites registrados aún en su historial.</p>
 					</div>
 
 				</div>
@@ -314,24 +310,24 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			<div id="tab-content-folder" class="hidden space-y-6">
 				
 				<!-- Overview Banner -->
-				<div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+				<div class="bg-slate-900 border border-yuc-gold/20 rounded-xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-white">
 					<div class="space-y-2 flex-grow">
-						<h3 class="text-lg font-bold text-slate-800 font-display">Expediente Digital Único del Ciudadano</h3>
-						<p class="text-xs text-slate-500">
+						<h3 class="text-lg font-bold text-white font-display">Expediente Digital Único del Ciudadano</h3>
+						<p class="text-xs text-slate-300">
 							Suba sus documentos una sola vez. Se vincularán automáticamente al iniciar cualquier trámite del Gobierno del Estado de Yucatán sin necesidad de volver a cargarlos.
 						</p>
 						<!-- Progress Dossier -->
 						<div class="space-y-1.5 pt-2 max-w-sm">
-							<div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase font-display">
+							<div class="flex justify-between text-[10px] font-bold text-slate-450 uppercase font-display">
 								<span>PROGRESO DEL EXPEDIENTE</span>
 								<span id="lbl-dossier-progress">75%</span>
 							</div>
-							<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+							<div class="w-full h-2 bg-slate-955 rounded-full overflow-hidden">
 								<div id="bar-dossier-progress" class="h-full bg-yuc-green transition-all duration-500" style="width: 75%;"></div>
 							</div>
 						</div>
 					</div>
-					<button id="btn-download-dossier-zip" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700 shrink-0 shadow-sm font-display">
+					<button id="btn-download-dossier-zip" class="px-5 py-3 bg-yuc-gold hover:bg-yuc-gold-light text-slate-950 text-xs font-black rounded-lg transition-colors flex items-center gap-1.5 border border-yuc-gold shrink-0 shadow-lg font-display">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
 						<span>Descargar Expediente Completo (ZIP)</span>
 					</button>
@@ -339,6 +335,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 				<!-- Grid list of core documents -->
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="dossier-grid">
+					<!-- Injected dynamically from JS -->
+				</div>
+
+			</div>er-grid">
 					<!-- Injected dynamically from JS -->
 				</div>
 
@@ -398,8 +398,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			const activateTab = (tab) => {
 				// Reset tabs classes
-				const activeClass = "pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green focus:outline-none flex items-center gap-2";
-				const inactiveClass = "pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-850 focus:outline-none flex items-center gap-2 relative";
+				const activeClass = "pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-gold text-yuc-gold focus:outline-none flex items-center gap-2";
+				const inactiveClass = "pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white focus:outline-none flex items-center gap-2 relative";
 				
 				tabCatalog.className = inactiveClass;
 				tabInbox.className = inactiveClass;
@@ -452,20 +452,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					const grid = document.getElementById('catalog-grid');
 					json.data.forEach(t => {
 						const card = document.createElement('div');
-						card.className = "catalog-card bg-white dark:bg-slate-900 border border-yuc-green/30 dark:border-yuc-green/20 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between";
+						card.className = "catalog-card bg-slate-900 border border-yuc-green/20 hover:border-yuc-gold/30 rounded-xl p-6 shadow-md hover:shadow-lg transition-all flex flex-col justify-between";
 						card.setAttribute('data-title', (t.nombre || '').toLowerCase());
 						card.innerHTML = `
 							<div>
 								<div class="flex justify-between items-start gap-4">
-									<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green dark:text-yuc-green-light font-bold text-[10px] uppercase">${t.dependencia?.nombre || 'Dependencia'}</span>
+									<span class="px-2 py-0.5 rounded bg-yuc-green/15 text-yuc-gold font-bold text-[10px] uppercase">${t.dependencia?.nombre || 'Dependencia'}</span>
 									<span class="text-xs text-slate-400 font-medium">Resolución: ${t.plazo_dias_habiles ? t.plazo_dias_habiles + ' días' : 'Variable'}</span>
 								</div>
-								<h3 class="text-lg font-bold text-slate-800 dark:text-white mt-3 font-display">${t.nombre}</h3>
-								<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">${t.descripcion || ''}</p>
+								<h3 class="text-lg font-bold text-white mt-3 font-display">${t.nombre}</h3>
+								<p class="text-xs text-slate-400 mt-2 leading-relaxed">${t.descripcion || ''}</p>
 							</div>
-							<div class="pt-6 border-t border-slate-100 dark:border-slate-850 mt-6 flex justify-between items-center">
-								<span class="text-xs font-bold text-yuc-green dark:text-yuc-green-light">Costo: ${t.costo_referencia || 'Consultar'}</span>
-								<a href="/ciudadano/tramite?id=${t.id}" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors">Iniciar Trámite</a>
+							<div class="pt-6 border-t border-slate-800 mt-6 flex justify-between items-center">
+								<span class="text-xs font-bold text-yuc-gold">Costo: ${t.costo_referencia || 'Consultar'}</span>
+								<a href="/ciudadano/tramite?id=${t.id}" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all shadow-md">Iniciar Trámite</a>
 							</div>
 						`;
 						grid.prepend(card);
@@ -550,13 +550,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					if (isLoaded) loadedCount++;
 
 					const card = document.createElement('div');
-					card.className = "bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between h-44 shadow-sm";
+					card.className = "bg-slate-900 border border-yuc-gold/20 rounded-xl p-5 flex flex-col justify-between h-44 shadow-md";
 					
 					let statusBadge = `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold text-[9px] uppercase tracking-wide font-display">Pendiente</span>`;
 					let actionButtons = `
-						<div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 hover:border-yuc-green rounded-lg p-4 cursor-pointer text-center h-16 w-full">
+						<div class="relative flex items-center justify-center border-2 border-dashed border-slate-700 hover:border-yuc-gold rounded-lg p-4 cursor-pointer text-center h-16 w-full">
 							<input type="file" id="upload-${doc.id}" class="absolute inset-0 opacity-0 cursor-pointer" />
-							<span class="text-xs font-bold text-slate-500 font-display">Subir Archivo</span>
+							<span class="text-xs font-bold text-slate-400 font-display">Subir Archivo</span>
 						</div>
 					`;
 
@@ -566,11 +566,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							<div class="flex justify-between items-center gap-3 w-full">
 								<div class="text-left">
 									<p class="text-[10px] text-slate-400 font-mono truncate max-w-[150px]" title="${doc.file}">${doc.file}</p>
-									<p class="text-[9px] text-slate-400">Fecha: ${doc.date}</p>
+									<p class="text-[9px] text-slate-550">Fecha: ${doc.date}</p>
 								</div>
 								<div class="flex gap-2">
-									<button id="btn-dl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded font-display">Descargar</button>
-									<button id="btn-repl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded font-display">Reemplazar</button>
+									<button id="btn-dl-${doc.id}" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold rounded border border-slate-700 font-display">Descargar</button>
+									<button id="btn-repl-${doc.id}" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-[10px] font-bold rounded border border-slate-700 font-display">Reemplazar</button>
 								</div>
 							</div>
 						`;
@@ -578,10 +578,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 					card.innerHTML = `
 						<div class="flex justify-between items-start gap-4">
-							<h4 class="font-bold text-xs text-slate-800 font-display">${doc.name}</h4>
+							<h4 class="font-bold text-xs text-white font-display">${doc.name}</h4>
 							${statusBadge}
 						</div>
-						<div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-center w-full">
+						<div class="pt-4 border-t border-slate-800 mt-4 flex items-center justify-center w-full">
 							${actionButtons}
 						</div>
 					`;
@@ -776,19 +776,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					else if (req.status === 'Recibido') badgeClass = 'bg-blue-500/10 text-blue-500 border border-blue-500/20';
 
 					const tr = document.createElement('tr');
-					tr.className = "hover:bg-slate-50/50 transition-colors";
+					tr.className = "hover:bg-slate-800/40 border-b border-slate-850/50 transition-colors";
 					tr.innerHTML = `
-						<td class="px-6 py-4 font-mono font-bold text-slate-800">${req.folio}</td>
-						<td class="px-6 py-4 font-semibold">${req.name}</td>
+						<td class="px-6 py-4 font-mono font-bold text-white">${req.folio}</td>
+						<td class="px-6 py-4 font-semibold text-slate-200">${req.name}</td>
 						<td class="px-6 py-4 text-xs text-slate-400">${req.dept}</td>
-						<td class="px-6 py-4 text-xs">${req.date}</td>
+						<td class="px-6 py-4 text-xs text-slate-400">${req.date}</td>
 						<td class="px-6 py-4">
 							<span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
 								${req.status}
 							</span>
 						</td>
 						<td class="px-6 py-4 text-right">
-							<a href="/ciudadano/tracker?folio=${req.folio}" class="px-3.5 py-1.5 bg-slate-100 hover:bg-yuc-green hover:text-white text-slate-700 text-xs font-extrabold rounded-lg transition-all inline-flex items-center gap-1 font-display">
+							<a href="/ciudadano/tracker?folio=${req.folio}" class="px-3.5 py-1.5 bg-slate-800 hover:bg-yuc-green hover:text-white text-slate-200 border border-slate-750 text-xs font-extrabold rounded-lg transition-all inline-flex items-center gap-1 font-display">
 								<span>Rastrear</span>
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
