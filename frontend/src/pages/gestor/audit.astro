@@ -1,0 +1,171 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Logs de Auditoría">
+	
+	<!-- Manager Sub-navigation header -->
+	<div class="bg-slate-900 text-white transition-colors border-b border-slate-800">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 gap-4">
+				<div>
+					<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
+					<h1 class="text-2xl font-black font-display mt-1">Bitácora de Seguridad y Auditoría</h1>
+					<p class="text-xs text-slate-400 mt-1">Historial inalterable de transiciones de estados y accesos del sistema.</p>
+				</div>
+			</div>
+
+			<!-- Submenu -->
+			<div class="flex gap-6 text-sm border-t border-slate-800/60 pt-1">
+				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Dashboard</a>
+				<a href="/gestor/cola" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Cola de Solicitudes</a>
+				<a href="/gestor/audit" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all">Logs de Auditoría</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Workspace -->
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+		
+		<div id="gestor-audit-content" class="space-y-6">
+			
+			<!-- Audit Table -->
+			<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+				<div class="p-6 border-b border-slate-100 dark:border-slate-850 flex justify-between items-center">
+					<div>
+						<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display">Historial de Operaciones del Sistema</h3>
+						<p class="text-xs text-slate-400 mt-1">Lista en tiempo real filtrada para cumplimiento normativo OCDE.</p>
+					</div>
+					<button id="btn-clear-logs" class="text-xs font-bold text-red-500 hover:underline">Reiniciar Bitácora</button>
+				</div>
+
+				<div class="overflow-x-auto">
+					<table class="w-full text-left border-collapse">
+						<thead>
+							<tr class="bg-slate-50 dark:bg-slate-950/40 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+								<th class="px-6 py-4">Fecha y Hora</th>
+								<th class="px-6 py-4">Folio Solicitud</th>
+								<th class="px-6 py-4">Usuario</th>
+								<th class="px-6 py-4">Rol</th>
+								<th class="px-6 py-4">Transición Estado</th>
+								<th class="px-6 py-4">IP Origen</th>
+								<th class="px-6 py-4">Comentarios</th>
+							</tr>
+						</thead>
+						<tbody id="audit-tbody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs text-slate-700 dark:text-slate-350">
+							<!-- Rendered dynamically from JS -->
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Empty State -->
+				<div id="audit-empty-msg" class="hidden text-center py-16 text-slate-400">
+					No existen registros de auditoría almacenados.
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script is:inline>
+		// Protect page access
+		const gestorLogged = localStorage.getItem('gestor_logged');
+		if (gestorLogged !== 'true') {
+			window.location.href = '/gestor';
+		} else {
+			
+			const defaultLogs = [
+				{
+					id: "LOG-001",
+					folio: "TRM-2026-00104",
+					user_id: "ciudadano_pech@gmail.com",
+					rol: "Ciudadano",
+					estado_anterior: "-",
+					estado_nuevo: "Recibido",
+					ip: "189.145.48.2",
+					timestamp: "2026-04-12 11:22:05",
+					comentario: "Solicitud de Acreditación Henequenera ingresada vía web."
+				},
+				{
+					id: "LOG-002",
+					folio: "TRM-2026-00104",
+					user_id: "revisor_rural@yucatan.gob.mx",
+					rol: "Revisor",
+					estado_anterior: "Recibido",
+					estado_nuevo: "En revisión",
+					ip: "192.168.1.15",
+					timestamp: "2026-04-13 09:15:30",
+					comentario: "Cotejo de escrituras parcelarias correcto."
+				},
+				{
+					id: "LOG-003",
+					folio: "TRM-2026-00104",
+					user_id: "director_rural@yucatan.gob.mx",
+					rol: "Aprobador",
+					estado_anterior: "En revisión",
+					estado_nuevo: "Aprobado",
+					ip: "192.168.1.8",
+					timestamp: "2026-04-14 14:02:11",
+					comentario: "Expediente aprobado y firmado digitalmente. Certificado oficial generado."
+				}
+			];
+
+			const getLogs = () => {
+				const local = localStorage.getItem('civicflow_audit_logs');
+				if (!local) {
+					localStorage.setItem('civicflow_audit_logs', JSON.stringify(defaultLogs));
+					return defaultLogs;
+				}
+				return JSON.parse(local);
+			};
+
+			const renderLogs = () => {
+				const tbody = document.getElementById('audit-tbody');
+				const emptyMsg = document.getElementById('audit-empty-msg');
+				const logs = getLogs();
+
+				tbody.innerHTML = '';
+
+				if (logs.length === 0) {
+					emptyMsg.classList.remove('hidden');
+					return;
+				}
+
+				emptyMsg.classList.add('hidden');
+
+				// Render newest first
+				logs.reverse().forEach(log => {
+					let transStr = `<span class="font-semibold">${log.estado_anterior}</span> → <span class="font-bold text-yuc-green dark:text-yuc-green-light">${log.estado_nuevo}</span>`;
+					if (log.estado_nuevo === 'Documentación incompleta') transStr = `<span class="font-semibold">${log.estado_anterior}</span> → <span class="font-bold text-orange-500">${log.estado_nuevo}</span>`;
+					else if (log.estado_nuevo === 'Aprobado') transStr = `<span class="font-semibold">${log.estado_anterior}</span> → <span class="font-bold text-emerald-500">${log.estado_nuevo}</span>`;
+					else if (log.estado_nuevo === 'Rechazado') transStr = `<span class="font-semibold">${log.estado_anterior}</span> → <span class="font-bold text-red-500">${log.estado_nuevo}</span>`;
+
+					const tr = document.createElement('tr');
+					tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-850/30 transition-colors";
+					tr.innerHTML = `
+						<td class="px-6 py-4 font-mono">${log.timestamp}</td>
+						<td class="px-6 py-4 font-mono font-bold text-slate-800 dark:text-white">${log.folio}</td>
+						<td class="px-6 py-4 font-semibold">${log.user_id}</td>
+						<td class="px-6 py-4 font-medium">${log.rol}</td>
+						<td class="px-6 py-4 text-xs">${transStr}</td>
+						<td class="px-6 py-4 font-mono">${log.ip}</td>
+						<td class="px-6 py-4 max-w-xs truncate" title="${log.comentario}">${log.comentario}</td>
+					`;
+					tbody.appendChild(tr);
+				});
+			};
+
+			renderLogs();
+
+			// Clear logs
+			document.getElementById('btn-clear-logs').addEventListener('click', () => {
+				if(confirm("¿Está seguro de reiniciar los logs de auditoría? Se restablecerán los predefinidos.")) {
+					localStorage.removeItem('civicflow_audit_logs');
+					renderLogs();
+					window.showToast("Bitácora restablecida", "warning");
+				}
+			});
+		}
+	</script>
+</Layout>

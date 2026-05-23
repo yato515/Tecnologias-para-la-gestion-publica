@@ -1,0 +1,229 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Cola de Solicitudes">
+	
+	<!-- Manager Sub-navigation header -->
+	<div class="bg-slate-900 text-white transition-colors border-b border-slate-800">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 gap-4">
+				<div>
+					<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
+					<h1 class="text-2xl font-black font-display mt-1">Bandeja de Solicitudes Recibidas</h1>
+					<p class="text-xs text-slate-400 mt-1">Gestión operativa de la cola de expedientes digitales.</p>
+				</div>
+				<div>
+					<button id="btn-export-csv" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"></path></svg>
+						<span>Exportar a Excel (CSV)</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Submenu -->
+			<div class="flex gap-6 text-sm border-t border-slate-800/60 pt-1">
+				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Dashboard</a>
+				<a href="/gestor/cola" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all">Cola de Solicitudes</a>
+				<a href="/gestor/audit" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Logs de Auditoría</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Workspace -->
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+		
+		<div id="gestor-cola-content" class="space-y-6">
+			
+			<!-- Filter Bar -->
+			<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm flex flex-wrap gap-4 items-center">
+				<div class="space-y-1">
+					<label class="block text-[10px] font-bold text-slate-500 uppercase">Filtrar por Estado</label>
+					<select id="filter-status" class="px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:ring-2 focus:ring-yuc-green focus:outline-none">
+						<option value="todos">Todos los estados</option>
+						<option value="Recibido">Recibido</option>
+						<option value="En revisión">En revisión</option>
+						<option value="Documentación incompleta">Documentación incompleta</option>
+						<option value="Aprobado">Aprobado</option>
+						<option value="Rechazado">Rechazado</option>
+					</select>
+				</div>
+
+				<div class="space-y-1">
+					<label class="block text-[10px] font-bold text-slate-500 uppercase">Filtrar por Trámite</label>
+					<select id="filter-name" class="px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:ring-2 focus:ring-yuc-green focus:outline-none">
+						<option value="todos">Todos los trámites</option>
+						<option value="Residencia">Constancia de Residencia</option>
+						<option value="Funcionamiento">Licencia de Funcionamiento</option>
+						<option value="Henequenero">Productor Henequenero</option>
+						<option value="Suelo">Permiso Uso Suelo</option>
+					</select>
+				</div>
+			</div>
+
+			<!-- Table Queue -->
+			<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+				<div class="overflow-x-auto">
+					<table class="w-full text-left border-collapse">
+						<thead>
+							<tr class="bg-slate-50 dark:bg-slate-950/40 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+								<th class="px-6 py-4">Folio</th>
+								<th class="px-6 py-4">Trámite</th>
+								<th class="px-6 py-4">Ciudadano</th>
+								<th class="px-6 py-4">Fecha Solicitud</th>
+								<th class="px-6 py-4">Días Transcurridos</th>
+								<th class="px-6 py-4">Estado</th>
+								<th class="px-6 py-4 text-right">Acción</th>
+							</tr>
+						</thead>
+						<tbody id="cola-tbody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-sm text-slate-700 dark:text-slate-350">
+							<!-- Rendered dynamically from JS -->
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Empty Queue message -->
+				<div id="cola-empty-msg" class="hidden text-center py-16 space-y-3">
+					<p class="text-slate-500 dark:text-slate-400 text-xs">No existen solicitudes que coincidan con los filtros aplicados.</p>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script is:inline>
+		// Protect page access
+		const gestorLogged = localStorage.getItem('gestor_logged');
+		if (gestorLogged !== 'true') {
+			window.location.href = '/gestor';
+		} else {
+			
+			const defaultRequests = [
+				{ folio: "TRM-2026-00104", name: "Acreditación de Productor Henequenero", dept: "Desarrollo Rural", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech" },
+				{ folio: "TRM-2026-00201", name: "Constancia de Residencia", dept: "Catastro y Registro del Estado de Yucatán", date: "2026-05-18", status: "Recibido", citizen_fullname: "Eduardo Chan" },
+				{ folio: "TRM-2026-00202", name: "Licencia de Funcionamiento Comercial", dept: "Dirección de Fomento Económico del Estado", date: "2026-05-15", status: "En revisión", citizen_fullname: "Marisela Puc" }
+			];
+
+			const getRequests = () => {
+				const local = localStorage.getItem('civicflow_requests');
+				if (!local) {
+					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
+					return defaultRequests;
+				}
+				return JSON.parse(local);
+			};
+
+			const renderQueue = () => {
+				const tbody = document.getElementById('cola-tbody');
+				const emptyMsg = document.getElementById('cola-empty-msg');
+				const requests = getRequests();
+
+				const statusFilter = document.getElementById('filter-status').value;
+				const nameFilter = document.getElementById('filter-name').value;
+
+				tbody.innerHTML = '';
+				let count = 0;
+
+				// system reference current date
+				const currentDate = new Date('2026-05-22');
+
+				requests.reverse().forEach(r => {
+					// Apply filters
+					const matchStatus = statusFilter === 'todos' || r.status === statusFilter;
+					let matchName = nameFilter === 'todos';
+					if (nameFilter === 'Residencia' && r.name.includes('Residencia')) matchName = true;
+					if (nameFilter === 'Funcionamiento' && r.name.includes('Funcionamiento')) matchName = true;
+					if (nameFilter === 'Henequenero' && r.name.includes('Henequenero')) matchName = true;
+					if (nameFilter === 'Suelo' && r.name.includes('Suelo')) matchName = true;
+
+					if (matchStatus && matchName) {
+						count++;
+						
+						// Calculate backlog days
+						const reqDate = new Date(r.date);
+						const diffTime = Math.abs(currentDate - reqDate);
+						const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+						let daysText = `${diffDays} días`;
+						let daysClass = 'text-slate-600 dark:text-slate-400';
+						
+						if (r.status === 'Recibido' || r.status === 'En revisión') {
+							if (diffDays >= 3) {
+								daysClass = 'text-red-500 font-bold';
+								daysText = `⚠️ ${diffDays} días`;
+							}
+						} else {
+							daysClass = 'text-slate-400 dark:text-slate-500';
+							daysText = `${diffDays} días (Cerrado)`;
+						}
+
+						let badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+						if (r.status === 'En revisión') badgeClass = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
+						else if (r.status === 'Aprobado') badgeClass = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+						else if (r.status === 'Documentación incompleta') badgeClass = 'bg-orange-500/10 text-orange-500 border border-orange-500/20';
+						else if (r.status === 'Rechazado') badgeClass = 'bg-red-500/10 text-red-500 border border-red-500/20';
+						else if (r.status === 'Recibido') badgeClass = 'bg-blue-500/10 text-blue-500 border border-blue-500/20';
+
+						const tr = document.createElement('tr');
+						tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-850/30 transition-colors";
+						tr.innerHTML = `
+							<td class="px-6 py-4 font-mono font-bold text-slate-850 dark:text-slate-200">${r.folio}</td>
+							<td class="px-6 py-4 font-semibold">${r.name}</td>
+							<td class="px-6 py-4 text-xs font-semibold">${r.citizen_fullname || 'N/A'}</td>
+							<td class="px-6 py-4 text-xs">${r.date}</td>
+							<td class="px-6 py-4 text-xs ${daysClass}">${daysText}</td>
+							<td class="px-6 py-4">
+								<span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
+									${r.status}
+								</span>
+							</td>
+							<td class="px-6 py-4 text-right">
+								<a href="/gestor/solicitud?id=${r.folio}" class="px-3.5 py-1.5 bg-slate-800 hover:bg-yuc-green hover:text-white dark:bg-slate-800 dark:hover:bg-yuc-green text-white text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1">
+									<span>Atender</span>
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+									</svg>
+								</a>
+							</td>
+						`;
+						tbody.appendChild(tr);
+					}
+				});
+
+				if (count === 0) {
+					emptyMsg.classList.remove('hidden');
+				} else {
+					emptyMsg.classList.add('hidden');
+				}
+			};
+
+			document.getElementById('filter-status').addEventListener('change', renderQueue);
+			document.getElementById('filter-name').addEventListener('change', renderQueue);
+			
+			// Initial load
+			renderQueue();
+
+			// Export to CSV
+			document.getElementById('btn-export-csv').addEventListener('click', () => {
+				const requests = getRequests();
+				
+				let csvContent = "data:text/csv;charset=utf-8,";
+				csvContent += "Folio,Tramite,Dependencia,Fecha,Ciudadano,Estado\n";
+
+				requests.forEach(r => {
+					csvContent += `"${r.folio}","${r.name}","${r.dept}","${r.date}","${r.citizen_fullname || 'N/A'}","${r.status}"\n`;
+				});
+
+				const encodedUri = encodeURI(csvContent);
+				const link = document.createElement("a");
+				link.setAttribute("href", encodedUri);
+				link.setAttribute("download", "reporte_solicitudes_yucatan.csv");
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				window.showToast("Bandeja exportada exitosamente como CSV", "success");
+			});
+		}
+	</script>
+</Layout>

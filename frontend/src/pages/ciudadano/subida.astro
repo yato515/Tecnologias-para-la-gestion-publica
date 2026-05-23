@@ -1,0 +1,349 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Subida de Documentación Digital - Portal Ciudadano">
+	
+	<!-- Top Banner -->
+	<section class="bg-yuc-green text-white py-8 transition-colors border-b border-yuc-gold/30">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+			<div>
+				<a href="/ciudadano" class="text-xs font-bold text-yuc-gold hover:underline flex items-center gap-1.5">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+					</svg>
+					<span>Cancelar y Volver al Catálogo</span>
+				</a>
+				<h1 id="lbl-upload-title" class="text-2xl sm:text-3xl font-black font-display mt-2">Requisitos de Trámite</h1>
+				<p id="lbl-upload-dept" class="text-slate-200 text-xs mt-1">Cargue los documentos digitales requeridos para completar su solicitud.</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+		
+		<!-- Onboarding Steps Header -->
+		<div class="flex items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-800 mb-8 text-xs font-bold text-slate-400">
+			<div class="flex items-center gap-2 text-yuc-green dark:text-yuc-green-light">
+				<span class="w-6 h-6 rounded-full border-2 border-yuc-green dark:border-yuc-green-light flex items-center justify-center font-bold text-xs bg-yuc-green/10">1</span>
+				<span>Registro</span>
+			</div>
+			<div class="h-[2px] flex-grow bg-yuc-green/30 mx-4"></div>
+			<div class="flex items-center gap-2 text-yuc-green dark:text-yuc-green-light">
+				<span class="w-6 h-6 rounded-full border-2 border-yuc-green dark:border-yuc-green-light flex items-center justify-center font-bold text-xs bg-yuc-green/10">2</span>
+				<span>Catálogo</span>
+			</div>
+			<div class="h-[2px] flex-grow bg-yuc-green/30 mx-4"></div>
+			<div class="flex items-center gap-2 text-yuc-green dark:text-yuc-green-light">
+				<span class="w-6 h-6 rounded-full border-2 border-yuc-green dark:border-yuc-green-light flex items-center justify-center font-bold text-xs bg-yuc-green/10">3</span>
+				<span>Requisitos</span>
+			</div>
+			<div class="h-[2px] flex-grow bg-slate-200 dark:bg-slate-800 mx-4"></div>
+			<div class="flex items-center gap-2">
+				<span class="w-6 h-6 rounded-full border-2 border-slate-350 flex items-center justify-center font-bold text-xs">4</span>
+				<span>Comprobante</span>
+			</div>
+		</div>
+
+		<!-- Main Card -->
+		<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8 space-y-6">
+			
+			<div>
+				<h2 class="text-xl font-bold text-slate-850 dark:text-white font-display">Expediente de Trámite Digital</h2>
+				<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+					Arrastre o seleccione los archivos correspondientes a cada apartado. Los formatos admitidos son PDF, PNG y JPG con tamaño máximo de 5MB por archivo.
+				</p>
+			</div>
+
+			<!-- Document Slots Container -->
+			<div id="document-slots" class="space-y-6">
+				<!-- Rendered dynamically by script depending on procedure -->
+			</div>
+
+			<!-- Quick Dossier Import Option -->
+			<div class="p-4 rounded-xl border border-yuc-green/20 bg-yuc-green/5 dark:bg-slate-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+				<div>
+					<h4 class="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+						<svg class="w-4 h-4 text-yuc-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.25m9.75-4.875c.621 0 1.125.504 1.125 1.125V2.25M7.875 6h9.75c.621 0 1.125.504 1.125 1.125V18a1.125 1.125 0 01-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H18" /></svg>
+						<span>¿Desea importar desde su Expediente Digital?</span>
+					</h4>
+					<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Si ya tiene cargados sus documentos en su Expediente Personal, puede traerlos con un solo clic.</p>
+				</div>
+				<button type="button" id="btn-import-dossier" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm border border-yuc-green-light">
+					Importar de Expediente
+				</button>
+			</div>
+
+			<!-- Submit & Back Buttons -->
+			<div class="pt-6 border-t border-slate-150 dark:border-slate-800 flex justify-between gap-4">
+				<a href="/ciudadano" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg text-sm transition-all border border-slate-250/50 dark:border-slate-750/50 text-center">
+					Atrás
+				</a>
+				<button type="button" id="btn-submit-procedure" class="px-6 py-2.5 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-lg text-sm transition-all flex items-center gap-1.5 shadow-md">
+					<span>Enviar Solicitud a Dependencia</span>
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+				</button>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script is:inline>
+		// Protect Route
+		const logged = localStorage.getItem('citizen_logged');
+		if (logged !== 'true') {
+			window.location.href = '/ciudadano/login';
+		} else {
+			
+			// Identify current tramite
+			const params = new URLSearchParams(window.location.search);
+			const tramiteId = params.get('tramite') || 'ssp';
+
+			const tramitesData = {
+				ssp: {
+					title: "Licencia de Conducir y Placas",
+					dept: "Secretaría de Seguridad Pública (SSP)",
+					docs: [
+						{ id: "ine", name: "Identificación Oficial (INE) Vigente", label: "Suba INE legible por ambos lados" },
+						{ id: "domicilio", name: "Comprobante de Domicilio de Yucatán", label: "Luz, agua o predial menor a 3 meses" },
+						{ id: "pago", name: "Recibo de Pago de Derechos", label: "Comprobante de transferencia o ventanilla estatal" }
+					]
+				},
+				sat: {
+					title: "Inscripción en el RFC (SAT)",
+					dept: "Servicio de Administración Tributaria / AAFY",
+					docs: [
+						{ id: "curp", name: "Cédula de Identificación de CURP Oficial", label: "CURP certificada por RENAPO" },
+						{ id: "domicilio", name: "Comprobante de Domicilio Fiscal", label: "Comprobante de domicilio catastral oficial" }
+					]
+				},
+				pasaporte: {
+					title: "Trámite de Pasaporte Mexicano",
+					dept: "Secretaría de Relaciones Exteriores (SRE)",
+					docs: [
+						{ id: "acta", name: "Acta de Nacimiento Certificada", label: "Copia oficial de acta en PDF" },
+						{ id: "ine", name: "Identificación Oficial (INE)", label: "INE o cédula profesional legible" },
+						{ id: "pago_federal", name: "Comprobante de Pago Federal", label: "Hoja de pago bancario oficial" }
+					]
+				},
+				ine: {
+					title: "CURP y Actas Certificadas",
+					dept: "Registro Civil de Yucatán / INE",
+					docs: [
+						{ id: "acta_digital", name: "Copia de Acta Anterior / Datos Registrales", label: "Suba copia simple o datos legibles" }
+					]
+				}
+			};
+
+			const currentTramite = tramitesData[tramiteId] || tramitesData.ssp;
+			
+			// Populate page header
+			document.getElementById('lbl-upload-title').textContent = currentTramite.title;
+			document.getElementById('lbl-upload-dept').textContent = `Dependencia: ${currentTramite.dept}`;
+
+			const slotsContainer = document.getElementById('document-slots');
+			const uploadedFiles = {}; // Holds mock file names
+
+			// Render slots
+			const renderSlots = () => {
+				slotsContainer.innerHTML = '';
+				currentTramite.docs.forEach(doc => {
+					const hasFile = uploadedFiles[doc.id];
+					
+					const slotHtml = `
+						<div class="space-y-2" id="slot-container-${doc.id}">
+							<label class="block text-xs font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">${doc.name} *</label>
+							
+							<!-- Drag and Drop Area -->
+							<div 
+								id="drop-zone-${doc.id}" 
+								class="border-2 border-dashed ${hasFile ? 'border-yuc-green bg-yuc-green/5 dark:bg-slate-950/40' : 'border-slate-200 dark:border-slate-800 hover:border-yuc-green/50 bg-slate-50/50 dark:bg-slate-950/20'} rounded-xl p-6 text-center transition-all cursor-pointer relative group flex flex-col justify-center items-center min-h-[140px]"
+							>
+								<!-- Hidden file input -->
+								<input type="file" id="file-${doc.id}" class="absolute inset-0 opacity-0 cursor-pointer" />
+								
+								<div class="space-y-2 pointer-events-none" id="drop-content-${doc.id}">
+									${hasFile ? `
+										<!-- Uploaded UI state -->
+										<div class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-1">
+											<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+										</div>
+										<p class="text-xs text-slate-800 dark:text-white font-bold">${uploadedFiles[doc.id]}</p>
+										<p class="text-[10px] text-slate-400">Archivo verificado por CivicFlow Yucatán. Haga clic para reemplazar.</p>
+									` : `
+										<!-- Empty state -->
+										<svg class="mx-auto h-8 w-8 text-slate-450 dark:text-slate-500 group-hover:text-yuc-green transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+											<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+										<p class="text-xs text-slate-600 dark:text-slate-400 font-bold">Arrastre aquí su archivo o <span class="text-yuc-green dark:text-yuc-green-light underline">búsquelo</span></p>
+										<p class="text-[10px] text-slate-400">${doc.label}</p>
+									`}
+								</div>
+
+								<!-- Algorithmic Scanner Loader Overlay (Hidden by default) -->
+								<div id="scan-overlay-${doc.id}" class="absolute inset-0 bg-white/95 dark:bg-slate-900/95 rounded-xl flex flex-col justify-center items-center p-4 space-y-3 hidden">
+									<div class="w-8 h-8 rounded-full border-4 border-slate-200 border-t-yuc-green animate-spin"></div>
+									<div class="text-center space-y-1">
+										<p class="text-[11px] font-bold text-slate-800 dark:text-white uppercase tracking-wider">Escaneando Documento...</p>
+										<p id="scan-step-${doc.id}" class="text-[9px] text-slate-550 dark:text-slate-400 font-mono">Leyendo metadatos...</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					`;
+					
+					const tempDiv = document.createElement('div');
+					tempDiv.innerHTML = slotHtml;
+					slotsContainer.appendChild(tempDiv.firstElementChild);
+
+					// Hook input listener
+					const fileInput = document.getElementById(`file-${doc.id}`);
+					const dropZone = document.getElementById(`drop-zone-${doc.id}`);
+					const scanOverlay = document.getElementById(`scan-overlay-${doc.id}`);
+					const scanStepText = document.getElementById(`scan-step-${doc.id}`);
+
+					const handleUploadSimulation = (fileName) => {
+						// Show validation scanner loader
+						scanOverlay.classList.remove('hidden');
+						scanStepText.textContent = "Cargando archivo...";
+
+						const steps = [
+							"Validando formato PDF/Imagen...",
+							"Leyendo metadatos EXIF...",
+							"Cotejando CURP contra base oficial...",
+							"Verificando sello digital de origen...",
+							"Cotejo exitoso con sistemas estatales."
+						];
+
+						let currentStep = 0;
+						const stepInterval = setInterval(() => {
+							if (currentStep < steps.length) {
+								scanStepText.textContent = steps[currentStep];
+								currentStep++;
+							} else {
+								clearInterval(stepInterval);
+								scanOverlay.classList.add('hidden');
+								uploadedFiles[doc.id] = fileName;
+								renderSlots();
+								window.showToast("Cotejo automático completado con éxito", "success");
+							}
+						}, 600);
+					};
+
+					fileInput.addEventListener('change', (e) => {
+						if (e.target.files.length > 0) {
+							handleUploadSimulation(e.target.files[0].name);
+						}
+					});
+
+					// Dragover visual effects
+					dropZone.addEventListener('dragover', (e) => {
+						e.preventDefault();
+						dropZone.classList.add('border-yuc-green', 'bg-yuc-green/5');
+					});
+
+					dropZone.addEventListener('dragleave', () => {
+						if (!uploadedFiles[doc.id]) {
+							dropZone.classList.remove('border-yuc-green', 'bg-yuc-green/5');
+						}
+					});
+
+					dropZone.addEventListener('drop', (e) => {
+						e.preventDefault();
+						if (e.dataTransfer.files.length > 0) {
+							handleUploadSimulation(e.dataTransfer.files[0].name);
+						}
+					});
+
+				});
+			};
+
+			// Import from dossier
+			document.getElementById('btn-import-dossier').addEventListener('click', () => {
+				const dossier = JSON.parse(localStorage.getItem('civicflow_dossier')) || [];
+				
+				let importedCount = 0;
+				currentTramite.docs.forEach(doc => {
+					// Find equivalent in dossier
+					const match = dossier.find(d => d.id === doc.id && d.status === 'Cargado');
+					if (match) {
+						uploadedFiles[doc.id] = match.file || `importado_${doc.id}.pdf`;
+						importedCount++;
+					}
+				});
+
+				if (importedCount > 0) {
+					renderSlots();
+					window.showToast(`Se importaron ${importedCount} documentos del expediente`, "success");
+				} else {
+					window.showToast("No se encontraron documentos equivalentes cargados en su expediente.", "warning");
+				}
+			});
+
+			// Initialize Slots
+			renderSlots();
+
+			// Submission process
+			document.getElementById('btn-submit-procedure').addEventListener('click', () => {
+				// Check that all required docs are loaded
+				let missing = false;
+				currentTramite.docs.forEach(doc => {
+					if (!uploadedFiles[doc.id]) missing = true;
+				});
+
+				if (missing) {
+					window.showToast("Debe subir todos los documentos obligatorios para proceder", "error");
+					return;
+				}
+
+				// Generate Folio and Token
+				const randomNum = Math.floor(100 + Math.random() * 900);
+				const randomToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
+				const randomFolio = `TRM-2026-00${randomNum}`;
+				const curp = localStorage.getItem('citizen_curp');
+				const name = localStorage.getItem('citizen_fullname') || 'Ciudadano Demo';
+				const email = localStorage.getItem('citizen_email');
+				const currentDateStr = new Date().toISOString().split('T')[0];
+
+				// Save new request in local requests array
+				const requests = JSON.parse(localStorage.getItem('civicflow_requests')) || [];
+				
+				// Determine delegated place based on user address or mock
+				const locations = ["Mérida Centro", "Kanasín Oficina Regional", "Valladolid Palacio", "Tizimín Norte", "Progreso Ventanilla Puerto"];
+				const randomLoc = locations[Math.floor(Math.random() * locations.length)];
+
+				// Simulates automatic algorithm evaluation based on curp or mock value.
+				// A approved dictamen is set for demo if curp contains an even digit, else declinado
+				const lastChar = curp.charAt(curp.length - 1);
+				const isApproved = !isNaN(lastChar) ? parseInt(lastChar) % 2 === 0 : true;
+				const mockStatus = "Recibido"; 
+				
+				const newReq = {
+					folio: randomFolio,
+					name: currentTramite.title,
+					dept: currentTramite.dept,
+					date: currentDateStr,
+					status: mockStatus,
+					token: randomToken,
+					citizen_curp: curp,
+					citizen_fullname: name,
+					citizen_email: email,
+					delegation: randomLoc,
+					algorithmic_result: isApproved ? 'Aprobado' : 'Declinado',
+					comments: "En espera de validación de firma y dictamen oficial por el titular."
+				};
+
+				requests.push(newReq);
+				localStorage.setItem('civicflow_requests', JSON.stringify(requests));
+
+				// Redirect to success screen
+				window.showToast("¡Solicitud enviada exitosamente!", "success");
+				setTimeout(() => {
+					window.location.href = `/ciudadano/exito?token=${randomToken}&folio=${randomFolio}&tramite=${tramiteId}`;
+				}, 800);
+			});
+
+		}
+	</script>
+</Layout>

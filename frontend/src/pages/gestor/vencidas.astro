@@ -1,0 +1,224 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Solicitudes Vencidas (Control de Eficiencia) - CivicFlow">
+	
+	<!-- Manager Sub-navigation header -->
+	<div class="bg-slate-900 text-white transition-colors border-b border-slate-800">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 gap-4">
+				<div>
+					<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
+					<h1 class="text-2xl font-black font-display mt-1">Control de Plazos y Eficiencia</h1>
+					<p class="text-xs text-slate-400 mt-1">Auditoría en tiempo real de folios con tiempos de respuesta excedidos.</p>
+				</div>
+				<div class="flex items-center gap-3">
+					<button id="btn-gestor-logout" class="px-4 py-2 border border-slate-700 hover:bg-slate-800 text-slate-350 rounded-lg text-xs font-bold transition-all">
+						Cerrar Sesión
+					</button>
+				</div>
+			</div>
+
+			<!-- Submenu -->
+			<div class="flex gap-6 text-sm border-t border-slate-800/60 pt-1">
+				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-450 hover:text-white transition-all">Mesa de Trabajo</a>
+				<a href="/gestor/vencidas" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all flex items-center gap-1.5">
+					<span>Solicitudes Vencidas</span>
+					<span id="badge-vencidas-count" class="hidden px-1.5 py-0.5 rounded-full bg-red-650 text-white font-extrabold text-[9px]">0</span>
+				</a>
+				<a href="/gestor/cola" class="pb-3 border-b-2 border-transparent text-slate-450 hover:text-white transition-all">Bandeja de Entrada</a>
+				<a href="/gestor/audit" class="pb-3 border-b-2 border-transparent text-slate-450 hover:text-white transition-all">Logs de Auditoría</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- Main Workspace -->
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+		
+		<div id="vencidas-content" class="space-y-6">
+			
+			<!-- High Priority Alert Banner -->
+			<div class="p-5 rounded-2xl border border-red-200 bg-red-500/5 dark:bg-red-950/15 flex gap-4 items-start">
+				<div class="w-10 h-10 rounded-xl bg-red-600/10 dark:bg-red-500/10 text-red-650 dark:text-red-500 flex items-center justify-center shrink-0 animate-pulse">
+					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+				</div>
+				<div class="space-y-1">
+					<h3 class="text-sm font-extrabold text-red-800 dark:text-red-400 uppercase tracking-wide">Monitoreo de Plazos Excedidos</h3>
+					<p class="text-xs text-red-755 dark:text-slate-300 leading-relaxed">
+						Se listan de forma exclusiva los expedientes que superan el <strong class="underline">Plazo Máximo de Atención (3 días hábiles)</strong>. De conformidad con las normas de gobernanza digital, estas solicitudes deben ser dictaminadas de forma prioritaria bajo sanción administrativa por dilación.
+					</p>
+				</div>
+			</div>
+
+			<!-- Filter Metric Card -->
+			<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+				<div class="space-y-0.5">
+					<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Registros Vencidos Detectados</span>
+					<div class="flex items-baseline gap-2">
+						<span id="lbl-vencidas-metric" class="text-3xl font-black text-red-650 font-display">0</span>
+						<span class="text-xs text-slate-500">solicitudes fuera de tiempo de atención</span>
+					</div>
+				</div>
+				<button id="btn-force-refresh" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-350 text-xs font-bold rounded-lg border border-slate-200/50 dark:border-slate-750 flex items-center gap-1.5 transition-colors">
+					<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
+					<span>Re-evaluar plazos</span>
+				</button>
+			</div>
+
+			<!-- Red Highlighted List of Overdue items -->
+			<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+				<div class="overflow-x-auto font-sans">
+					<table class="w-full text-left border-collapse">
+						<thead>
+							<tr class="bg-slate-50 dark:bg-slate-950/40 text-slate-550 text-[10px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+								<th class="px-6 py-4">Folio</th>
+								<th class="px-6 py-4">Trámite / Área</th>
+								<th class="px-6 py-4">Ciudadano</th>
+								<th class="px-6 py-4">Fecha Registro</th>
+								<th class="px-6 py-4 text-red-650">Días Transcurridos</th>
+								<th class="px-6 py-4">Estatus Técnico</th>
+								<th class="px-6 py-4 text-right">Acción Emergente</th>
+							</tr>
+						</thead>
+						<tbody id="vencidas-tbody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs text-slate-700 dark:text-slate-350">
+							<!-- Rendered dynamically -->
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Empty State -->
+				<div id="vencidas-empty-msg" class="hidden text-center py-16 space-y-3">
+					<div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0110 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.746 3.746 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0114 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+					</div>
+					<p class="text-slate-500 dark:text-slate-400 text-xs font-semibold">¡Excelente! Ninguna solicitud excede el tiempo límite en este momento.</p>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script is:inline>
+		// Protect Route
+		const gestorLogged = localStorage.getItem('gestor_logged');
+		if (gestorLogged !== 'true') {
+			window.location.href = '/gestor';
+		} else {
+			
+			// Populate manager credentials
+			document.getElementById('btn-gestor-logout').addEventListener('click', () => {
+				localStorage.removeItem('gestor_logged');
+				localStorage.removeItem('gestor_email');
+				localStorage.removeItem('gestor_role');
+				window.showToast("Sesión de gestor cerrada", "info");
+				setTimeout(() => {
+					window.location.href = '/gestor';
+				}, 600);
+			});
+
+			const defaultRequests = [
+				{ folio: "TRM-2026-00201", name: "Licencia de Conducir y Placas", dept: "Secretaría de Seguridad Pública (SSP)", date: "2026-05-18", status: "Recibido", citizen_fullname: "Eduardo Chan", token: "TK-128491", delegation: "Mérida Centro", algorithmic_result: "Aprobado" },
+				{ folio: "TRM-2026-00202", name: "Inscripción en el RFC (SAT)", dept: "Hacienda / SAT", date: "2026-05-15", status: "En revisión", citizen_fullname: "Marisela Puc", token: "TK-992381", delegation: "Progreso Ventanilla Puerto", algorithmic_result: "Declinado" },
+				{ folio: "TRM-2026-00104", name: "Trámite de Pasaporte Mexicano", dept: "Secretaría de Relaciones Exteriores (SRE)", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech", token: "TK-849201", delegation: "Valladolid Palacio", algorithmic_result: "Aprobado" }
+			];
+
+			const getRequests = () => {
+				const local = localStorage.getItem('civicflow_requests');
+				if (!local) {
+					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
+					return defaultRequests;
+				}
+				return JSON.parse(local);
+			};
+
+			const renderVencidas = () => {
+				const tbody = document.getElementById('vencidas-tbody');
+				const emptyMsg = document.getElementById('vencidas-empty-msg');
+				const requests = getRequests();
+
+				tbody.innerHTML = '';
+				
+				const currentDate = new Date('2026-05-22'); // system reference date
+				let count = 0;
+
+				requests.reverse().forEach(r => {
+					// Check if status is open (pending, in-review)
+					const isOpen = r.status === 'Recibido' || r.status === 'En revisión' || r.status === 'En revisión con sistemas oficiales';
+					
+					if (isOpen) {
+						const reqDate = new Date(r.date);
+						const diffTime = Math.abs(currentDate - reqDate);
+						const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+						// If 3 or more days, it is overdue
+						if (diffDays >= 3) {
+							count++;
+
+							const tr = document.createElement('tr');
+							tr.className = "hover:bg-red-500/5 transition-colors border-l-4 border-red-650 bg-red-650/[0.01]";
+							
+							tr.innerHTML = `
+								<td class="px-6 py-4 font-mono font-bold text-red-655 dark:text-red-500">${r.folio}</td>
+								<td class="px-6 py-4">
+									<p class="font-bold text-slate-800 dark:text-white leading-tight">${r.name}</p>
+									<p class="text-[10px] text-slate-400 leading-none mt-0.5">${r.dept}</p>
+								</td>
+								<td class="px-6 py-4 font-semibold">${r.citizen_fullname || 'N/A'}</td>
+								<td class="px-6 py-4">${r.date}</td>
+								<td class="px-6 py-4 font-black text-red-650 dark:text-red-400 flex items-center gap-1.5">
+									<span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+									<span>${diffDays} días</span>
+								</td>
+								<td class="px-6 py-4">
+									<span class="px-2 py-0.5 rounded-full bg-red-500/10 text-red-650 border border-red-500/20 font-bold uppercase text-[9px]">
+										ATENCIÓN INMEDIATA
+									</span>
+								</td>
+								<td class="px-6 py-4 text-right">
+									<a href="/gestor/solicitud?id=${r.folio}" class="px-3.5 py-2 bg-red-650 hover:bg-red-600 text-white font-extrabold rounded-lg transition-all inline-flex items-center gap-1 shadow-md shadow-red-500/10">
+										<span>Atender De Emergencia</span>
+										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+									</a>
+								</td>
+							`;
+							tbody.appendChild(tr);
+						}
+					}
+				});
+
+				// Update metrics
+				document.getElementById('lbl-vencidas-metric').textContent = count;
+				
+				// Update overdue badge count in subnav
+				const badgeOverdue = document.getElementById('badge-vencidas-count');
+				if (count > 0) {
+					badgeOverdue.textContent = count;
+					badgeOverdue.classList.remove('hidden');
+					emptyMsg.classList.add('hidden');
+				} else {
+					badgeOverdue.classList.add('hidden');
+					emptyMsg.classList.remove('hidden');
+				}
+			};
+
+			// Initial load
+			renderVencidas();
+
+			// Force re-evaluate click handler
+			document.getElementById('btn-force-refresh').addEventListener('click', () => {
+				renderVencidas();
+				window.showToast("Cálculo de plazos re-evaluado", "success");
+			});
+
+			// Sincronización
+			window.addEventListener('storage', (e) => {
+				if (e.key === 'civicflow_requests') {
+					renderVencidas();
+				}
+			});
+
+		}
+	</script>
+</Layout>

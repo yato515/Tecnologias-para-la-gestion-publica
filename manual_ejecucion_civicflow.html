@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Instalación y Ejecución - CivicFlow</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-yuc-green-dark: #00382b;
+            --color-yuc-green: #005c42;
+            --color-yuc-green-light: #008260;
+            --color-yuc-gold: #c29b38;
+            --color-yuc-gold-light: #e5c158;
+            --color-yuc-gold-dark: #8e6d23;
+            --font-display: "Outfit", sans-serif;
+            --font-sans: "Plus Jakarta Sans", sans-serif;
+        }
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, var(--color-yuc-green-dark) 0%, var(--color-yuc-green) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 5px solid var(--color-yuc-gold);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header-banner h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-family: var(--font-display);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+        .header-banner p {
+            margin: 0.5rem 0 0;
+            font-size: 1rem;
+            color: #cbd5e1;
+        }
+        .print-tip {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.5rem 1.2rem;
+            background: rgba(194, 155, 56, 0.2);
+            border: 1px solid var(--color-yuc-gold);
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #ffdf7e;
+        }
+        .content-card {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 3rem;
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        h2 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--color-yuc-green);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
+        }
+        h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-yuc-green-dark);
+            margin-top: 1.5rem;
+        }
+        p, li {
+            font-size: 0.95rem;
+            color: #475569;
+        }
+        code {
+            font-family: monospace;
+            background-color: #f1f5f9;
+            color: #b91c1c;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 1rem 0;
+            border-left: 4px solid var(--color-yuc-gold);
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            font-weight: normal;
+        }
+        .alert-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #16a34a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        .alert-box strong {
+            color: #15803d;
+        }
+        .steps-list {
+            padding-left: 1.5rem;
+        }
+        .steps-list li {
+            margin-bottom: 0.75rem;
+        }
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        @media print {
+            body {
+                background-color: white;
+            }
+            .header-banner {
+                display: none;
+            }
+            .content-card {
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                max-width: 100%;
+            }
+            h2 {
+                page-break-before: always;
+            }
+            h2:first-of-type {
+                page-break-before: avoid;
+            }
+            pre {
+                background-color: #f8fafc;
+                color: #0f172a;
+                border: 1px solid #cbd5e1;
+                border-left: 4px solid var(--color-yuc-green);
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <h1>Manual de Instalación y Ejecución</h1>
+        <p>Prototipo Interactivo de Trámites CivicFlow - Gobierno del Estado de Yucatán</p>
+        <div class="print-tip">🖨️ Presione CTRL + P y elija "Guardar como PDF" para guardarlo en su computadora</div>
+    </div>
+
+    <div class="content-card">
+        
+        <h2>1. Prerrequisitos de Software</h2>
+        <p>No necesitas descargar ni configurar el framework Astro de manera global en tu máquina. El proyecto se encarga de autodescargarlo localmente utilizando Node.js.</p>
+        
+        <ul class="steps-list">
+            <li><strong>Descargar e instalar Node.js:</strong> Visita <a href="https://nodejs.org/" target="_blank">nodejs.org</a> y descarga la versión recomendada <strong>LTS (versión 22 o superior)</strong>. Al instalarlo, se añadirá el gestor de paquetes <code>npm</code> a tu sistema.</li>
+            <li><strong>Editor de Código:</strong> Se recomienda <a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a> para editar y correr la terminal.</li>
+            <li><strong>Git (Opcional):</strong> Para clonar el repositorio de forma ágil desde la consola.</li>
+        </ul>
+
+        <h2>2. Configuración del Proyecto</h2>
+        <p>Sigue esta secuencia de pasos para descargar e instalar todas las dependencias necesarias:</p>
+        
+        <ol class="steps-list">
+            <li>Abre Visual Studio Code.</li>
+            <li>Ve a <strong>Archivo > Abrir Carpeta</strong> y selecciona la carpeta <code>frontend</code> (es la carpeta que contiene el archivo <code>package.json</code>).</li>
+            <li>Abre la terminal integrada de VS Code (atajo: <code>Ctrl + `</code> o en el menú superior <strong>Terminal > Nueva terminal</strong>).</li>
+            <li>Ejecuta el siguiente comando para instalar las librerías necesarias:
+                <pre><code>npm.cmd install</code></pre>
+                <p><em>(Si utilizas macOS o Linux, simplemente ejecuta <code>npm install</code>).</em></p>
+            </li>
+        </ol>
+
+        <div class="alert-box">
+            <strong>💡 Nota sobre dependencias:</strong> Este comando crea la carpeta <code>node_modules</code> localmente, la cual aloja el compilador de Astro y Tailwind CSS v4 de forma temporal. No se sube al repositorio de Git.
+        </div>
+
+        <h2>3. Cómo Correr el Servidor Local</h2>
+        <p>Una vez completada la instalación, ejecuta el siguiente comando para correr el servidor de desarrollo local:</p>
+        
+        <pre><code>npm.cmd run dev</code></pre>
+        <p><em>(En macOS o Linux, corre <code>npm run dev</code>).</em></p>
+
+        <p>Esto habilitará la dirección web local: <a href="http://localhost:4321/" target="_blank">http://localhost:4321/</a>. Ábrela en tu navegador para ver la maquetación en vivo.</p>
+
+        <h3>Compilación del Catálogo Completo</h3>
+        <p>Si realizas cambios en los archivos y necesitas volver a generar el catálogo de pantallas offline de la raíz del proyecto (<code>CivicFlow_Catalogo_Pantallas.html</code>), ejecuta estos dos comandos en orden:</p>
+        <pre><code>npm.cmd run build
+node compile_screens.js</code></pre>
+
+        <h2>4. Subir el Repositorio a GitHub</h2>
+        <p>El proyecto ya incluye un archivo <code>.gitignore</code> configurado para evitar subir archivos residuales pesados. Puedes compartir este repositorio en GitHub sin problemas:</p>
+
+        <ol class="steps-list">
+            <li>Inicializa Git en la carpeta raíz del proyecto:
+                <pre><code>git init</code></pre>
+            </li>
+            <li>Añade los archivos al historial:
+                <pre><code>git add .</code></pre>
+            </li>
+            <li>Crea un commit para guardar el estado actual:
+                <pre><code>git commit -m "feat: maqueta civicflow finalizada"</code></pre>
+            </li>
+            <li>Vincúlalo con tu nuevo repositorio remoto y súbelo a GitHub:
+                <pre><code>git branch -M main
+git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+git push -u origin main</code></pre>
+            </li>
+        </ol>
+
+        <h2>5. Resolución de Errores Comunes de PowerShell</h2>
+        <p>Si al correr comandos con <code>npm</code> obtienes un error del sistema que indica que la <strong>ejecución de scripts está deshabilitada</strong>:</p>
+        
+        <ul class="steps-list">
+            <li>Añade la extensión <strong><code>.cmd</code></strong> a tus comandos, por ejemplo, utiliza <code>npm.cmd install</code> y <code>npm.cmd run dev</code>.</li>
+            <li>O bien, en tu terminal de VS Code, presiona el menú desplegable junto al icono de basura y selecciona <strong>Command Prompt (Símbolo del sistema)</strong>. Esto evitará las políticas restrictivas de PowerShell.</li>
+            <li>O desbloquea temporalmente PowerShell ejecutando:
+                <pre><code>Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass</code></pre>
+            </li>
+        </ul>
+
+    </div>
+
+    <footer>
+        Gobierno del Estado de Yucatán - Ventanilla Única de Trámites CivicFlow 2026. Todos los derechos reservados.
+    </footer>
+
+</body>
+</html>

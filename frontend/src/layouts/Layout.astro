@@ -1,0 +1,286 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "CivicFlow - Plataforma de Automatización de Trámites del Gobierno del Estado de Yucatán" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title} | CivicFlow - Gobierno del Estado de Yucatán</title>
+		<meta name="description" content={description} />
+		
+		<!-- Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	</head>
+	<body class="bg-slate-50 text-slate-900 dark:bg-bg-dark dark:text-slate-100 min-h-screen flex flex-col antialiased">
+		
+		<!-- Official Federal/State Ribbon -->
+		<div class="bg-yuc-green-dark text-[10px] text-slate-300 font-semibold tracking-wider py-1.5 px-4 flex justify-between items-center border-b border-yuc-green/30 select-none">
+			<div class="flex items-center gap-2">
+				<span class="inline-block w-2 h-2 rounded-full bg-yuc-gold animate-pulse"></span>
+				<span>ESTADO LIBRE Y SOBERANO DE YUCATÁN</span>
+			</div>
+			<div class="flex gap-4">
+				<a href="https://yucatan.gob.mx" target="_blank" rel="noopener noreferrer" class="hover:text-yuc-gold transition-colors">YUCATAN.GOB.MX</a>
+				<span class="text-slate-500">|</span>
+				<span>SISTEMA ESTATAL DE TRÁMITES</span>
+			</div>
+		</div>
+
+		<!-- Main Premium Header -->
+		<header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors shadow-sm">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+				
+				<!-- Logo and Heraldry -->
+				<a href="/" class="flex items-center gap-3 group focus:outline-none">
+					<div class="w-12 h-12 flex items-center justify-center bg-yuc-green text-yuc-gold rounded-xl shadow-md border border-yuc-green-light transition-transform group-hover:scale-105">
+						<!-- Custom Premium SVG Logo representing Yucatan Shield / Digital Portal -->
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-7 h-7">
+							<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" fill="currentColor" fill-opacity="0.1" />
+							<path d="M12 8v8" stroke="var(--color-yuc-gold)" />
+							<path d="M9 11l3 3 3-3" stroke="var(--color-yuc-gold)" />
+							<circle cx="12" cy="6" r="1" fill="var(--color-yuc-gold)" />
+						</svg>
+					</div>
+					<div>
+						<div class="flex items-center gap-1.5">
+							<span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-800 dark:text-white">Civic<span class="text-yuc-green dark:text-yuc-green-light">Flow</span></span>
+							<span class="px-1.5 py-0.5 rounded bg-yuc-gold/15 text-yuc-gold-dark dark:text-yuc-gold font-bold text-[9px] uppercase tracking-wider">Yucatán</span>
+						</div>
+						<p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-none mt-0.5">Ventanilla Única Digital de Trámites</p>
+					</div>
+				</a>
+
+				<!-- Accessibility Controls & Theme Toggles -->
+				<div class="flex items-center gap-2 sm:gap-3">
+					
+					<!-- High Contrast Button -->
+					<button 
+						id="btn-contrast" 
+						class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors focus:ring-2 focus:ring-yuc-green text-xs font-semibold flex items-center gap-1.5"
+						title="Modo Accesibilidad (Alto Contraste)"
+						aria-label="Toggle Alto Contraste"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m0-18a9 9 0 0 1 9 9m-9-9a9 9 0 0 0-9 9m9 9a9 9 0 0 1 9-9m-9 9a9 9 0 0 0-9-9" />
+						</svg>
+						<span class="hidden md:inline">Contraste</span>
+					</button>
+
+					<!-- Dark Mode Toggle -->
+					<button 
+						id="btn-theme" 
+						class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors focus:ring-2 focus:ring-yuc-green"
+						title="Alternar Tema Claro / Oscuro"
+						aria-label="Toggle Dark Mode"
+					>
+						<!-- Sun icon -->
+						<svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 hidden">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+						</svg>
+						<!-- Moon icon -->
+						<svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+						</svg>
+					</button>
+
+					<!-- Role Quick Link -->
+					<div class="h-6 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1"></div>
+
+					<a 
+						id="nav-role-link"
+						href="/gestor" 
+						class="px-4 py-2 text-xs font-bold rounded-lg bg-yuc-green text-white hover:bg-yuc-green-light shadow-sm transition-all focus:ring-2 focus:ring-yuc-green focus:ring-offset-2 flex items-center gap-1.5"
+					>
+						<span>Panel Gestor</span>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+						</svg>
+					</a>
+				</div>
+
+			</div>
+		</header>
+
+		<!-- Main Content Workspace -->
+		<main class="flex-grow">
+			<slot />
+		</main>
+
+		<!-- Toast Container -->
+		<div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm pointer-events-none"></div>
+
+		<!-- Footer -->
+		<footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-12 transition-colors">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+					<div class="space-y-4 col-span-1 md:col-span-2">
+						<div class="flex items-center gap-2">
+							<div class="w-8 h-8 flex items-center justify-center bg-yuc-green text-yuc-gold rounded-lg">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+									<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+								</svg>
+							</div>
+							<span class="font-extrabold text-white text-lg tracking-tight">Civic<span class="text-yuc-green-light">Flow</span></span>
+						</div>
+						<p class="text-sm text-slate-400 pr-4">
+							Plataforma digital para la automatización y transparencia de trámites gubernamentales del Estado de Yucatán. Diseñada para agilizar la interacción entre la ciudadanía y la administración pública sin intermediarios y con total trazabilidad.
+						</p>
+					</div>
+					<div>
+						<h4 class="font-bold text-white text-sm tracking-wider uppercase mb-4">Enlaces Oficiales</h4>
+						<ul class="space-y-2 text-sm">
+							<li><a href="https://yucatan.gob.mx" class="hover:text-white transition-colors">Gobierno del Estado</a></li>
+							<li><a href="https://tramites.yucatan.gob.mx" class="hover:text-white transition-colors">Ventanilla Estatal</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">Transparencia Yucatán</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">Aviso de Privacidad</a></li>
+						</ul>
+					</div>
+					<div>
+						<h4 class="font-bold text-white text-sm tracking-wider uppercase mb-4">Ayuda e Inclusión</h4>
+						<ul class="space-y-2 text-sm">
+							<li><a href="#" class="hover:text-white transition-colors">Centro de Soporte</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">Manual de Accesibilidad</a></li>
+							<li><a href="#" class="hover:text-white transition-colors">Directorio de Dependencias</a></li>
+							<li><span class="text-xs px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">A11y Nivel AA</span></li>
+						</ul>
+					</div>
+				</div>
+				<div class="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center text-xs gap-4">
+					<p>&copy; {new Date().getFullYear()} Gobierno del Estado de Yucatán. Todos los derechos reservados. Desarrollado para HackaTec 2026.</p>
+					<div class="flex gap-4">
+						<a href="#" class="hover:text-white transition-colors">Términos de Uso</a>
+						<a href="#" class="hover:text-white transition-colors">Contacto</a>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Client Side Logic for Theme and Accesibility -->
+		<script is:inline>
+			// Check local preferences
+			const initTheme = () => {
+				const theme = localStorage.getItem('theme') || 'light';
+				if (theme === 'dark') {
+					document.documentElement.classList.add('dark');
+					document.getElementById('icon-sun').classList.remove('hidden');
+					document.getElementById('icon-moon').classList.add('hidden');
+				} else {
+					document.documentElement.classList.remove('dark');
+					document.getElementById('icon-sun').classList.add('hidden');
+					document.getElementById('icon-moon').classList.remove('hidden');
+				}
+			};
+
+			const initContrast = () => {
+				const contrast = localStorage.getItem('contrast') || 'normal';
+				if (contrast === 'high') {
+					document.documentElement.classList.add('high-contrast');
+				} else {
+					document.documentElement.classList.remove('high-contrast');
+				}
+			};
+
+			// Initialize
+			initTheme();
+			initContrast();
+
+			// Theme Toggle Click Handler
+			document.getElementById('btn-theme').addEventListener('click', () => {
+				const isDark = document.documentElement.classList.contains('dark');
+				if (isDark) {
+					document.documentElement.classList.remove('dark');
+					localStorage.setItem('theme', 'light');
+					document.getElementById('icon-sun').classList.add('hidden');
+					document.getElementById('icon-moon').classList.remove('hidden');
+					window.showToast("Modo claro activado", "info");
+				} else {
+					document.documentElement.classList.add('dark');
+					localStorage.setItem('theme', 'dark');
+					document.getElementById('icon-sun').classList.remove('hidden');
+					document.getElementById('icon-moon').classList.add('hidden');
+					window.showToast("Modo oscuro activado", "info");
+				}
+			});
+
+			// Contrast Toggle Click Handler
+			document.getElementById('btn-contrast').addEventListener('click', () => {
+				const isHigh = document.documentElement.classList.contains('high-contrast');
+				if (isHigh) {
+					document.documentElement.classList.remove('high-contrast');
+					localStorage.setItem('contrast', 'normal');
+					window.showToast("Contraste normal restablecido", "info");
+				} else {
+					document.documentElement.classList.add('high-contrast');
+					localStorage.setItem('contrast', 'high');
+					window.showToast("Modo de alto contraste activado", "warning");
+				}
+			});
+
+			// Global Toast helper
+			window.showToast = (message, type = 'success') => {
+				const container = document.getElementById('toast-container');
+				if (!container) return;
+
+				const toast = document.createElement('div');
+				toast.className = `p-4 rounded-xl shadow-lg border text-sm font-semibold transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto flex items-center gap-3`;
+				
+				let bg = 'bg-white border-slate-200 text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100';
+				let iconColor = 'text-green-500';
+				let iconSvg = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+				if (type === 'error') {
+					iconColor = 'text-red-500';
+					iconSvg = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+				} else if (type === 'warning') {
+					iconColor = 'text-amber-500';
+					iconSvg = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+				} else if (type === 'info') {
+					iconColor = 'text-blue-500';
+					iconSvg = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+				}
+
+				toast.className += ` ${bg}`;
+				toast.innerHTML = `<span class="${iconColor}">${iconSvg}</span><span class="flex-grow">${message}</span>`;
+				
+				container.appendChild(toast);
+
+				// Animation in
+				setTimeout(() => {
+					toast.classList.remove('translate-y-2', 'opacity-0');
+				}, 10);
+
+				// Remove toast
+				setTimeout(() => {
+					toast.classList.add('opacity-0', 'scale-95');
+					setTimeout(() => {
+						toast.remove();
+					}, 300);
+				}, 3500);
+			};
+
+			// Adjust role text on page load based on current route
+			const adjustNavRoleText = () => {
+				const link = document.getElementById('nav-role-link');
+				if (!link) return;
+				if (window.location.pathname.startsWith('/gestor')) {
+					link.href = '/ciudadano';
+					link.innerHTML = `<span>Portal Ciudadano</span><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>`;
+				}
+			};
+			adjustNavRoleText();
+		</script>
+	</body>
+</html>

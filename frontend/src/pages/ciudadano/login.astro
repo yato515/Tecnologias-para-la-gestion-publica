@@ -1,0 +1,145 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Iniciar Sesión - Portal Ciudadano">
+	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-bg-dark transition-colors relative overflow-hidden">
+		
+		<!-- Graphic Background details -->
+		<div class="absolute top-0 right-0 w-96 h-96 rounded-full bg-yuc-green/5 blur-3xl pointer-events-none"></div>
+		<div class="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-yuc-gold/5 blur-3xl pointer-events-none"></div>
+
+		<div class="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl relative z-10">
+			
+			<div class="text-center">
+				<div class="mx-auto w-12 h-12 rounded-xl bg-yuc-green/10 text-yuc-green flex items-center justify-center mb-4">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+					</svg>
+				</div>
+				<h2 class="text-3xl font-black text-slate-800 dark:text-white font-display">Portal Ciudadano</h2>
+				<p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+					Ingrese con su cuenta para iniciar trámites o revisar su bandeja de solicitudes.
+				</p>
+			</div>
+
+			<form class="mt-8 space-y-6" id="login-form">
+				<div class="space-y-4">
+					<!-- CURP Field -->
+					<div>
+						<label for="curp" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Clave Única de Registro de Población (CURP)</label>
+						<div class="relative">
+							<input 
+								id="curp" 
+								name="curp" 
+								type="text" 
+								required 
+								maxlength="18"
+								class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors uppercase"
+								placeholder="AAAA000000XXXXXX00"
+							/>
+						</div>
+						<p id="curp-error" class="mt-1.5 text-xs text-red-500 font-semibold hidden"></p>
+					</div>
+
+					<!-- Email Field -->
+					<div>
+						<label for="email" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Correo Electrónico</label>
+						<input 
+							id="email" 
+							name="email" 
+							type="email" 
+							required 
+							class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors"
+							placeholder="correo@ejemplo.com"
+						/>
+					</div>
+
+					<!-- Password Field -->
+					<div>
+						<label for="password" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Contraseña</label>
+						<input 
+							id="password" 
+							name="password" 
+							type="password" 
+							required 
+							class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors"
+							placeholder="••••••••"
+						/>
+					</div>
+				</div>
+
+				<div class="flex items-center justify-between text-xs">
+					<div class="flex items-center">
+						<input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-yuc-green focus:ring-yuc-green border-slate-300 rounded" />
+						<label for="remember-me" class="ml-2 block text-slate-600 dark:text-slate-400">Recordarme en este equipo</label>
+					</div>
+					<a href="#" class="font-bold text-yuc-green hover:underline">¿Olvidó su contraseña?</a>
+				</div>
+
+				<div>
+					<button 
+						type="submit" 
+						class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-extrabold text-white bg-yuc-green hover:bg-yuc-green-light transition-all focus:ring-2 focus:ring-offset-2 focus:ring-yuc-green"
+					>
+						Ingresar al Portal
+					</button>
+				</div>
+			</form>
+
+			<div class="text-center text-xs text-slate-500 dark:text-slate-400">
+				<span>¿No tiene cuenta aún? </span>
+				<a href="/ciudadano/registro" class="font-bold text-yuc-green hover:underline">Registrarse en CivicFlow</a>
+			</div>
+
+			<!-- Helper testing credentials banner -->
+			<div class="mt-4 p-4 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs">
+				<p class="font-bold text-slate-800 dark:text-slate-200">Acceso Rápido Demo:</p>
+				<p class="text-slate-500 dark:text-slate-400 mt-1">Escriba cualquier CURP válido (18 caracteres) y correo electrónico. Ej: <code class="text-yuc-green font-bold">XAXA000000HDFXX099</code></p>
+			</div>
+
+		</div>
+	</div>
+
+	<script is:inline>
+		const form = document.getElementById('login-form');
+		const curpInput = document.getElementById('curp');
+		const curpError = document.getElementById('curp-error');
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const curp = curpInput.value.trim().toUpperCase();
+			const email = document.getElementById('email').value.trim();
+
+			// Clean errors
+			curpError.classList.add('hidden');
+
+			// Basic CURP validation (18 chars, letters and numbers)
+			const curpRegex = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
+			if (curp.length !== 18) {
+				curpError.textContent = "El CURP debe tener exactamente 18 caracteres.";
+				curpError.classList.remove('hidden');
+				window.showToast("Corrija el CURP para continuar", "error");
+				return;
+			}
+			
+			if (!curpRegex.test(curp)) {
+				curpError.textContent = "Formato de CURP inválido (Ej: AAAA000000HDFXX000).";
+				curpError.classList.remove('hidden');
+				window.showToast("CURP con formato inválido", "error");
+				return;
+			}
+
+			// Save session in localStorage
+			localStorage.setItem('citizen_curp', curp);
+			localStorage.setItem('citizen_email', email);
+			localStorage.setItem('citizen_logged', 'true');
+
+			window.showToast("¡Sesión iniciada con éxito!", "success");
+
+			setTimeout(() => {
+				window.location.href = '/ciudadano';
+			}, 800);
+		});
+	</script>
+</Layout>
