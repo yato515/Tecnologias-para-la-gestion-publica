@@ -177,21 +177,23 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					body: JSON.stringify({ curp, email, nombre_completo: fullname })
 				});
 				const json = await res.json();
-				if (json.success && json.data) {
-					localStorage.setItem('citizen_id', json.data.id);
-					localStorage.setItem('citizen_nombre', json.data.nombre_completo || fullname);
+				if (json.success) {
+					window.showToast("¡Registro completado! Redirigiendo al login...", "success");
+					setTimeout(() => { window.location.href = '/ciudadano/login'; }, 1200);
+					return;
+				} else {
+					window.showToast(json.message || "Error al registrar usuario", "error");
+					return;
 				}
 			} catch (_) {
 				// Backend no disponible, continúa con sesión local
+				localStorage.setItem('citizen_curp', curp);
+				localStorage.setItem('citizen_email', email);
+				localStorage.setItem('citizen_fullname', fullname);
+				localStorage.setItem('citizen_logged', 'true');
+				window.showToast("¡Registro completado (Modo Demo)!", "success");
+				setTimeout(() => { window.location.href = '/ciudadano'; }, 800);
 			}
-
-			localStorage.setItem('citizen_curp', curp);
-			localStorage.setItem('citizen_email', email);
-			localStorage.setItem('citizen_fullname', fullname);
-			localStorage.setItem('citizen_logged', 'true');
-
-			window.showToast("¡Registro y consentimiento completados!", "success");
-			setTimeout(() => { window.location.href = '/ciudadano'; }, 800);
 		});
 	</script>
 </Layout>

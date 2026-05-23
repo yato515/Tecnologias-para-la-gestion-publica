@@ -241,7 +241,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			// Intentar buscar en la API primero
 			let req = null;
 			try {
-				const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${query}`);
+				const token = localStorage.getItem('jwt_token');
+				const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${query}`, {
+					headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+				});
+				if (res.status === 401 || res.status === 403) {
+					localStorage.clear();
+					window.location.href = '/ciudadano/login';
+					return;
+				}
 				const json = await res.json();
 				if (json.success && json.data) {
 					const s = json.data;

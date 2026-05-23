@@ -126,15 +126,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			// Intentar login contra el backend
 			try {
-				const res = await fetch(`${API_URL}/api/users/login`, {
+				const res = await fetch(`${API_URL}/api/auth/login`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ curp, email })
+					body: JSON.stringify({ email, password: curp })
 				});
 				const json = await res.json();
-				if (json.success && json.data) {
-					localStorage.setItem('citizen_id', json.data.id);
-					localStorage.setItem('citizen_nombre', json.data.nombre_completo || '');
+				if (json.success && json.token) {
+					localStorage.setItem('jwt_token', json.token);
+					localStorage.setItem('citizen_id', json.user.id);
+					localStorage.setItem('citizen_nombre', json.user.nombre || '');
 				}
 			} catch (_) {
 				// Backend no disponible, continúa con sesión local

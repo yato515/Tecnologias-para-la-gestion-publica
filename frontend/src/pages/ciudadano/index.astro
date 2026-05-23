@@ -350,13 +350,12 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
-		const citizenLogged = localStorage.getItem('citizen_logged');
+		const token = localStorage.getItem('jwt_token');
 		const overlay = document.getElementById('login-required-overlay');
 		const content = document.getElementById('hub-content');
 
-		if (citizenLogged !== 'true') {
-			overlay.classList.remove('hidden');
-			content.classList.add('hidden');
+		if (!token) {
+			window.location.href = '/ciudadano/login';
 		} else {
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
@@ -402,10 +401,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			tabFolder.addEventListener('click', () => activateTab('folder'));
 
 			// Cargar catálogo desde API (si hay datos en DB los agrega al grid)
-			fetch(`${API_URL}/api/tramites/catalogo`)
-				.then(r => r.json())
+			fetch(`${API_URL}/api/tramites/catalogo`, {
+				headers: { 'Authorization': `Bearer ${token}` }
+			})
+				.then(r => {
+					if (r.status === 401 || r.status === 403) {
+						localStorage.clear();
+						window.location.href = '/ciudadano/login';
+						return;
+					}
+					return r.json();
+				})
 				.then(json => {
-					if (!json.success || !json.data || json.data.length === 0) return;
+					if (!json || !json.success || !json.data || json.data.length === 0) return;
 					const grid = document.getElementById('catalog-grid');
 					json.data.forEach(t => {
 						const card = document.createElement('div');
@@ -646,7 +654,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const citizenId = localStorage.getItem('citizen_id');
 				if (citizenId) {
 					try {
-						const res = await fetch(`${API_URL}/api/tramites/solicitudes/${citizenId}`);
+						const res = await fetch(`${API_URL}/api/tramites/solicitudes/${citizenId}`, {
+							headers: { 'Authorization': `Bearer ${token}` }
+						});
+						if (res.status === 401 || res.status === 403) {
+							localStorage.clear();
+							window.location.href = '/ciudadano/login';
+							return;
+						}
 						const json = await res.json();
 						if (json.success && Array.isArray(json.data)) {
 							apiRequests = json.data.map(s => ({
@@ -715,9 +730,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			// Logout
 			document.getElementById('btn-logout').addEventListener('click', () => {
-				localStorage.removeItem('citizen_logged');
-				localStorage.removeItem('citizen_curp');
-				localStorage.removeItem('citizen_email');
+				localStorage.clear();
 				window.showToast("Sesión cerrada", "info");
 				setTimeout(() => {
 					window.location.href = '/ciudadano/login';

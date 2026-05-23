@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import userRoutes from './routes/users.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import { verifyToken } from './middleware/auth.middleware.js';
 
@@ -18,6 +17,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/auth',     authRoutes);
 app.use('/api/users',    userRoutes);
 app.use('/api/gestores', gestorRoutes);
 app.use('/api/tramites', tramiteRoutes);
