@@ -12,7 +12,7 @@ import SolicitudCard from '../../components/SolicitudCard.astro';
 				<div>
 					<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
 					<h1 class="text-2xl font-black font-display mt-1">Mesa de Trabajo Gubernamental</h1>
-					<p class="text-xs text-slate-400 mt-1">Funcionario: <span id="lbl-gestor-email" class="font-bold text-white">...</span> | Rol: <span id="lbl-gestor-role" class="font-bold text-yuc-gold">...</span></p>
+					<p class="text-xs text-slate-400 mt-1">Funcionario: <span id="lbl-gestor-email" class="font-bold text-white font-sans">...</span> | Rol: <span id="lbl-gestor-role" class="font-bold text-yuc-gold">...</span> | JWT: <span id="lbl-gestor-token" class="font-mono text-yuc-gold font-bold truncate max-w-[150px] inline-block align-bottom cursor-pointer hover:underline" title="Ver completo">...</span></p>
 				</div>
 				<div class="flex items-center gap-3">
 					<button id="btn-gestor-logout" class="px-4 py-2 border border-slate-700 hover:bg-slate-800 text-slate-350 rounded-lg text-xs font-bold transition-all">
@@ -169,6 +169,13 @@ import SolicitudCard from '../../components/SolicitudCard.astro';
 			document.getElementById('lbl-gestor-email').textContent = localStorage.getItem('gestor_email') || 'N/A';
 			const role = localStorage.getItem('gestor_role') || 'N/A';
 			document.getElementById('lbl-gestor-role').textContent = role;
+
+			const tokenVal = localStorage.getItem('jwt_token_gestor') || 'N/A';
+			const tokenEl = document.getElementById('lbl-gestor-token');
+			tokenEl.textContent = tokenVal;
+			tokenEl.addEventListener('click', () => {
+				alert("Token JWT Gestor Completo:\n\n" + tokenVal);
+			});
 
 			// Logout handler
 			document.getElementById('btn-gestor-logout').addEventListener('click', () => {

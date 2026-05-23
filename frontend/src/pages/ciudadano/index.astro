@@ -11,7 +11,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			<div>
 				<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider font-display">GOBIERNO DEL ESTADO DE YUCATÁN</span>
 				<h1 class="text-3xl font-extrabold font-display mt-1">Mi Portal Ciudadano</h1>
-				<p class="text-slate-200 text-xs mt-1">CURP: <span id="lbl-curp" class="font-mono font-bold text-white">Cargando...</span> | Sesión: <span id="lbl-email" class="font-bold text-white">Cargando...</span></p>
+				<p class="text-slate-200 text-xs mt-1">CURP: <span id="lbl-curp" class="font-mono font-bold text-white">Cargando...</span> | Sesión: <span id="lbl-email" class="font-bold text-white">Cargando...</span> | JWT: <span id="lbl-token" class="font-mono text-yuc-gold font-bold truncate max-w-[150px] inline-block align-bottom cursor-pointer hover:underline" title="Ver completo">Cargando...</span></p>
 			</div>
 			<div>
 				<button 
@@ -359,6 +359,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 		} else {
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
+			
+			const tokenVal = localStorage.getItem('jwt_token') || 'N/A';
+			const tokenEl = document.getElementById('lbl-token');
+			tokenEl.textContent = tokenVal;
+			tokenEl.addEventListener('click', () => {
+				alert("Token JWT Completo:\n\n" + tokenVal);
+			});
 
 			// Enable tabs
 			const tabCatalog = document.getElementById('tab-btn-catalog');
