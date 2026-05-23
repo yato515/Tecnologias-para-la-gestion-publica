@@ -7,6 +7,7 @@ router.get('/', UsersController.getUsers);
 router.post('/', UsersController.createUser);
 router.post('/login', UsersController.loginByCurp);
 router.post('/register', UsersController.registerCitizen);
+router.post('/recuperar', UsersController.recuperarAcceso);
 router.put('/:id', UsersController.updateUser);
 router.delete('/:id', UsersController.deleteUser);
 

@@ -49,19 +49,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						/>
 					</div>
 
-					<!-- Role selection -->
-					<div>
-						<label for="role" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Rol / Permisos del Funcionario</label>
-						<select 
-							id="role" 
-							name="role" 
-							required
-							class="block w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
-						>
-							<option value="Revisor">Revisor (Catastro / SDR) - Puede comentar y pre-evaluar</option>
-							<option value="Aprobador">Aprobador (Director de Dependencia) - Puede dictaminar y firmar</option>
-						</select>
-					</div>
+					<!-- Role selection removed -->
 
 				</div>
 
@@ -73,6 +61,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						Ingresar al Módulo Gestor
 					</button>
 				</div>
+                <div class="mt-4 text-center">
+                    <a href="#" id="forgot-password" class="font-bold text-xs text-yuc-green hover:underline">¿Olvidó su contraseña?</a>
+                </div>
 			</form>
 
 			<!-- Testing info -->
@@ -93,9 +84,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			e.preventDefault();
 			const email = document.getElementById('email').value.trim();
 			const password = document.getElementById('password').value;
-			const role = document.getElementById('role').value;
 
 			let loginSuccess = false;
+			let role = '';
 			try {
 				const res = await fetch(`${API_URL}/api/auth/login`, {
 					method: 'POST',
@@ -107,6 +98,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					localStorage.setItem('jwt_token_gestor', json.token);
 					localStorage.setItem('gestor_logged', 'true');
 					localStorage.setItem('gestor_email', json.user.email);
+					role = json.user.rol;
 					loginSuccess = true;
 				} else {
 					window.showToast(json.message || "Credenciales inválidas en el servidor.", "error");
@@ -115,6 +107,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			} catch (_) {
 				// Fallback local en desarrollo/modo demo
 				localStorage.setItem('jwt_token_gestor', 'mock-jwt-token-gestor-demo');
+				role = 'Revisor';
 				loginSuccess = true;
 			}
 
@@ -129,6 +122,30 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				setTimeout(() => {
 					window.location.href = '/gestor/dashboard';
 				}, 800);
+			}
+		});
+
+		document.getElementById('forgot-password').addEventListener('click', async (e) => {
+			e.preventDefault();
+			const email = document.getElementById('email').value.trim();
+			if (!email) {
+				window.showToast("Por favor, ingresa tu correo institucional primero.", "error");
+				return;
+			}
+			try {
+				const res = await fetch(`${API_URL}/api/auth/recuperar`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email })
+				});
+				const json = await res.json();
+				if (json.success) {
+					window.showToast("Se ha enviado un enlace de recuperación a tu correo.", "success");
+				} else {
+					window.showToast(json.message || "Error al recuperar la contraseña.", "error");
+				}
+			} catch (err) {
+				window.showToast("Error al conectar con el servidor.", "error");
 			}
 		});
 	</script>
