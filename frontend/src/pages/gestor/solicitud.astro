@@ -430,7 +430,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				else if (req.estado === 'aprobado') badgeClass = 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/20';
 				else if (req.estado === 'documentacion_incompleta') badgeClass = 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
 				else if (req.estado === 'rechazado') badgeClass = 'bg-red-500/15 text-red-500 border border-red-500/20';
-				else if (req.estado === 'recibido') badgeClass = 'bg-blue-500/15 text-blue-500 border border-blue-500/20';
+				else if (req.estado === 'recibido') badgeClass = 'bg-yuc-green/15 text-yuc-green border border-yuc-green/20';
 				statusBadge.className = `px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
 
 				// Render review controls based on roles and current status
@@ -778,7 +778,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					if (status === 'Rechazado') return 'bg-red-500/15 text-red-500 border border-red-500/20';
 					if (status === 'En revisión') return 'bg-amber-500/15 text-amber-500 border border-amber-500/20';
 					if (status === 'Documentación incompleta') return 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
-					return 'bg-blue-500/15 text-blue-500 border border-blue-500/20';
+					return 'bg-yuc-green/15 text-yuc-green border border-yuc-green/20';
 				}
 
 				function renderCompactHistory() {
