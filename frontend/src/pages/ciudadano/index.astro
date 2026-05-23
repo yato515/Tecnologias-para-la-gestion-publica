@@ -5,11 +5,11 @@ import Layout from '../../layouts/Layout.astro';
 <Layout title="Mi Portal Ciudadano">
 	
 	<!-- Top Welcome banner -->
-	<section class="bg-yuc-green text-white py-10 transition-colors border-b border-yuc-gold/30">
+	<section class="bg-yuc-green text-white py-10 border-b border-yuc-gold/30">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 			<div>
-				<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
-				<h1 class="text-3xl font-black font-display mt-1">Mi Portal Ciudadano</h1>
+				<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider font-display">GOBIERNO DEL ESTADO DE YUCATÁN</span>
+				<h1 class="text-3xl font-extrabold font-display mt-1">Mi Portal Ciudadano</h1>
 				<p class="text-slate-200 text-xs mt-1">CURP: <span id="lbl-curp" class="font-mono font-bold text-white">Cargando...</span> | Sesión: <span id="lbl-email" class="font-bold text-white">Cargando...</span></p>
 			</div>
 			<div>
@@ -27,15 +27,15 @@ import Layout from '../../layouts/Layout.astro';
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 		
 		<!-- Protected Route Alert overlay (hidden by default) -->
-		<div id="login-required-overlay" class="hidden bg-yellow-50 dark:bg-slate-900 border border-yellow-200 dark:border-slate-800 rounded-2xl p-8 text-center max-w-lg mx-auto space-y-6 shadow-xl">
-			<div class="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-500 flex items-center justify-center mx-auto">
+		<div id="login-required-overlay" class="hidden bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center max-w-lg mx-auto space-y-6 shadow-sm">
+			<div class="w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mx-auto">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
 			</div>
 			<div class="space-y-2">
-				<h3 class="text-xl font-bold text-slate-800 dark:text-white">Se requiere Iniciar Sesión</h3>
-				<p class="text-sm text-slate-500 dark:text-slate-400">Para ingresar a este portal y realizar trámites, primero debe identificarse como ciudadano.</p>
+				<h3 class="text-xl font-bold text-slate-800">Se requiere Iniciar Sesión</h3>
+				<p class="text-sm text-slate-500">Para ingresar a este portal y realizar trámites, primero debe identificarse como ciudadano.</p>
 			</div>
-			<a href="/ciudadano/login" class="inline-block px-6 py-3 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-xl shadow-md transition-all text-sm">
+			<a href="/ciudadano/login" class="inline-block px-6 py-3 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-xl shadow-sm text-sm">
 				Iniciar Sesión Ahora
 			</a>
 		</div>
@@ -44,35 +44,35 @@ import Layout from '../../layouts/Layout.astro';
 		<div id="hub-content" class="space-y-8">
 			
 			<!-- Tabs Selection -->
-			<div class="flex border-b border-slate-200 dark:border-slate-800 gap-6">
+			<div class="flex border-b border-slate-200 gap-6">
 				<button 
 					id="tab-btn-catalog" 
-					class="pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green dark:border-yuc-green-light dark:text-yuc-green-light focus:outline-none transition-all flex items-center gap-2"
+					class="pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green focus:outline-none flex items-center gap-2"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
 					</svg>
-					<span>Catálogo de Trámites</span>
+					<span class="font-display">Catálogo de Trámites</span>
 				</button>
 				<button 
 					id="tab-btn-inbox" 
-					class="pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 focus:outline-none transition-all flex items-center gap-2 relative"
+					class="pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-850 focus:outline-none flex items-center gap-2 relative"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M21.75 9v.906a2.25 2.25 0 01-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 001.183 1.981l6.478 3.488m8.839 2.51l-4.66-2.51m0 0l-1.023-.55a2.25 2.25 0 00-2.134 0l-1.022.55m0 0l-4.661 2.51m16.5 1.615a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V8.844a2.25 2.25 0 011.183-1.98l7.5-4.04a2.25 2.25 0 012.134 0l7.5 4.04a2.25 2.25 0 011.183 1.98V19.5z" />
 					</svg>
-					<span>Mi Bandeja de Trámites</span>
+					<span class="font-display">Mi Bandeja de Trámites</span>
 					<!-- Badge of count -->
-					<span id="badge-inbox-count" class="hidden bg-yuc-gold text-slate-950 font-extrabold text-[10px] w-5 h-5 rounded-full items-center justify-center">0</span>
+					<span id="badge-inbox-count" class="hidden bg-yuc-gold text-white font-extrabold text-[10px] w-5 h-5 rounded-full items-center justify-center">0</span>
 				</button>
 				<button 
 					id="tab-btn-folder" 
-					class="pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 focus:outline-none transition-all flex items-center gap-2 relative"
+					class="pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-850 focus:outline-none flex items-center gap-2 relative"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.008 1.24l.885 1.77a2.25 2.25 0 002.007 1.24h1.98a2.25 2.25 0 002.007-1.24l.885-1.77a2.25 2.25 0 012.007-1.24h3.86m-18 0h18m-18 0v-4.5m18 4.5v-4.5m-18 0a2.25 2.25 0 014.5-9h15a2.25 2.25 0 0121.75 11.25M3 13.5v5.25c0 .621.504 1.125 1.125 1.125h15.75c.621 0 1.125-.504 1.125-1.125V13.5" />
 					</svg>
-					<span>Mi Expediente Digital</span>
+					<span class="font-display">Mi Expediente Digital</span>
 				</button>
 			</div>
 
@@ -88,7 +88,7 @@ import Layout from '../../layouts/Layout.astro';
 					<input 
 						id="txt-search"
 						type="text" 
-						class="block w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors"
+						class="block w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
 						placeholder="Buscar trámite por palabra clave (ej: residencia, henequén)..."
 					/>
 				</div>
@@ -97,96 +97,96 @@ import Layout from '../../layouts/Layout.astro';
 				<div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 					
 					<!-- Card 1: SSP (Licencias y Placas) -->
-					<div class="catalog-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" data-title="ssp licencias placas conducir vehiculo seguridad publica yucatan">
+					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="ssp licencias placas conducir vehiculo seguridad publica yucatan">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green dark:text-yuc-green-light font-bold text-[10px] uppercase">SEGURIDAD PÚBLICA (SSP)</span>
-								<span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Resolución: 1 día</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase font-display">SEGURIDAD PÚBLICA (SSP)</span>
+								<span class="text-xs text-slate-400 font-medium">Resolución: 1 día</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 dark:text-white mt-3 font-display">Licencia de Conducir y Placas</h3>
-							<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">Licencia de Conducir y Placas</h3>
+							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
 								Trámite oficial para expedición, renovación y duplicado de licencias para conducir, así como alta, reemplacamiento e inspección de placas vehiculares en el Estado.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500 dark:text-slate-400">• Identificación oficial (INE) • Comprobante de domicilio reciente • Pago de derechos</p>
+								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-500">• Identificación oficial (INE) • Comprobante de domicilio reciente • Pago de derechos</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 dark:border-slate-850 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green dark:text-yuc-green-light">Costo: Variable</span>
-							<a href="/ciudadano/subida?tramite=ssp" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors">
+						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-green font-display">Costo: Variable</span>
+							<a href="/ciudadano/subida?tramite=ssp" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</a>
 						</div>
 					</div>
 
 					<!-- Card 2: SAT (Alta de RFC y Citas) -->
-					<div class="catalog-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" data-title="sat rfc fiscal contribuyente hacienda citas alta cedula">
+					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="sat rfc fiscal contribuyente hacienda citas alta cedula">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-gold/10 text-yuc-gold-dark dark:text-yuc-gold font-bold text-[10px] uppercase">HACIENDA / SAT</span>
-								<span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Resolución: Redirección</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-gold/10 text-yuc-gold-dark font-bold text-[10px] uppercase font-display">HACIENDA / SAT</span>
+								<span class="text-xs text-slate-400 font-medium">Resolución: Redirección</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 dark:text-white mt-3 font-display">Inscripción en el RFC (SAT)</h3>
-							<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">Inscripción en el RFC (SAT)</h3>
+							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
 								Alta y obtención de la Cédula de Identificación Fiscal. Requiere validación de homoclave ante el SAT para la facturación y trámites estatales de fomento.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500 dark:text-slate-400">• CURP oficial • Cuenta de correo • Firma electrónica vigente (e.firma)</p>
+								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-500">• CURP oficial • Cuenta de correo • e.firma vigente</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 dark:border-slate-850 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green dark:text-yuc-green-light">Costo: Gratuito</span>
-							<button id="btn-sat-tramite" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors">
+						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-green font-display">Costo: Gratuito</span>
+							<button id="btn-sat-tramite" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</button>
 						</div>
 					</div>
 
 					<!-- Card 3: Pasaportes (SRE) -->
-					<div class="catalog-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" data-title="sre pasaporte mexicano cita relaciones exteriores viaje internacional">
+					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="sre pasaporte mexicano cita relaciones exteriores viaje internacional">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green dark:text-yuc-green-light font-bold text-[10px] uppercase">RELACIONES EXTERIORES (SRE)</span>
-								<span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Resolución: 1 día (Cita)</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase font-display">RELACIONES EXTERIORES (SRE)</span>
+								<span class="text-xs text-slate-400 font-medium">Resolución: 1 día (Cita)</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 dark:text-white mt-3 font-display">Trámite de Pasaporte Mexicano</h3>
-							<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">Trámite de Pasaporte Mexicano</h3>
+							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
 								Pre-cotejo de requisitos y solicitud de cita oficial para la emisión de pasaporte por primera vez o renovación en las delegaciones de Yucatán.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500 dark:text-slate-400">• Acta de nacimiento certificada • INE vigente • Pago de derechos federales</p>
+								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-500">• Acta de nacimiento certificada • INE vigente • Pago de derechos</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 dark:border-slate-850 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green dark:text-yuc-green-light">Costo: Estatal + Federal</span>
-							<a href="/ciudadano/subida?tramite=pasaporte" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors">
+						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-green font-display">Costo: Estatal + Federal</span>
+							<a href="/ciudadano/subida?tramite=pasaporte" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</a>
 						</div>
 					</div>
 
 					<!-- Card 4: INE / Registro Civil (CURP y Actas) -->
-					<div class="catalog-card bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" data-title="ine registro civil curp actas nacimiento defuncion matrimonio yucatan copias">
+					<div class="catalog-card bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between" data-title="ine registro civil curp actas nacimiento defuncion matrimonio yucatan copias">
 						<div>
 							<div class="flex justify-between items-start gap-4">
-								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green dark:text-yuc-green-light font-bold text-[10px] uppercase">REGISTRO CIVIL / INE</span>
-								<span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Resolución: Inmediato</span>
+								<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase font-display">REGISTRO CIVIL / INE</span>
+								<span class="text-xs text-slate-400 font-medium">Resolución: Inmediato</span>
 							</div>
-							<h3 class="text-lg font-bold text-slate-800 dark:text-white mt-3 font-display">CURP y Actas Certificadas</h3>
-							<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+							<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">CURP y Actas Certificadas</h3>
+							<p class="text-xs text-slate-500 mt-2 leading-relaxed">
 								Búsqueda y expedición oficial de la clave CURP y copias certificadas del acta de nacimiento, matrimonio o actas registrales del estado civil de las personas.
 							</p>
 							<div class="mt-4 space-y-1">
-								<h4 class="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Requisitos clave:</h4>
-								<p class="text-[11px] text-slate-500 dark:text-slate-400">• CURP o datos registrales completos (Libro, Acta, Año) • Pago por copia</p>
+								<h4 class="text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Requisitos clave:</h4>
+								<p class="text-[11px] text-slate-500">• CURP o datos registrales completos • Pago por copia</p>
 							</div>
 						</div>
-						<div class="pt-6 border-t border-slate-100 dark:border-slate-850 mt-6 flex justify-between items-center">
-							<span class="text-xs font-bold text-yuc-green dark:text-yuc-green-light">Costo: Gratuito / Variable</span>
-							<a href="/ciudadano/subida?tramite=ine" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors">
+						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
+							<span class="text-xs font-bold text-yuc-green font-display">Costo: Gratuito / Variable</span>
+							<a href="/ciudadano/subida?tramite=ine" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</a>
 						</div>
@@ -195,18 +195,18 @@ import Layout from '../../layouts/Layout.astro';
 				</div>
 				
 				<!-- No results message -->
-				<div id="no-results-msg" class="hidden text-center py-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
-					<p class="text-slate-500 dark:text-slate-400 text-sm">No se encontraron trámites con esos términos.</p>
-					<button id="btn-clear-search" class="text-xs font-bold text-yuc-green hover:underline">Limpiar búsqueda</button>
+				<div id="no-results-msg" class="hidden text-center py-12 bg-white border border-slate-200 rounded-xl space-y-3">
+					<p class="text-slate-500 text-sm">No se encontraron trámites con esos términos.</p>
+					<button id="btn-clear-search" class="text-xs font-bold text-yuc-green hover:underline font-display">Limpiar búsqueda</button>
 				</div>
 			</div>
 
 			<!-- SAT RFC Warning Modal -->
 			<div id="sat-rfc-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
 				<!-- Backdrop -->
-				<div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" id="sat-modal-close-bg"></div>
+				<div class="absolute inset-0 bg-slate-950/40" id="sat-modal-close-bg"></div>
 				<!-- Card content -->
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl relative z-10 space-y-6">
+				<div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-lg relative z-10 space-y-6">
 					<div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
 						<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -214,38 +214,38 @@ import Layout from '../../layouts/Layout.astro';
 					</div>
 					
 					<div class="space-y-2">
-						<h3 class="text-xl font-bold text-slate-800 dark:text-white font-display">Requisito Fiscal: RFC Faltante</h3>
-						<p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+						<h3 class="text-xl font-bold text-slate-800 font-display">Requisito Fiscal: RFC Faltante</h3>
+						<p class="text-sm text-slate-505 leading-relaxed">
 							Para realizar trámites relacionados con el SAT en CivicFlow, es obligatorio tener registrado su RFC con Homoclave. El sistema detecta que su perfil no cuenta con esta clave.
 						</p>
 					</div>
 
 					<!-- Simulate configuration option -->
-					<div class="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-850 space-y-2.5">
-						<label for="sat-rfc-input" class="block text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Configurar RFC en este dispositivo (Demo)</label>
+					<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2.5">
+						<label for="sat-rfc-input" class="block text-[10px] font-bold text-slate-600 uppercase tracking-wider font-display">Configurar RFC en este dispositivo (Demo)</label>
 						<div class="flex gap-2">
 							<input 
 								type="text" 
 								id="sat-rfc-input" 
 								maxlength="13" 
-								class="block w-full px-3 py-2 rounded-lg border border-slate-250 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono uppercase" 
+								class="block w-full px-3 py-2 rounded-lg border border-slate-250 bg-white text-xs font-mono uppercase" 
 								placeholder="XAXX010101000" 
 							/>
 							<button 
 								type="button" 
 								id="btn-save-rfc" 
-								class="px-3.5 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors border border-yuc-green-light shrink-0"
+								class="px-3.5 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors border border-yuc-green-light shrink-0 font-display"
 							>
 								Guardar
 							</button>
 						</div>
 					</div>
 
-					<div class="flex flex-col sm:flex-row gap-3 sm:justify-end text-xs font-bold pt-2 border-t border-slate-100 dark:border-slate-850">
+					<div class="flex flex-col sm:flex-row gap-3 sm:justify-end text-xs font-bold pt-2 border-t border-slate-100">
 						<button 
 							type="button" 
 							id="btn-close-sat-modal" 
-							class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-850 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border border-slate-250/50 dark:border-slate-800 transition-colors"
+							class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border border-slate-250/50 transition-colors font-display"
 						>
 							Cancelar
 						</button>
@@ -254,7 +254,7 @@ import Layout from '../../layouts/Layout.astro';
 							target="_blank" 
 							rel="noopener noreferrer" 
 							id="btn-go-to-sat"
-							class="px-4 py-2.5 bg-yuc-gold hover:bg-yuc-gold-light text-slate-950 rounded-lg text-center transition-colors shadow-sm"
+							class="px-4 py-2.5 bg-yuc-gold hover:bg-yuc-gold-light text-white rounded-lg text-center transition-colors shadow-sm font-display"
 						>
 							Entendido, ir al SAT
 						</a>
@@ -265,14 +265,14 @@ import Layout from '../../layouts/Layout.astro';
 			<!-- TAB 2: INBOX (MY REQUESTS) -->
 			<div id="tab-content-inbox" class="hidden space-y-6">
 				
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
-					<div class="p-6 border-b border-slate-100 dark:border-slate-850 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+				<div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+					<div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 						<div>
-							<h3 class="text-lg font-bold text-slate-800 dark:text-white font-display">Historial de Trámites Solicitados</h3>
+							<h3 class="text-lg font-bold text-slate-800 font-display">Historial de Trámites Solicitados</h3>
 							<p class="text-xs text-slate-400 mt-1">Lista completa de trámites asociados a su cuenta y su estado actual en tiempo real.</p>
 						</div>
 						<div>
-							<button id="btn-refresh-inbox" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-200/50 dark:border-slate-700/50">
+							<button id="btn-refresh-inbox" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-200/50 font-display">
 								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
 								<span>Actualizar</span>
 							</button>
@@ -282,7 +282,7 @@ import Layout from '../../layouts/Layout.astro';
 					<div class="overflow-x-auto">
 						<table class="w-full text-left border-collapse">
 							<thead>
-								<tr class="bg-slate-50 dark:bg-slate-950/40 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+								<tr class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b border-slate-200 font-display">
 									<th class="px-6 py-4">Folio de Seguimiento</th>
 									<th class="px-6 py-4">Trámite</th>
 									<th class="px-6 py-4">Dependencia</th>
@@ -291,7 +291,7 @@ import Layout from '../../layouts/Layout.astro';
 									<th class="px-6 py-4 text-right">Acciones</th>
 								</tr>
 							</thead>
-							<tbody id="inbox-tbody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-sm text-slate-700 dark:text-slate-350">
+							<tbody id="inbox-tbody" class="divide-y divide-slate-200/60 text-sm text-slate-700">
 								<!-- Rendered dynamically from JS -->
 							</tbody>
 						</table>
@@ -299,10 +299,10 @@ import Layout from '../../layouts/Layout.astro';
 
 					<!-- Empty tray message -->
 					<div id="inbox-empty-msg" class="hidden text-center py-16 space-y-3">
-						<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+						<div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path></svg>
 						</div>
-						<p class="text-slate-500 dark:text-slate-400 text-xs">No tiene trámites registrados aún en su historial.</p>
+						<p class="text-slate-500 text-xs">No tiene trámites registrados aún en su historial.</p>
 					</div>
 
 				</div>
@@ -313,24 +313,24 @@ import Layout from '../../layouts/Layout.astro';
 			<div id="tab-content-folder" class="hidden space-y-6">
 				
 				<!-- Overview Banner -->
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+				<div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
 					<div class="space-y-2 flex-grow">
-						<h3 class="text-lg font-bold text-slate-800 dark:text-white font-display">Expediente Digital Único del Ciudadano</h3>
-						<p class="text-xs text-slate-500 dark:text-slate-400">
+						<h3 class="text-lg font-bold text-slate-800 font-display">Expediente Digital Único del Ciudadano</h3>
+						<p class="text-xs text-slate-500">
 							Suba sus documentos una sola vez. Se vincularán automáticamente al iniciar cualquier trámite del Gobierno del Estado de Yucatán sin necesidad de volver a cargarlos.
 						</p>
 						<!-- Progress Dossier -->
 						<div class="space-y-1.5 pt-2 max-w-sm">
-							<div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+							<div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase font-display">
 								<span>PROGRESO DEL EXPEDIENTE</span>
 								<span id="lbl-dossier-progress">75%</span>
 							</div>
-							<div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-								<div id="bar-dossier-progress" class="h-full bg-yuc-green dark:bg-yuc-green-light transition-all duration-500" style="width: 75%;"></div>
+							<div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+								<div id="bar-dossier-progress" class="h-full bg-yuc-green transition-all duration-500" style="width: 75%;"></div>
 							</div>
 						</div>
 					</div>
-					<button id="btn-download-dossier-zip" class="px-5 py-3 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700 shrink-0 shadow-md">
+					<button id="btn-download-dossier-zip" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 border border-slate-700 shrink-0 shadow-sm font-display">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
 						<span>Descargar Expediente Completo (ZIP)</span>
 					</button>
@@ -371,8 +371,8 @@ import Layout from '../../layouts/Layout.astro';
 
 			const activateTab = (tab) => {
 				// Reset tabs classes
-				const activeClass = "pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green dark:border-yuc-green-light dark:text-yuc-green-light focus:outline-none transition-all flex items-center gap-2";
-				const inactiveClass = "pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 focus:outline-none transition-all flex items-center gap-2 relative";
+				const activeClass = "pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green focus:outline-none flex items-center gap-2";
+				const inactiveClass = "pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-850 focus:outline-none flex items-center gap-2 relative";
 				
 				tabCatalog.className = inactiveClass;
 				tabInbox.className = inactiveClass;
@@ -433,17 +433,6 @@ import Layout from '../../layouts/Layout.astro';
 				filterCatalog();
 			});
 
-			// Requests list
-			const defaultRequests = [
-				{
-					folio: "TRM-2026-00104",
-					name: "Acreditación de Productor Henequenero",
-					dept: "Desarrollo Rural",
-					date: "2026-04-12",
-					status: "Aprobado"
-				}
-			];
-
 			const defaultDossier = [
 				{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "ine_ciudadano_yuc.pdf", status: "Cargado", date: "2026-05-18" },
 				{ id: "dom", name: "Comprobante de Domicilio", file: "comprobante_luz_merida.pdf", status: "Cargado", date: "2026-05-18" },
@@ -472,18 +461,18 @@ import Layout from '../../layouts/Layout.astro';
 					if (isLoaded) loadedCount++;
 
 					const card = document.createElement('div');
-					card.className = "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col justify-between h-44 shadow-sm";
+					card.className = "bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between h-44 shadow-sm";
 					
-					let statusBadge = `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold text-[9px] uppercase tracking-wide">Pendiente</span>`;
+					let statusBadge = `<span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-500 font-bold text-[9px] uppercase tracking-wide font-display">Pendiente</span>`;
 					let actionButtons = `
-						<div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-yuc-green rounded-lg p-4 cursor-pointer text-center h-16 w-full">
+						<div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 hover:border-yuc-green rounded-lg p-4 cursor-pointer text-center h-16 w-full">
 							<input type="file" id="upload-${doc.id}" class="absolute inset-0 opacity-0 cursor-pointer" />
-							<span class="text-xs font-bold text-slate-500 dark:text-slate-400">Subir Archivo</span>
+							<span class="text-xs font-bold text-slate-500 font-display">Subir Archivo</span>
 						</div>
 					`;
 
 					if (isLoaded) {
-						statusBadge = `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[9px] uppercase tracking-wide">✓ Cargado</span>`;
+						statusBadge = `<span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold text-[9px] uppercase tracking-wide font-display">✓ Cargado</span>`;
 						actionButtons = `
 							<div class="flex justify-between items-center gap-3 w-full">
 								<div class="text-left">
@@ -491,8 +480,8 @@ import Layout from '../../layouts/Layout.astro';
 									<p class="text-[9px] text-slate-400">Fecha: ${doc.date}</p>
 								</div>
 								<div class="flex gap-2">
-									<button id="btn-dl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded">Descargar</button>
-									<button id="btn-repl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-bold rounded">Reemplazar</button>
+									<button id="btn-dl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded font-display">Descargar</button>
+									<button id="btn-repl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded font-display">Reemplazar</button>
 								</div>
 							</div>
 						`;
@@ -500,10 +489,10 @@ import Layout from '../../layouts/Layout.astro';
 
 					card.innerHTML = `
 						<div class="flex justify-between items-start gap-4">
-							<h4 class="font-bold text-xs text-slate-800 dark:text-white">${doc.name}</h4>
+							<h4 class="font-bold text-xs text-slate-800 font-display">${doc.name}</h4>
 							${statusBadge}
 						</div>
-						<div class="pt-4 border-t border-slate-100 dark:border-slate-850 mt-4 flex items-center justify-center">
+						<div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-center w-full">
 							${actionButtons}
 						</div>
 					`;
@@ -625,7 +614,6 @@ import Layout from '../../layouts/Layout.astro';
 
 				tbody.innerHTML = '';
 				
-				// Filter citizen requests (only show requests if user curp matches? In mock we show all local storage requests)
 				if (requests.length === 0) {
 					emptyMsg.classList.remove('hidden');
 					document.getElementById('badge-inbox-count').classList.add('hidden');
@@ -638,7 +626,7 @@ import Layout from '../../layouts/Layout.astro';
 
 				// Order requests newest first
 				requests.reverse().forEach(req => {
-					let badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+					let badgeClass = 'bg-slate-100 text-slate-700';
 					if (req.status === 'En revisión') badgeClass = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
 					else if (req.status === 'Aprobado') badgeClass = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
 					else if (req.status === 'Documentación incompleta') badgeClass = 'bg-orange-500/10 text-orange-500 border border-orange-500/20';
@@ -646,11 +634,11 @@ import Layout from '../../layouts/Layout.astro';
 					else if (req.status === 'Recibido') badgeClass = 'bg-blue-500/10 text-blue-500 border border-blue-500/20';
 
 					const tr = document.createElement('tr');
-					tr.className = "hover:bg-slate-50/50 dark:hover:bg-slate-850/30 transition-colors";
+					tr.className = "hover:bg-slate-50/50 transition-colors";
 					tr.innerHTML = `
-						<td class="px-6 py-4 font-mono font-bold text-slate-800 dark:text-white">${req.folio}</td>
+						<td class="px-6 py-4 font-mono font-bold text-slate-800">${req.folio}</td>
 						<td class="px-6 py-4 font-semibold">${req.name}</td>
-						<td class="px-6 py-4 text-xs text-slate-400 dark:text-slate-500">${req.dept}</td>
+						<td class="px-6 py-4 text-xs text-slate-400">${req.dept}</td>
 						<td class="px-6 py-4 text-xs">${req.date}</td>
 						<td class="px-6 py-4">
 							<span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
@@ -658,7 +646,7 @@ import Layout from '../../layouts/Layout.astro';
 							</span>
 						</td>
 						<td class="px-6 py-4 text-right">
-							<a href="/ciudadano/tracker?folio=${req.folio}" class="px-3.5 py-1.5 bg-slate-100 hover:bg-yuc-green hover:text-white dark:bg-slate-800 dark:hover:bg-yuc-green text-slate-700 dark:text-slate-350 text-xs font-extrabold rounded-lg transition-all inline-flex items-center gap-1">
+							<a href="/ciudadano/tracker?folio=${req.folio}" class="px-3.5 py-1.5 bg-slate-100 hover:bg-yuc-green hover:text-white text-slate-700 text-xs font-extrabold rounded-lg transition-all inline-flex items-center gap-1 font-display">
 								<span>Rastrear</span>
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
 									<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

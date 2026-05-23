@@ -3,22 +3,18 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="Acceso de Servidores Públicos - Panel Gestor">
-	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-bg-dark transition-colors relative overflow-hidden">
+	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
 		
-		<!-- Decorative Background Shapes -->
-		<div class="absolute top-0 left-0 w-96 h-96 rounded-full bg-yuc-gold/5 blur-3xl pointer-events-none"></div>
-		<div class="absolute bottom-0 right-0 w-96 h-96 rounded-full bg-yuc-green/5 blur-3xl pointer-events-none"></div>
-
-		<div class="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl relative z-10">
+		<div class="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl border border-slate-200 shadow-sm relative z-10">
 			
 			<div class="text-center">
-				<div class="mx-auto w-12 h-12 rounded-xl bg-yuc-gold/10 text-yuc-gold-dark dark:text-yuc-gold flex items-center justify-center mb-4">
+				<div class="mx-auto w-12 h-12 rounded-xl bg-yuc-gold/10 text-yuc-gold-dark flex items-center justify-center mb-4">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.375m0-10.03L12 3m0 0l2.625 2.67M12 3v15.75m0 0H9m3 0h3.375M9 15h3.375M9 12h3.75m3.75-9H18a2.25 2.25 0 012.25 2.25v13.5A2.25 2.25 0 0118 21h-2.25" />
 					</svg>
 				</div>
-				<h2 class="text-3xl font-black text-slate-800 dark:text-white font-display">Panel Gestor</h2>
-				<p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+				<h2 class="text-2xl font-bold text-slate-800 font-display">Panel Gestor</h2>
+				<p class="mt-2 text-xs text-slate-500">
 					Módulo interno para validación, revisión y firma de expedientes digitales.
 				</p>
 			</div>
@@ -28,38 +24,38 @@ import Layout from '../../layouts/Layout.astro';
 					
 					<!-- Email Field -->
 					<div>
-						<label for="email" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Correo Institucional</label>
+						<label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Correo Institucional</label>
 						<input 
 							id="email" 
 							name="email" 
 							type="email" 
 							required 
-							class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors"
+							class="block w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
 							placeholder="servidor@yucatan.gob.mx"
 						/>
 					</div>
 
 					<!-- Password Field -->
 					<div>
-						<label for="password" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Contraseña</label>
+						<label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Contraseña</label>
 						<input 
 							id="password" 
 							name="password" 
 							type="password" 
 							required 
-							class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors"
+							class="block w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
 							placeholder="••••••••"
 						/>
 					</div>
 
 					<!-- Role selection -->
 					<div>
-						<label for="role" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Rol / Permisos del Funcionario</label>
+						<label for="role" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Rol / Permisos del Funcionario</label>
 						<select 
 							id="role" 
 							name="role" 
 							required
-							class="block w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm transition-colors"
+							class="block w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
 						>
 							<option value="Revisor">Revisor (Catastro / SDR) - Puede comentar y pre-evaluar</option>
 							<option value="Aprobador">Aprobador (Director de Dependencia) - Puede dictaminar y firmar</option>
@@ -71,7 +67,7 @@ import Layout from '../../layouts/Layout.astro';
 				<div>
 					<button 
 						type="submit" 
-						class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-extrabold text-white bg-slate-850 hover:bg-slate-750 transition-all focus:ring-2 focus:ring-offset-2 focus:ring-slate-700 border border-slate-700"
+						class="w-full flex justify-center py-3.5 px-4 border border-slate-300 rounded-xl shadow-sm text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 transition-colors border border-slate-350"
 					>
 						Ingresar al Módulo Gestor
 					</button>
@@ -79,11 +75,11 @@ import Layout from '../../layouts/Layout.astro';
 			</form>
 
 			<!-- Testing info -->
-			<div class="mt-4 p-4 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs">
-				<p class="font-bold text-slate-850 dark:text-slate-200">Credenciales Demo:</p>
-				<ul class="text-slate-500 dark:text-slate-400 mt-1.5 space-y-1">
-					<li>• Revisor: <code class="text-yuc-green font-bold">revisor@yucatan.gob.mx</code> | Contraseña libre</li>
-					<li>• Aprobador: <code class="text-yuc-green font-bold">director@yucatan.gob.mx</code> | Contraseña libre</li>
+			<div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs">
+				<p class="font-bold text-slate-800">Credenciales Demo:</p>
+				<ul class="text-slate-500 mt-1.5 space-y-1">
+					<li>• Revisor: <code class="text-yuc-green font-bold bg-slate-200/50 px-1 rounded">revisor@yucatan.gob.mx</code></li>
+					<li>• Aprobador: <code class="text-yuc-green font-bold bg-slate-200/50 px-1 rounded">director@yucatan.gob.mx</code></li>
 				</ul>
 			</div>
 
