@@ -4,24 +4,23 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Acceso de Servidores Públicos - Panel Gestor">
-	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-900 relative overflow-hidden">
+	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style="background-color: #0a2318;">
 		
-		<!-- Background decorative elements -->
+		<!-- Background decorative elements (matching index green theme) -->
 		<div class="absolute inset-0 z-0">
-			<div class="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-10"></div>
-			<div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-yuc-green/20 blur-3xl"></div>
-			<div class="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-yuc-gold/20 blur-3xl"></div>
+			<div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full opacity-20 blur-3xl" style="background-color: #1a5c38;"></div>
+			<div class="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full opacity-20 blur-3xl" style="background-color: #c29b38;"></div>
 		</div>
 
-		<div class="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl shadow-2xl relative z-10 border-t-4 border-t-yuc-gold">
+		<div class="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl shadow-2xl relative z-10 border-t-4" style="border-top-color: #c29b38;">
 			
 			<div class="text-center">
-				<div class="mx-auto w-14 h-14 rounded-full bg-slate-900 text-yuc-gold flex items-center justify-center mb-4 shadow-md">
+				<div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center mb-4 shadow-md" style="background-color: #0a2318; color: #c29b38;">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.375m0-10.03L12 3m0 0l2.625 2.67M12 3v15.75m0 0H9m3 0h3.375M9 15h3.375M9 12h3.75m3.75-9H18a2.25 2.25 0 012.25 2.25v13.5A2.25 2.25 0 0118 21h-2.25" />
 					</svg>
 				</div>
-				<h2 class="text-2xl font-bold text-slate-800 font-display">Panel Gestor</h2>
+				<h2 class="text-2xl font-bold font-display" style="color: #1a2e1a;">Panel Gestor</h2>
 				<p class="mt-2 text-xs text-slate-500">
 					Módulo interno para validación, revisión y firma de expedientes digitales.
 				</p>
@@ -32,53 +31,61 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					
 					<!-- Email Field -->
 					<div>
-						<label for="email" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Correo Institucional</label>
+						<label for="email" class="block text-xs font-bold uppercase tracking-wider mb-1" style="color: #1a2e1a;">Correo Institucional</label>
 						<input 
 							id="email" 
 							name="email" 
 							type="email" 
 							required 
-							class="block w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
+							class="block w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all"
+							style="border-color: #d1d5db; background-color: #f8fafc;"
 							placeholder="servidor@yucatan.gob.mx"
+							onfocus="this.style.borderColor='#005c42'; this.style.boxShadow='0 0 0 2px rgba(0,92,66,0.15)';"
+							onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
 						/>
 					</div>
 
 					<!-- Password Field -->
 					<div>
-						<label for="password" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Contraseña</label>
+						<label for="password" class="block text-xs font-bold uppercase tracking-wider mb-1" style="color: #1a2e1a;">Contraseña</label>
 						<input 
 							id="password" 
 							name="password" 
 							type="password" 
 							required 
-							class="block w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-sm"
+							class="block w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all"
+							style="border-color: #d1d5db; background-color: #f8fafc;"
 							placeholder="••••••••"
+							onfocus="this.style.borderColor='#005c42'; this.style.boxShadow='0 0 0 2px rgba(0,92,66,0.15)';"
+							onblur="this.style.borderColor='#d1d5db'; this.style.boxShadow='none';"
 						/>
 					</div>
-
-					<!-- Role selection removed -->
 
 				</div>
 
 				<div>
 					<button 
 						type="submit" 
-						class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-yuc-green focus:ring-2 focus:ring-yuc-green transition-colors"
+						id="btn-submit-login"
+						class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white transition-all"
+						style="background-color: #005c42;"
+						onmouseover="this.style.backgroundColor='#004a34';"
+						onmouseout="this.style.backgroundColor='#005c42';"
 					>
 						Ingresar al Módulo Gestor
 					</button>
 				</div>
                 <div class="mt-4 text-center">
-                    <a href="#" id="forgot-password" class="font-bold text-xs text-slate-500 hover:text-yuc-green hover:underline transition-colors">¿Olvidó su contraseña institucional?</a>
+                    <a href="#" id="forgot-password" class="font-bold text-xs text-slate-500 hover:underline transition-colors" style="" onmouseover="this.style.color='#005c42';" onmouseout="this.style.color='';">¿Olvidó su contraseña institucional?</a>
                 </div>
 			</form>
 
 			<!-- Testing info -->
-			<div class="mt-4 p-4 rounded-xl bg-slate-100 border border-slate-200 text-xs">
-				<p class="font-bold text-slate-800">Credenciales Demo:</p>
+			<div class="mt-4 p-4 rounded-xl text-xs" style="background-color: #f0faf5; border: 1px solid #c6e8d5;">
+				<p class="font-bold" style="color: #1a2e1a;">Credenciales Demo:</p>
 				<ul class="text-slate-500 mt-1.5 space-y-1">
-					<li>• Revisor: <code class="text-yuc-green font-bold bg-slate-200/50 px-1 rounded">revisor@yucatan.gob.mx</code></li>
-					<li>• Aprobador: <code class="text-yuc-green font-bold bg-slate-200/50 px-1 rounded">director@yucatan.gob.mx</code></li>
+					<li>• Revisor: <code class="font-bold px-1 rounded" style="color: #005c42; background-color: #d8f0e4;">revisor@yucatan.gob.mx</code></li>
+					<li>• Aprobador: <code class="font-bold px-1 rounded" style="color: #c29b38; background-color: #fdf6e3;">director@yucatan.gob.mx</code></li>
 				</ul>
 			</div>
 
@@ -87,46 +94,68 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 	<script is:inline define:vars={{ API_URL }}>
 		const form = document.getElementById('gestor-login-form');
+		const btnSubmit = document.getElementById('btn-submit-login');
+
 		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const email = document.getElementById('email').value.trim();
 			const password = document.getElementById('password').value;
 
+			// Deshabilitar botón mientras carga
+			btnSubmit.disabled = true;
+			btnSubmit.textContent = 'Verificando...';
+			btnSubmit.style.opacity = '0.7';
+
 			let loginSuccess = false;
 			let role = '';
+
 			try {
 				const res = await fetch(`${API_URL}/api/auth/login`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ email, password })
 				});
-				const json = await res.json();
-				if (json.success && json.user) {
-					localStorage.setItem('gestor_logged', 'true');
-					localStorage.setItem('gestor_email', json.user.email);
-					role = json.user.rol;
-					loginSuccess = true;
-				} else {
-					window.showToast(json.message || "Credenciales inválidas en el servidor.", "error");
+
+				if (!res.ok) {
+					const errJson = await res.json().catch(() => ({}));
+					window.showToast(errJson.message || `Error del servidor (${res.status})`, 'error');
+					btnSubmit.disabled = false;
+					btnSubmit.textContent = 'Ingresar al Módulo Gestor';
+					btnSubmit.style.opacity = '1';
 					return;
 				}
-			} catch (_) {
+
+				const json = await res.json();
+				console.log('[gestor login] respuesta:', json);
+
+				if (json.success && json.user) {
+					role = json.user.rol || 'revisor';
+					loginSuccess = true;
+				} else {
+					window.showToast(json.message || 'Credenciales inválidas en el servidor.', 'error');
+					btnSubmit.disabled = false;
+					btnSubmit.textContent = 'Ingresar al Módulo Gestor';
+					btnSubmit.style.opacity = '1';
+					return;
+				}
+			} catch (err) {
+				console.warn('[gestor login] Error de conexión, usando fallback demo:', err.message);
 				// Fallback local en desarrollo/modo demo
-				role = 'Revisor';
+				role = 'revisor';
 				loginSuccess = true;
 			}
 
 			if (loginSuccess) {
-				// Aseguramos persistencia local de rol y login para demo
 				localStorage.setItem('gestor_logged', 'true');
 				localStorage.setItem('gestor_email', email);
 				localStorage.setItem('gestor_role', role);
 
-				window.showToast(`Bienvenido al sistema. Rol: ${role}`, "success");
+				window.showToast(`Bienvenido al sistema. Rol: ${role}`, 'success');
 
+				// Redirigir directamente sin esperar demasiado
 				setTimeout(() => {
-					window.location.href = '/gestor/dashboard';
-				}, 800);
+					window.location.replace('/gestor/dashboard');
+				}, 600);
 			}
 		});
 
@@ -134,7 +163,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			e.preventDefault();
 			const email = document.getElementById('email').value.trim();
 			if (!email) {
-				window.showToast("Por favor, ingresa tu correo institucional primero.", "error");
+				window.showToast('Por favor, ingresa tu correo institucional primero.', 'error');
 				return;
 			}
 			
@@ -149,13 +178,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				});
 				const json = await res.json();
 				if (json.success) {
-					window.showToast("Contraseña actualizada exitosamente desde el sistema.", "success");
+					window.showToast('Contraseña actualizada exitosamente desde el sistema.', 'success');
 					document.getElementById('password').value = newPassword;
 				} else {
-					window.showToast(json.message || "Error al actualizar contraseña.", "error");
+					window.showToast(json.message || 'Error al actualizar contraseña.', 'error');
 				}
 			} catch (err) {
-				window.showToast("Error al conectar con el servidor.", "error");
+				window.showToast('Error al conectar con el servidor.', 'error');
 			}
 		});
 	</script>
