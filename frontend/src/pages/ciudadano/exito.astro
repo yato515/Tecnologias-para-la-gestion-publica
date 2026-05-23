@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="Trámite Enviado Exitosamente - CivicFlow">
+<Layout title="Trámite Enviado Exitosamente - In óolal Yucatan">
 	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-bg-dark transition-colors relative overflow-hidden">
 		
 		<!-- Decorative Background Details -->
@@ -21,7 +21,7 @@ import Layout from '../../layouts/Layout.astro';
 				</div>
 				<h2 class="text-3xl font-black text-slate-800 dark:text-white font-display">¡Envío Exitoso!</h2>
 				<p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-					Su solicitud ha sido recibida y registrada por el sistema de automatización gubernamental CivicFlow del Estado de Yucatán.
+					Su solicitud ha sido recibida y registrada por el sistema de automatización gubernamental In óolal Yucatan del Estado de Yucatán.
 				</p>
 			</div>
 
@@ -187,7 +187,7 @@ import Layout from '../../layouts/Layout.astro';
 				const encodedUri = encodeURI(pdfText);
 				const link = document.createElement("a");
 				link.setAttribute("href", encodedUri);
-				link.setAttribute("download", `acuse_civicflow_${folio}.txt`);
+				link.setAttribute("download", `acuse_inoolal_${folio}.txt`);
 				document.body.appendChild(link);
 				link.click();
 				document.body.removeChild(link);
