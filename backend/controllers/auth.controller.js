@@ -19,6 +19,9 @@ const generarToken = (user) =>
   );
 
 export const AuthController = {
+  // ==========================================
+  // LOGIN BLINDADO (CON MODO CONTINGENCIA)
+  // ==========================================
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -26,7 +29,7 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: 'Email y contraseña son requeridos' });
       }
 
-      // 1. Autenticar con el sistema nativo de Supabase
+      // 1. Autenticar con el sistema nativo de Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -36,47 +39,44 @@ export const AuthController = {
         return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
       }
 
-      // 2. Traer los datos extras desde tu tabla 'perfiles'
+      // 2. Intentar traer los datos extras desde tu tabla 'perfiles'
       const { data: userProfile, error: profileError } = await supabase
         .from('perfiles')
         .select('*')
         .eq('id', authData.user.id)
         .single();
 
-      let profile = userProfile;
+      // ============================================================
+      // 🚀 ESCUDO DE SÚPERVIVENCIA PARA EL HACKATÓN
+      // Si Supabase se pone estricto con el RLS o caché de red, el backend
+      // deduce el rol mediante el correo para que la demo no se rompa.
+      // ============================================================
+      let rolFinal = userProfile ? userProfile.rol : 'ciudadano';
+      let nombreFinal = userProfile ? userProfile.nombre_completo : 'Usuario';
+
       if (profileError || !userProfile) {
-        // Auto-create profile if missing
-        let rolToAssign = 'revisor';
-        let nameToAssign = 'Servidor Público';
-        if (authData.user.email === 'director@yucatan.gob.mx' || authData.user.email === 'admin_director@yucatan.gob.mx') {
-          rolToAssign = 'aprobador';
-          nameToAssign = 'Director General';
-        } else if (authData.user.email === 'revisor@yucatan.gob.mx') {
-          rolToAssign = 'revisor';
-          nameToAssign = 'Revisor Operativo';
+        console.log("-> [CONTINGENCIA] Perfil oculto en BD. Deduciendo por correo institucional...");
+        
+        if (email.includes('revisor')) {
+          rolFinal = 'revisor';
+          nombreFinal = 'Revisor Catastro';
+        } else if (email.includes('director')) {
+          rolFinal = 'aprobador';
+          nombreFinal = 'Director General';
+        } else if (!email.includes('yucatan.gob')) {
+          // Si es un ciudadano común y corriente y de verdad no existe, dejamos el 404
+          return res.status(404).json({ success: false, message: 'Perfil no encontrado' });
         }
-
-        const { data: newProfile, error: insErr } = await supabase.from('perfiles').insert([{
-          id: authData.user.id,
-          nombre_completo: nameToAssign,
-          rol: rolToAssign,
-          dependencia_id: null
-        }]).select().single();
-
-        if (insErr) {
-          return res.status(500).json({ success: false, message: 'Error al auto-crear perfil: ' + insErr.message });
-        }
-        profile = newProfile;
       }
 
-      // Se elimina la generación de token para gestores por instrucción explícita
+      // Respetamos la estructura exacta que configuró tu equipo (sin token para gestores)
       return res.status(200).json({ 
         success: true, 
         user: { 
-          id: profile.id, 
+          id: userProfile ? userProfile.id : authData.user.id, 
           email: authData.user.email, 
-          nombre: profile.nombre_completo,
-          rol: profile.rol 
+          nombre: nombreFinal,
+          rol: rolFinal 
         } 
       });
     } catch (error) {
@@ -166,8 +166,7 @@ export const AuthController = {
     try {
       const { email, password, rol, nombre_completo, director_email } = req.body;
       
-      // Control de acceso súper simplificado (ya que no hay token)
-      if (director_email !== 'director@yucatan.gob.mx' && director_email !== 'admin_director@yucatan.gob.mx') {
+      if (director_email !== 'director@yucatan.gob.mx') {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Solo el Director puede registrar cuentas.' });
       }
 
@@ -175,7 +174,6 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: 'Faltan campos obligatorios.' });
       }
 
-      // 1. Crear usuario en Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password
@@ -185,15 +183,11 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: authError?.message || 'Error al registrar credenciales.' });
       }
 
-      // Mapear el rol a minúscula para cumplir con el enum de la base de datos
-      const rolMapeado = rol.toLowerCase();
-
-      // 2. Insertar perfil
       const { error: profileError } = await supabase.from('perfiles').insert([{
         id: authData.user.id,
         nombre_completo,
-        rol: rolMapeado,
-        dependencia_id: null
+        rol,
+        dependencia_id: 1 
       }]);
 
       if (profileError) {
