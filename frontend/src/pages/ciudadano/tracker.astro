@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="Buscador y Tracker de Trámites - CivicFlow">
+<Layout title="Buscador y Tracker de Trámites - In óolal Yucatan">
 	
 	<!-- Top Banner -->
 	<section class="bg-yuc-green text-white py-8 transition-colors border-b border-yuc-gold/30">
@@ -408,9 +408,9 @@ import Layout from '../../layouts/Layout.astro';
 			
 			const currentStatus = requests[idx].status;
 			let nextStatus = 'En revisión con sistemas oficiales';
-			let comment = "El sistema CivicFlow inició la verificación de identidad del ciudadano.";
+			let comment = "El sistema In óolal Yucatan inició la verificación de identidad del ciudadano.";
 			let actor = 'sistema_automatico@yucatan.gob.mx';
-			let actorRol = 'CivicFlow Algoritmo';
+			let actorRol = 'In óolal Yucatan Algoritmo';
 
 			if (currentStatus === 'Recibido') {
 				nextStatus = 'En revisión con sistemas oficiales';
