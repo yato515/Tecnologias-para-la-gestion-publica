@@ -5,6 +5,7 @@ const router = Router();
 
 router.get('/solicitudes',                       GestorController.getSolicitudes);
 router.get('/dependencias',                      GestorController.getDependencias);
+router.get('/solicitudes/:id',                   GestorController.getSolicitud);
 router.patch('/solicitudes/:id/estado',          GestorController.cambiarEstado);
 router.patch('/solicitudes/:id/asignar',         GestorController.asignar);
 router.get('/solicitudes/:id/mensajes',          GestorController.getMensajes);

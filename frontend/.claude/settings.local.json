@@ -9,7 +9,11 @@
       "Bash(python3 /tmp/fix_subida.py)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Read(//c/Users/ACER/Documents/Tecnologico/8 Semestre/Hackatec/Tecnologias-para-la-gestion-publica/backend/**)",
+      "Bash(node -e \"console.log\\('syntax check'\\); import\\('./controllers/gestorController.js'\\).then\\(\\(\\) => console.log\\('OK'\\)\\).catch\\(e => console.error\\('ERROR:', e.message\\)\\)\")",
+      "Bash(node -e \"import\\('./controllers/gestorController.js'\\).then\\(\\(\\) => console.log\\('✅ OK'\\)\\).catch\\(e => console.error\\('❌', e.message\\)\\)\")",
+      "Bash(node -e ' *)"
     ]
   }
 }

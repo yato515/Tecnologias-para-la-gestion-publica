@@ -15,7 +15,8 @@ export const GestorController = {
   getSolicitudes: async (req, res) => {
     try {
       const { dependencia_id, tipo_solicitud, municipio } = req.query;
-      let query = supabase
+      const listClient = supabaseAdmin || supabase;
+      let query = listClient
         .from('solicitudes')
         .select(`
           *,
@@ -25,7 +26,8 @@ export const GestorController = {
         `);
 
       if (dependencia_id && dependencia_id !== 'null' && dependencia_id !== 'undefined') {
-        query = query.eq('dependencia_id', dependencia_id);
+        // Include solicitudes for this dependencia OR unassigned (dependencia_id IS NULL)
+        query = query.or(`dependencia_id.eq.${dependencia_id},dependencia_id.is.null`);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -100,6 +102,72 @@ export const GestorController = {
     }
   },
 
+  // GET /api/gestores/solicitudes/:id
+  getSolicitud: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const identifier = decodeURIComponent(id || '').trim();
+
+      if (!identifier || identifier === 'null' || identifier === 'undefined') {
+        return res.status(400).json({ success: false, message: 'Folio o id de solicitud requerido' });
+      }
+
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+
+      const selectFields = `
+        *,
+        ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp),
+        tramite:tramites_catalogo(nombre, plazo_dias_habiles),
+        dependencia:dependencias(nombre)
+      `;
+
+      // Helper: run the query and return the first match
+      const runQuery = async (client) => {
+        let q = client.from('solicitudes').select(selectFields);
+        q = isUUID ? q.eq('id', identifier) : q.eq('folio', identifier);
+        q = q.limit(1);
+        const { data: rows, error: err } = await q;
+        return { data: rows && rows.length > 0 ? rows[0] : null, error: err };
+      };
+
+      // Try with regular client first (matches how getSolicitudes works)
+      let { data, error } = await runQuery(supabase);
+
+      // Retry with admin client if the regular client returned nothing
+      if ((!data || error) && supabaseAdmin) {
+        const adminResult = await runQuery(supabaseAdmin);
+        if (!adminResult.error && adminResult.data) {
+          data = adminResult.data;
+          error = null;
+        }
+      }
+
+      if (error) throw error;
+      if (!data) {
+        return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
+      }
+
+      // Enrich with citizen email from auth
+      if (supabaseAdmin && data.ciudadano_id) {
+        try {
+          const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(data.ciudadano_id);
+          if (authUser?.user?.email) {
+            data = {
+              ...data,
+              ciudadano: data.ciudadano
+                ? { ...data.ciudadano, email: authUser.user.email }
+                : { email: authUser.user.email }
+            };
+          }
+        } catch (_) {}
+      }
+
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
   // GET /api/gestores/dependencias
   getDependencias: async (req, res) => {
     try {
@@ -127,19 +195,18 @@ export const GestorController = {
 
       // Obtener estado actual (y ciudadano_id, tramite y dependencia para el correo)
       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-      let query = supabase.from('solicitudes').select(`
+      const client = supabaseAdmin || supabase;
+      let query = client.from('solicitudes').select(`
         *,
         tramite:tramites_catalogo(nombre),
         ciudadano:perfiles!ciudadano_id(nombre_completo)
       `);
-      if (isUUID) {
-        query = query.eq('id', id);
-      } else {
-        query = query.eq('folio', id);
-      }
-      
-      const { data: solicitud, error: errGet } = await query.maybeSingle();
+      query = isUUID ? query.eq('id', id) : query.eq('folio', id);
+      query = query.limit(1);
+
+      const { data: rows, error: errGet } = await query;
       if (errGet) throw errGet;
+      const solicitud = rows && rows.length > 0 ? rows[0] : null;
       if (!solicitud) {
         return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
       }
@@ -153,7 +220,7 @@ export const GestorController = {
       }
 
       // Actualizar estado
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('solicitudes')
         .update({ estado: estado_nuevo, updated_at: new Date().toISOString() })
         .eq('id', solicitud.id)

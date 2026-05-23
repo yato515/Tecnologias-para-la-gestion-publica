@@ -122,67 +122,52 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				setTimeout(() => { window.location.href = '/gestor'; }, 600);
 			});
 
-			const defaultRequests = [
-				{ folio: "TRM-2026-00104", name: "Acreditación de Productor Henequenero", dept: "Desarrollo Rural", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech" },
-				{ folio: "TRM-2026-00201", name: "Constancia de Residencia", dept: "Catastro y Registro del Estado de Yucatán", date: "2026-05-18", status: "Recibido", citizen_fullname: "Eduardo Chan" },
-				{ folio: "TRM-2026-00202", name: "Licencia de Funcionamiento Comercial", dept: "Dirección de Fomento Económico del Estado", date: "2026-05-15", status: "En revisión", citizen_fullname: "Marisela Puc" }
-			];
 
-			// Cache de solicitudes (cargadas desde API o localStorage)
-			let cachedRequests = null;
+			const mapEstado = {
+				'recibido': 'Recibido',
+				'en_revision': 'En revisión',
+				'documentacion_incompleta': 'Documentación incompleta',
+				'aprobado': 'Aprobado',
+				'rechazado': 'Rechazado'
+			};
 
 			const loadRequests = async () => {
-				if (cachedRequests) return cachedRequests;
 				try {
 					const depId = localStorage.getItem('gestor_dependencia_id');
 					const tipoSolicitud = localStorage.getItem('gestor_tipo_solicitud');
 					const municipio = localStorage.getItem('gestor_municipio');
 
-					let url = `${API_URL}/api/gestores/solicitudes?`;
 					const params = [];
-					if (depId) params.push(`dependencia_id=${depId}`);
+					if (depId && depId !== 'null' && depId !== 'undefined') params.push(`dependencia_id=${depId}`);
 					if (tipoSolicitud && tipoSolicitud !== 'null' && tipoSolicitud !== 'undefined') {
 						params.push(`tipo_solicitud=${encodeURIComponent(tipoSolicitud)}`);
 					}
 					if (municipio && municipio !== 'null' && municipio !== 'undefined') {
 						params.push(`municipio=${encodeURIComponent(municipio)}`);
 					}
-					url += params.join('&');
+					const url = `${API_URL}/api/gestores/solicitudes${params.length ? '?' + params.join('&') : ''}`;
 
-					const res = await fetch(url, {
-						headers: { 'Content-Type': 'application/json' }
-					});
+					const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
 					if (res.status === 401 || res.status === 403) {
 						localStorage.clear();
 						window.location.href = '/gestor';
-						return;
+						return [];
 					}
 					const json = await res.json();
 					if (json.success && Array.isArray(json.data)) {
-						const mapEstado = {
-							'recibido': 'Recibido',
-							'en_revision': 'En revisión',
-							'documentacion_incompleta': 'Documentación incompleta',
-							'aprobado': 'Aprobado',
-							'rechazado': 'Rechazado'
-						};
-						cachedRequests = json.data.map(s => ({
+						return json.data.map(s => ({
 							id: s.id,
 							folio: s.folio || s.id,
-							name: s.tramite?.nombre || 'Trámite',
-							dept: s.dependencia?.nombre || '-',
+							name: s.tramite?.nombre || s.campos_respuesta?.tramite_nombre_fallback || 'Trámite',
+							dept: s.dependencia?.nombre || s.campos_respuesta?.dependencia_nombre_fallback || '-',
 							date: (s.created_at || '').split('T')[0],
 							status: mapEstado[s.estado] || s.estado || 'Recibido',
-							citizen_fullname: s.ciudadano?.nombre_completo || 'N/A',
-							citizen_email: s.ciudadano?.email || 'N/A'
+							citizen_fullname: s.ciudadano?.nombre_completo || (s.campos_respuesta?.nombre_ciudadano && s.campos_respuesta.nombre_ciudadano !== 'Ciudadano de Prueba' ? s.campos_respuesta.nombre_ciudadano : null) || 'Sin nombre',
+							citizen_email: s.ciudadano?.email || s.campos_respuesta?.correo_ciudadano || 'N/A'
 						}));
-						return cachedRequests;
 					}
 				} catch (_) {}
-				// Fallback a localStorage/defaults
-				const local = localStorage.getItem('civicflow_requests');
-				cachedRequests = local ? JSON.parse(local) : defaultRequests;
-				return cachedRequests;
+				return [];
 			};
 
 			const renderQueue = async () => {
@@ -197,9 +182,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				let count = 0;
 
 				// system reference current date
-				const currentDate = new Date('2026-05-22');
+				const currentDate = new Date();
 
-				requests.reverse().forEach(r => {
+				[...requests].reverse().forEach(r => {
 					// Apply filters
 					const matchStatus = statusFilter === 'todos' || r.status === statusFilter;
 					let matchName = nameFilter === 'todos';
@@ -250,7 +235,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								</span>
 							</td>
 							<td class="px-6 py-4 text-right">
-								<a href="/gestor/solicitud?id=${r.folio}" class="px-3.5 py-1.5 bg-slate-800 hover:bg-yuc-green hover:text-white dark:bg-slate-800 dark:hover:bg-yuc-green text-white text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1">
+								<a href="/gestor/solicitud?id=${encodeURIComponent(r.folio || r.id)}" class="px-3.5 py-1.5 bg-slate-800 hover:bg-yuc-green hover:text-white dark:bg-slate-800 dark:hover:bg-yuc-green text-white text-xs font-bold rounded-lg transition-all inline-flex items-center gap-1">
 									<span>Atender</span>
 									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
 										<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />

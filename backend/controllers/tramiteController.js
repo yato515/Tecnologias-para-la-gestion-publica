@@ -69,17 +69,25 @@ export const TramiteController = {
     try {
       const { ciudadano_id, tramite_id, dependencia_id, campos_respuesta } = req.body;
 
-      if (!ciudadano_id || !tramite_id || !dependencia_id) {
-        return res.status(400).json({
-          success: false,
-          message: 'ciudadano_id, tramite_id y dependencia_id son requeridos'
-        });
+      if (!ciudadano_id) {
+        return res.status(400).json({ success: false, message: 'ciudadano_id es requerido' });
       }
+
+      const year = new Date().getFullYear();
+      const random = Math.floor(1000 + Math.random() * 9000);
+      const folio = `TRM-${year}-${random}`;
 
       const client = supabaseAdmin || supabase;
       const { data, error } = await client
         .from('solicitudes')
-        .insert([{ ciudadano_id, tramite_id, dependencia_id, campos_respuesta: campos_respuesta || {} }])
+        .insert([{
+          folio,
+          ciudadano_id,
+          tramite_id: tramite_id || null,
+          dependencia_id: dependencia_id || null,
+          campos_respuesta: campos_respuesta || {},
+          estado: 'recibido'
+        }])
         .select()
         .single();
       if (error) throw error;

@@ -556,7 +556,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 									<span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-widest block">Token</span>
 									<code class="font-mono text-xs font-bold text-yuc-green tracking-wider">${r.token}</code>
 								</div>
-								<a href="/gestor/solicitud?id=${r.folio}" class="px-2.5 py-1 bg-slate-100 hover:bg-yuc-green text-slate-700 hover:text-white text-[10px] font-bold rounded-lg transition-colors flex items-center gap-0.5 shadow-sm">
+								<a href="/gestor/solicitud?id=${encodeURIComponent(r.folio || r.id)}" class="px-2.5 py-1 bg-slate-100 hover:bg-yuc-green text-slate-700 hover:text-white text-[10px] font-bold rounded-lg transition-colors flex items-center gap-0.5 shadow-sm">
 									<span>Atender</span>
 									<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
 								</a>

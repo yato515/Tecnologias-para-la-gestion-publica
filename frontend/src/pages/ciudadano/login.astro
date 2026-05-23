@@ -135,8 +135,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				});
 				const json = await res.json();
 				if (json.success) {
+					const nombre = json.data.nombre_completo || '';
 					localStorage.setItem('citizen_id', json.data.id);
-					localStorage.setItem('citizen_nombre', json.data.nombre_completo || '');
+					localStorage.setItem('citizen_nombre', nombre);
+					localStorage.setItem('citizen_fullname', nombre);
 					loginSuccess = true;
 				} else {
 					window.showToast(json.message || "Credenciales inválidas en el servidor.", "error");
@@ -146,6 +148,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				// Backend no disponible, continúa con sesión local (modo demo)
 				localStorage.setItem('citizen_id', 'demo-citizen-id');
 				localStorage.setItem('citizen_nombre', 'Ciudadano Demo');
+				localStorage.setItem('citizen_fullname', 'Ciudadano Demo');
 				loginSuccess = true;
 			}
 

@@ -41,11 +41,15 @@ export const SolicitudesService = {
   },
 
   obtenerPorFolio: async (folio) => {
-    const { data, error } = await supabase
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(folio);
+    const client = supabaseAdmin || supabase;
+    let query = client
       .from('solicitudes')
       .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo, curp)')
-      .eq('folio', folio)
-      .maybeSingle();
+      
+    query = isUUID ? query.eq('id', folio) : query.eq('folio', folio);
+
+    const { data, error } = await query.maybeSingle();
       
     if (error) {
       const err = new Error(error.message);

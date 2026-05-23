@@ -434,13 +434,26 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					document.getElementById('tab-admin').classList.remove('hidden');
 				}
 
-				// Load request from Backend
-				const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${folio}`);
-				const json = await res.json();
+				if (!folio) {
+					document.getElementById('solicitud-workspace').classList.add('hidden');
+					window.showToast("No se recibió un folio o identificador de solicitud", "error");
+					return;
+				}
+
+				const fetchJson = async (url) => {
+					const response = await fetch(url);
+					return response.json().catch(() => ({ success: false, message: 'Respuesta invÃ¡lida del servidor' }));
+				};
+
+				// Load request from gestor endpoint first; fallback keeps old links compatible.
+				let json = await fetchJson(`${API_URL}/api/gestores/solicitudes/${encodeURIComponent(folio)}`);
+				if (!json.success || !json.data) {
+					json = await fetchJson(`${API_URL}/api/tramites/solicitudes/folio/${encodeURIComponent(folio)}`);
+				}
 
 				if (!json.success || !json.data) {
 					document.getElementById('solicitud-workspace').classList.add('hidden');
-					window.showToast("Folio no encontrado en base de datos", "error");
+					window.showToast(`Solicitud no encontrada: ${folio}`, "error");
 					return;
 				}
 				
@@ -457,14 +470,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				};
 				const displayStatus = statusMap[req.estado] || req.estado;
 
-				// Fill labels
-				const cname = req.ciudadano?.nombre_completo || 'N/A';
-				const ccurp = req.ciudadano?.curp || 'N/A';
+				// Fill labels — campos_respuesta uses: nombre_ciudadano, correo_ciudadano, curp_ciudadano, municipio
+				const cname = req.ciudadano?.nombre_completo || req.campos_respuesta?.nombre_ciudadano || 'N/A';
+				const ccurp = req.ciudadano?.curp || req.campos_respuesta?.curp_ciudadano || 'N/A';
+				const cemail = req.ciudadano?.email || req.campos_respuesta?.correo_ciudadano || req.campos_respuesta?.email || 'N/A';
 
-				document.getElementById('lbl-solicitud-folio').textContent = req.folio;
+				document.getElementById('lbl-solicitud-folio').textContent = req.folio || req.id;
 				document.getElementById('lbl-citizen-name').textContent = cname;
 				document.getElementById('lbl-citizen-curp').textContent = ccurp;
-				document.getElementById('lbl-citizen-email').textContent = req.campos_respuesta?.email || 'N/A';
+				document.getElementById('lbl-citizen-email').textContent = cemail;
 				
 				const declaredName = document.getElementById('lbl-ai-declared-name');
 				if (declaredName) declaredName.textContent = cname;
@@ -475,8 +489,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				if (extractedName) extractedName.textContent = cname; // Simulate perfect match
 				const extractedCurp = document.getElementById('lbl-ai-extracted-curp');
 				if (extractedCurp) extractedCurp.textContent = ccurp; // Simulate perfect match
-				document.getElementById('lbl-citizen-phone').textContent = req.campos_respuesta?.telefono || 'N/A';
-				document.getElementById('lbl-citizen-address').textContent = req.campos_respuesta?.direccion || 'N/A';
+				document.getElementById('lbl-citizen-phone').textContent = req.campos_respuesta?.telefono || req.campos_respuesta?.telefono_ciudadano || 'N/A';
+				document.getElementById('lbl-citizen-address').textContent = req.campos_respuesta?.direccion || req.campos_respuesta?.municipio || 'N/A';
 				
 				document.getElementById('lbl-file-ine-name').textContent = 'ine_ciudadano.pdf';
 				document.getElementById('lbl-file-dom-name').textContent = 'comprobante_dom.pdf';
