@@ -14,15 +14,21 @@ export const GestorController = {
   // GET /api/gestores/solicitudes
   getSolicitudes: async (req, res) => {
     try {
-      const { data, error } = await supabase
+      const { dependencia_id } = req.query;
+      let query = supabase
         .from('solicitudes')
         .select(`
           *,
           ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp),
           tramite:tramites_catalogo(nombre, plazo_dias_habiles),
           dependencia:dependencias(nombre)
-        `)
-        .order('created_at', { ascending: false });
+        `);
+
+      if (dependencia_id && dependencia_id !== 'null' && dependencia_id !== 'undefined') {
+        query = query.eq('dependencia_id', dependencia_id);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
       if (error) throw error;
 
       let mappedData = data;
@@ -53,6 +59,21 @@ export const GestorController = {
       }
 
       return res.status(200).json({ success: true, data: mappedData });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // GET /api/gestores/dependencias
+  getDependencias: async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from('dependencias')
+        .select('*')
+        .eq('activa', true)
+        .order('nombre');
+      if (error) throw error;
+      return res.status(200).json({ success: true, data });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }

@@ -134,7 +134,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			const loadRequests = async () => {
 				if (cachedRequests) return cachedRequests;
 				try {
-					const res = await fetch(`${API_URL}/api/gestores/solicitudes`, {
+					const depId = localStorage.getItem('gestor_dependencia_id');
+					const url = depId ? `${API_URL}/api/gestores/solicitudes?dependencia_id=${depId}` : `${API_URL}/api/gestores/solicitudes`;
+					const res = await fetch(url, {
 						headers: { 'Content-Type': 'application/json' }
 					});
 					if (res.status === 401 || res.status === 403) {
@@ -143,7 +145,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						return;
 					}
 					const json = await res.json();
-					if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+					if (json.success && Array.isArray(json.data)) {
 						const mapEstado = {
 							'recibido': 'Recibido',
 							'en_revision': 'En revisión',

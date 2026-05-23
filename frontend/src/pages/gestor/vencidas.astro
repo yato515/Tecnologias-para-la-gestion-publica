@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Solicitudes Vencidas (Control de Eficiencia) - In óolal Yucatan">
@@ -102,7 +103,7 @@ import Layout from '../../layouts/Layout.astro';
 
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		// Protect Route
 		const gestorLogged = localStorage.getItem('gestor_logged');
 		if (gestorLogged !== 'true') {
@@ -128,25 +129,41 @@ import Layout from '../../layouts/Layout.astro';
 				}, 600);
 			});
 
-			const defaultRequests = [
-				{ folio: "TRM-2026-00201", name: "Licencia de Conducir y Placas", dept: "Secretaría de Seguridad Pública (SSP)", date: "2026-05-18", status: "Recibido", citizen_fullname: "Eduardo Chan", token: "TK-128491", delegation: "Mérida Centro", algorithmic_result: "Aprobado" },
-				{ folio: "TRM-2026-00202", name: "Inscripción en el RFC (SAT)", dept: "Hacienda / SAT", date: "2026-05-15", status: "En revisión", citizen_fullname: "Marisela Puc", token: "TK-992381", delegation: "Progreso Ventanilla Puerto", algorithmic_result: "Declinado" },
-				{ folio: "TRM-2026-00104", name: "Trámite de Pasaporte Mexicano", dept: "Secretaría de Relaciones Exteriores (SRE)", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech", token: "TK-849201", delegation: "Valladolid Palacio", algorithmic_result: "Aprobado" }
-			];
-
-			const getRequests = () => {
-				const local = localStorage.getItem('civicflow_requests');
-				if (!local) {
-					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
-					return defaultRequests;
+			const getRequests = async () => {
+				try {
+					const depId = localStorage.getItem('gestor_dependencia_id');
+					const url = depId ? `${API_URL}/api/gestores/solicitudes?dependencia_id=${depId}` : `${API_URL}/api/gestores/solicitudes`;
+					const res = await fetch(url);
+					const json = await res.json();
+					if (json.success && Array.isArray(json.data)) {
+						const mapEstado = {
+							'recibido': 'Recibido',
+							'en_revision': 'En revisión',
+							'documentacion_incompleta': 'Documentación incompleta',
+							'aprobado': 'Aprobado',
+							'rechazado': 'Rechazado'
+						};
+						return json.data.map(r => ({
+							id: r.id,
+							folio: r.folio || r.id,
+							name: r.tramite?.nombre || 'Trámite Genérico',
+							dept: r.dependencia?.nombre || 'Dependencia',
+							date: r.created_at ? r.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+							status: mapEstado[r.estado] || r.estado || 'Recibido',
+							citizen_fullname: r.ciudadano?.nombre_completo || 'Ciudadano'
+						}));
+					}
+					return [];
+				} catch (e) {
+					console.error(e);
+					return [];
 				}
-				return JSON.parse(local);
 			};
 
-			const renderVencidas = () => {
+			const renderVencidas = async () => {
 				const tbody = document.getElementById('vencidas-tbody');
 				const emptyMsg = document.getElementById('vencidas-empty-msg');
-				const requests = getRequests();
+				const requests = await getRequests();
 
 				tbody.innerHTML = '';
 				

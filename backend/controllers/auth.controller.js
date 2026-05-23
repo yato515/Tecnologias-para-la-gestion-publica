@@ -76,7 +76,8 @@ export const AuthController = {
           id: userProfile ? userProfile.id : authData.user.id, 
           email: authData.user.email, 
           nombre: nombreFinal,
-          rol: rolFinal 
+          rol: rolFinal,
+          dependencia_id: userProfile ? userProfile.dependencia_id : null
         } 
       });
     } catch (error) {
@@ -164,7 +165,7 @@ export const AuthController = {
 
   registrarGestor: async (req, res) => {
     try {
-      const { email, password, rol, nombre_completo, director_email } = req.body;
+      const { email, password, rol, nombre_completo, director_email, dependencia_id } = req.body;
       
       if (director_email !== 'director@yucatan.gob.mx') {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Solo el Director puede registrar cuentas.' });
@@ -186,8 +187,8 @@ export const AuthController = {
       const { error: profileError } = await supabase.from('perfiles').insert([{
         id: authData.user.id,
         nombre_completo,
-        rol,
-        dependencia_id: 1 
+        rol: rol.toLowerCase(),
+        dependencia_id: (dependencia_id && dependencia_id !== 'null' && dependencia_id !== 'undefined') ? dependencia_id : null
       }]);
 
       if (profileError) {

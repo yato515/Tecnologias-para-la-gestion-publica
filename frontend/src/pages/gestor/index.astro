@@ -109,6 +109,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			let loginSuccess = false;
 			let role = '';
 
+			let loginResponseData = null;
+
 			try {
 				const res = await fetch(`${API_URL}/api/auth/login`, {
 					method: 'POST',
@@ -130,6 +132,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 				if (json.success && json.user) {
 					role = json.user.rol || 'revisor';
+					loginResponseData = json;
 					loginSuccess = true;
 				} else {
 					window.showToast(json.message || 'Credenciales inválidas en el servidor.', 'error');
@@ -149,6 +152,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				localStorage.setItem('gestor_logged', 'true');
 				localStorage.setItem('gestor_email', email);
 				localStorage.setItem('gestor_role', role);
+
+				// Guardar dependencia_id
+				let depId = null;
+				if (loginResponseData && loginResponseData.user && loginResponseData.user.dependencia_id) {
+					depId = loginResponseData.user.dependencia_id;
+				} else if (email.includes('revisor') || email.includes('director')) {
+					// Contingencia/demo: Catastro y Registro del Estado de Yucatán
+					depId = 'a0000001-0000-0000-0000-000000000005';
+				}
+				if (depId) {
+					localStorage.setItem('gestor_dependencia_id', depId);
+				} else {
+					localStorage.removeItem('gestor_dependencia_id');
+				}
 
 				window.showToast(`Bienvenido al sistema. Rol: ${role}`, 'success');
 
