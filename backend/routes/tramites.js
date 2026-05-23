@@ -13,8 +13,8 @@ router.get('/solicitudes/:id/documentos',            TramiteController.getDocume
 router.post('/solicitudes/:id/documentos',           TramiteController.subirDocumento);
 router.post('/solicitudes/:id/calificar',            TramiteController.calificar);
 
-// Rutas de almacenamiento físico (Supabase Storage)
-router.post('/documentos/upload',                    upload.single('archivo'), TramiteController.uploadFisico);
-router.get('/documentos/ver',                       TramiteController.verDocumento);
+// Rutas de almacenamiento físico (Supabase Storage) - Comentadas para evitar crash por métodos faltantes
+// router.post('/documentos/upload',                    upload.single('archivo'), TramiteController.uploadFisico);
+// router.get('/documentos/ver',                       TramiteController.verDocumento);
 
 export default router;

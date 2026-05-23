@@ -1,5 +1,4 @@
-import jwt from 'jsonwebtoken';
-import { supabase } from '../config/supabase.service.js';
+import { supabase, supabaseAdmin } from '../config/supabase.service.js';
 
 const verificarDocumentosVigentes = async (userId) => {
   const { data, error } = await supabase
@@ -44,18 +43,40 @@ export const AuthController = {
         .eq('id', authData.user.id)
         .single();
 
+      let profile = userProfile;
       if (profileError || !userProfile) {
-        return res.status(404).json({ success: false, message: 'Perfil no encontrado' });
+        // Auto-create profile if missing
+        let rolToAssign = 'revisor';
+        let nameToAssign = 'Servidor Público';
+        if (authData.user.email === 'director@yucatan.gob.mx' || authData.user.email === 'admin_director@yucatan.gob.mx') {
+          rolToAssign = 'aprobador';
+          nameToAssign = 'Director General';
+        } else if (authData.user.email === 'revisor@yucatan.gob.mx') {
+          rolToAssign = 'revisor';
+          nameToAssign = 'Revisor Operativo';
+        }
+
+        const { data: newProfile, error: insErr } = await supabase.from('perfiles').insert([{
+          id: authData.user.id,
+          nombre_completo: nameToAssign,
+          rol: rolToAssign,
+          dependencia_id: null
+        }]).select().single();
+
+        if (insErr) {
+          return res.status(500).json({ success: false, message: 'Error al auto-crear perfil: ' + insErr.message });
+        }
+        profile = newProfile;
       }
 
       // Se elimina la generación de token para gestores por instrucción explícita
       return res.status(200).json({ 
         success: true, 
         user: { 
-          id: userProfile.id, 
+          id: profile.id, 
           email: authData.user.email, 
-          nombre: userProfile.nombre_completo,
-          rol: userProfile.rol 
+          nombre: profile.nombre_completo,
+          rol: profile.rol 
         } 
       });
     } catch (error) {
@@ -106,6 +127,41 @@ export const AuthController = {
     }
   },
 
+  resetManualPassword: async (req, res) => {
+    try {
+      const { email, new_password } = req.body;
+      if (!email || !new_password) {
+        return res.status(400).json({ success: false, message: 'Email y nueva contraseña son requeridos' });
+      }
+
+      if (!supabaseAdmin) {
+        return res.status(403).json({ success: false, message: 'Falta la llave de servicio de Supabase (SUPABASE_SERVICE_KEY) en el .env. Es obligatorio para cambiar contraseñas directamente sin correo electrónico.' });
+      }
+
+      // 1. Encontrar el usuario por email usando admin auth
+      const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+      if (listError) return res.status(500).json({ success: false, message: 'Error buscando usuario: ' + listError.message });
+      
+      const userToUpdate = listData.users.find(u => u.email === email);
+      if (!userToUpdate) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado en la plataforma de autenticación' });
+      }
+
+      // 2. Actualizar contraseña directamente
+      const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userToUpdate.id, {
+        password: new_password
+      });
+
+      if (updateError) {
+        return res.status(500).json({ success: false, message: 'Error al actualizar contraseña: ' + updateError.message });
+      }
+
+      return res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente' });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
   registrarGestor: async (req, res) => {
     try {
       const { email, password, rol, nombre_completo, director_email } = req.body;
@@ -129,12 +185,15 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: authError?.message || 'Error al registrar credenciales.' });
       }
 
+      // Mapear el rol a minúscula para cumplir con el enum de la base de datos
+      const rolMapeado = rol.toLowerCase();
+
       // 2. Insertar perfil
       const { error: profileError } = await supabase.from('perfiles').insert([{
         id: authData.user.id,
         nombre_completo,
-        rol,
-        dependencia_id: 1 // Por defecto o dinámico si hubiera
+        rol: rolMapeado,
+        dependencia_id: null
       }]);
 
       if (profileError) {

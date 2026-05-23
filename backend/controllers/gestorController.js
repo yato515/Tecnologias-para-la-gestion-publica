@@ -136,5 +136,50 @@ export const GestorController = {
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
+  },
+
+  // GET /api/gestores/personal
+  getPersonal: async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from('perfiles')
+        .select('*')
+        .in('rol', ['revisor', 'aprobador']);
+      if (error) throw error;
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // PUT /api/gestores/personal/:id
+  updatePersonal: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { nombre_completo, rol, director_email } = req.body;
+
+      // Basic auth check
+      if (director_email !== 'director@yucatan.gob.mx' && director_email !== 'admin_director@yucatan.gob.mx') {
+        return res.status(403).json({ success: false, message: 'No autorizado' });
+      }
+
+      if (!nombre_completo || !rol) {
+        return res.status(400).json({ success: false, message: 'Faltan campos' });
+      }
+
+      const rolMapeado = rol.toLowerCase();
+
+      const { data, error } = await supabase
+        .from('perfiles')
+        .update({ nombre_completo, rol: rolMapeado })
+        .eq('id', id)
+        .select()
+        .single();
+        
+      if (error) throw error;
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
   }
 };
