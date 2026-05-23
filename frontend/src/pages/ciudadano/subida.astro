@@ -359,32 +359,32 @@ import Layout from '../../layouts/Layout.astro';
 
 				document.getElementById('btn-apply-token').addEventListener('click', () => {
 					const tokenInput = document.getElementById('txt-dossier-token').value.trim().toUpperCase();
-					const storedToken = localStorage.getItem('jwt_token');
-
 					if (!tokenInput) {
 						window.showToast("Por favor ingresa un token", "warning");
 						return;
 					}
-					if (tokenInput !== storedToken || tokenInput === 'mock-jwt-token-demo') {
-						window.showToast("Token de expediente no encontrado.", "error");
+					
+					const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+					const tokenData = tokensDict[tokenInput];
+
+					if (!tokenData) {
+						window.showToast("Token no válido o no encontrado en el sistema.", "error");
 						return;
 					}
 
-					const dossier = JSON.parse(localStorage.getItem('civicflow_dossier')) || [];
 					let importedCount = 0;
 					currentTramite.docs.forEach(doc => {
-						const match = dossier.find(d => d.id === doc.id && d.status === 'Cargado');
-						if (match) {
-							uploadedFiles[doc.id] = match.file;
+						if (tokenData[doc.id]) {
+							uploadedFiles[doc.id] = tokenData[doc.id];
 							importedCount++;
 						}
 					});
 
 					if (importedCount > 0) {
 						renderSlots();
-						window.showToast(`Se cargaron ${importedCount} documentos desde tu expediente.`, "success");
+						window.showToast(`Se cargaron ${importedCount} documentos desde tu token.`, "success");
 					} else {
-						window.showToast("No se encontraron documentos cargados en tu expediente para este trámite.", "warning");
+						window.showToast("El token ingresado no contiene documentos para este trámite.", "warning");
 					}
 				});
 			};
@@ -422,15 +422,26 @@ import Layout from '../../layouts/Layout.astro';
 				});
 				localStorage.setItem('civicflow_dossier', JSON.stringify(updatedDossier));
 
-				// Generate/Regenerate Token
-				let token = localStorage.getItem('jwt_token');
-				let tokenChanged = false;
-
-				if (!token || token === 'N/A' || token === 'mock-jwt-token-demo' || hasUploadedNewFiles) {
-					token = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
-					localStorage.setItem('jwt_token', token);
-					tokenChanged = true;
+				// Evolution of Token
+				const currentToken = localStorage.getItem('jwt_token');
+				const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+				let previousFiles = {};
+				
+				if (currentToken && tokensDict[currentToken]) {
+					previousFiles = tokensDict[currentToken];
 				}
+				
+				// Merge old files and new files
+				const allFiles = { ...previousFiles, ...uploadedFiles };
+				
+				// Generate new token
+				const token = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
+				localStorage.setItem('jwt_token', token);
+				const tokenChanged = true;
+				
+				// Save new token to tokens dict
+				tokensDict[token] = allFiles;
+				localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
 
 				// Generate Folio
 				const randomNum = Math.floor(100 + Math.random() * 900);
