@@ -8,11 +8,11 @@ import Layout from '../../layouts/Layout.astro';
 	<section class="bg-yuc-green text-white py-8 transition-colors border-b border-yuc-gold/30">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
 			<div>
-				<a href="/ciudadano" class="text-xs font-bold text-yuc-gold hover:underline flex items-center gap-1.5">
+				<a href="/ciudadano" class="text-xs font-bold text-yuc-gold hover:underline flex items-center gap-1.5 font-display">
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 					</svg>
-					<span>Volver a la bandeja</span>
+					<span>Volver al Catálogo</span>
 				</a>
 				<h1 id="lbl-tramite-title" class="text-2xl sm:text-3xl font-black font-display mt-2">Cargando Trámite...</h1>
 				<p id="lbl-tramite-dept" class="text-slate-200 text-xs mt-1">Dependencia: ...</p>
@@ -20,285 +20,110 @@ import Layout from '../../layouts/Layout.astro';
 		</div>
 	</section>
 
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+	<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 		
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+		<!-- Main Form Card (Estilo Institucional / Oriéntate) -->
+		<div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 			
-			<!-- Left side: Step Form -->
-			<div class="lg:col-span-2 space-y-6">
+			<div class="p-8 space-y-8">
 				
-				<!-- Form Wrapper -->
-				<div id="form-container" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-6 sm:p-8">
+				<div class="text-center space-y-2">
+					<h2 class="text-2xl font-bold text-yuc-green-dark font-display">Validación de Requisitos</h2>
+					<p class="text-sm text-slate-500 max-w-lg mx-auto">
+						Para agilizar su solicitud y evitar que acuda presencialmente, utilizaremos su Expediente Digital Único. 
+						Proporcione su Token de Autenticación para continuar.
+					</p>
+				</div>
+
+				<form id="token-form" class="space-y-6 max-w-xl mx-auto border border-slate-100 p-6 rounded-lg bg-slate-50">
 					
-					<!-- Progress Steps header -->
-					<div class="flex items-center justify-between pb-6 border-b border-slate-100 dark:border-slate-850 mb-8 text-xs font-bold text-slate-400">
-						<div id="step-ind-1" class="flex items-center gap-2 text-yuc-green dark:text-yuc-green-light">
-							<span class="w-6 h-6 rounded-full border-2 border-yuc-green dark:border-yuc-green-light flex items-center justify-center font-bold text-xs bg-yuc-green/10">1</span>
-							<span>Datos Generales</span>
-						</div>
-						<div class="h-[2px] flex-grow bg-slate-200 dark:bg-slate-800 mx-4"></div>
-						<div id="step-ind-2" class="flex items-center gap-2">
-							<span class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center font-bold text-xs">2</span>
-							<span>Documentos</span>
-						</div>
-						<div class="h-[2px] flex-grow bg-slate-200 dark:bg-slate-800 mx-4"></div>
-						<div id="step-ind-3" class="flex items-center gap-2">
-							<span class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center font-bold text-xs">3</span>
-							<span>Confirmación</span>
+					<!-- Radio Buttons: ¿Tienes tu Token? -->
+					<div class="space-y-3 text-center border-b border-slate-200 pb-6">
+						<p class="text-sm font-bold text-slate-800 font-display">¿Cuentas con tu Token de Expediente Digital?</p>
+						<div class="flex items-center justify-center gap-8 mt-2">
+							<label class="flex items-center gap-2 cursor-pointer">
+								<input type="radio" name="hasToken" value="yes" checked class="w-4 h-4 text-yuc-green focus:ring-yuc-green border-slate-300">
+								<span class="text-sm font-semibold text-slate-700">Sí</span>
+							</label>
+							<label class="flex items-center gap-2 cursor-pointer">
+								<input type="radio" name="hasToken" value="no" class="w-4 h-4 text-yuc-green focus:ring-yuc-green border-slate-300">
+								<span class="text-sm font-semibold text-slate-700">No</span>
+							</label>
 						</div>
 					</div>
 
-					<!-- Form Panel -->
-					<form id="tramite-form" class="space-y-6">
+					<!-- Si selecciona SÍ -->
+					<div id="section-yes-token" class="space-y-6 transition-all">
 						
-						<!-- STEP 1 PANEL -->
-						<div id="panel-step-1" class="space-y-6">
-							<div class="space-y-4">
-								<h3 class="text-lg font-bold text-slate-800 dark:text-white font-display">1. Datos del Solicitante</h3>
-								<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-									<div>
-										<label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">CURP</label>
-										<input type="text" id="frm-curp" readonly class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 font-mono text-sm" />
-									</div>
-									<div>
-										<label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Correo Electrónico</label>
-										<input type="email" id="frm-email" readonly class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950 text-sm" />
-									</div>
-								</div>
-								<div>
-									<label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Nombre Completo (como aparece en INE)</label>
-									<input type="text" id="frm-fullname" required placeholder="Escriba su nombre completo" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green transition-all" />
-								</div>
-								<div>
-									<label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Teléfono de Contacto</label>
-									<input type="tel" id="frm-phone" required placeholder="10 dígitos" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green transition-all" />
-								</div>
-								<div>
-									<label class="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Domicilio Completo (Calle, Número, Colonia, Municipio)</label>
-									<textarea id="frm-address" required rows="3" placeholder="Escriba su dirección en Yucatán" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green transition-all"></textarea>
-								</div>
+						<!-- Datos de Contacto (Confirmación) -->
+						<div class="space-y-4">
+							<p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">DATOS DEL SOLICITANTE</p>
+							
+							<div>
+								<label class="block text-xs font-bold text-slate-700 mb-1">Nombre(s) y Apellidos</label>
+								<input type="text" id="frm-fullname" readonly class="w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-600" />
 							</div>
 							
-							<div class="pt-6 border-t border-slate-150 dark:border-slate-800 flex justify-end">
-								<button type="button" id="btn-to-step-2" class="px-6 py-2.5 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-lg text-sm transition-all flex items-center gap-1.5">
-									<span>Siguiente Paso</span>
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-								</button>
-							</div>
-						</div>
-
-						<!-- STEP 2 PANEL -->
-						<div id="panel-step-2" class="space-y-6 hidden">
-							<div class="space-y-4">
-								<h3 class="text-lg font-bold text-slate-800 dark:text-white font-display">2. Adjuntar Documentación Digital</h3>
-								<p class="text-xs text-slate-500 dark:text-slate-400">Suba sus archivos en formato PDF, PNG o JPG (tamaño máximo 5MB por archivo).</p>
-								
-								<!-- Import from digital dossier panel -->
-								<div class="p-4 rounded-xl border border-yuc-green/20 bg-yuc-green/5 dark:bg-slate-900/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-									<div>
-										<h4 class="font-bold text-xs text-slate-850 dark:text-slate-200">¿Desea agilizar su trámite?</h4>
-										<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Puede importar automáticamente los documentos validados desde su Expediente Digital de In óolal Yucatan.</p>
-									</div>
-									<button type="button" id="btn-import-from-dossier" class="px-3.5 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm flex items-center gap-1.5 border border-yuc-green-light">
-										<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-										<span>Importar Expediente</span>
-									</button>
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div>
+									<label class="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico</label>
+									<input type="email" id="frm-email" readonly class="w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-600" />
 								</div>
-								
-								<!-- File field 1 -->
-								<div class="space-y-1.5">
-									<label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Identificación Oficial Vigente (INE / Pasaporte) *</label>
-									<div class="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-yuc-green/50 rounded-xl p-6 text-center bg-slate-50/50 dark:bg-slate-950/20 transition-all cursor-pointer relative group">
-										<input type="file" id="file-ine" required class="absolute inset-0 opacity-0 cursor-pointer" />
-										<div class="space-y-1">
-											<svg class="mx-auto h-8 w-8 text-slate-400 group-hover:text-yuc-green transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-												<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-											</svg>
-											<p class="text-xs text-slate-500 dark:text-slate-400 font-bold"><span id="lbl-file-ine">Seleccionar Archivo</span></p>
-											<p class="text-[10px] text-slate-400">PDF, JPG o PNG de la identificación legible por ambos lados.</p>
-										</div>
-									</div>
-								</div>
-
-								<!-- File field 2 -->
-								<div class="space-y-1.5">
-									<label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Comprobante de Domicilio de Yucatán (Predial / Agua / Luz) *</label>
-									<div class="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-yuc-green/50 rounded-xl p-6 text-center bg-slate-50/50 dark:bg-slate-950/20 transition-all cursor-pointer relative group">
-										<input type="file" id="file-dom" required class="absolute inset-0 opacity-0 cursor-pointer" />
-										<div class="space-y-1">
-											<svg class="mx-auto h-8 w-8 text-slate-400 group-hover:text-yuc-green transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-												<path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-											</svg>
-											<p class="text-xs text-slate-500 dark:text-slate-400 font-bold"><span id="lbl-file-dom">Seleccionar Archivo</span></p>
-											<p class="text-[10px] text-slate-400">No mayor a 3 meses de antigüedad.</p>
-										</div>
-									</div>
-								</div>
-
-							</div>
-							
-							<div class="pt-6 border-t border-slate-150 dark:border-slate-800 flex justify-between">
-								<button type="button" id="btn-back-to-1" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-250 font-bold rounded-lg text-sm transition-all flex items-center gap-1.5 border border-slate-200/50 dark:border-slate-700/50">
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-									<span>Anterior</span>
-								</button>
-								<button type="button" id="btn-to-step-3" class="px-6 py-2.5 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-lg text-sm transition-all flex items-center gap-1.5">
-									<span>Siguiente Paso</span>
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-								</button>
-							</div>
-						</div>
-
-						<!-- STEP 3 PANEL -->
-						<div id="panel-step-3" class="space-y-6 hidden">
-							<div class="space-y-4">
-								<h3 class="text-lg font-bold text-slate-800 dark:text-white font-display">3. Declaración de Veracidad</h3>
-								<p class="text-xs text-slate-500 dark:text-slate-400">Por favor, revise con cuidado la información ingresada antes de enviar su solicitud.</p>
-								
-								<div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/30 p-5 space-y-3">
-									<p class="text-xs text-slate-500 dark:text-slate-400"><strong class="text-slate-700 dark:text-slate-350">Solicitante:</strong> <span id="chk-name">...</span></p>
-									<p class="text-xs text-slate-500 dark:text-slate-400"><strong class="text-slate-700 dark:text-slate-350">Teléfono:</strong> <span id="chk-phone">...</span></p>
-									<p class="text-xs text-slate-500 dark:text-slate-400"><strong class="text-slate-700 dark:text-slate-350">Dirección:</strong> <span id="chk-address">...</span></p>
-									<div class="h-[1px] bg-slate-200 dark:bg-slate-800 my-2"></div>
-									<div class="flex items-center">
-										<input id="frm-confirm-check" type="checkbox" required class="h-4 w-4 text-yuc-green focus:ring-yuc-green border-slate-300 rounded" />
-										<label for="frm-confirm-check" class="ml-2 block text-xs text-slate-600 dark:text-slate-400 font-semibold leading-relaxed">
-											Declaro bajo protesta de decir verdad que los datos declarados son verídicos y corresponden a los documentos cargados.
-										</label>
-									</div>
+								<div>
+									<label class="block text-xs font-bold text-slate-700 mb-1">CURP</label>
+									<input type="text" id="frm-curp" readonly class="w-full px-4 py-2 rounded-lg border border-slate-200 bg-slate-100 text-sm font-mono font-semibold text-slate-600 uppercase" />
 								</div>
 							</div>
-							
-							<div class="pt-6 border-t border-slate-150 dark:border-slate-800 flex justify-between">
-								<button type="button" id="btn-back-to-2" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-250 font-bold rounded-lg text-sm transition-all flex items-center gap-1.5 border border-slate-200/50 dark:border-slate-700/50">
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-									<span>Anterior</span>
-								</button>
-								<button type="submit" class="px-7 py-3 bg-yuc-green text-white hover:bg-yuc-green-light font-extrabold rounded-lg text-sm transition-all shadow-md flex items-center gap-2">
-									<span>Enviar Solicitud</span>
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
-								</button>
-							</div>
 						</div>
 
-					</form>
-				</div>
-
-				<!-- SUCCESS VOUCHER PANEL (Initially Hidden) -->
-				<div id="success-container" class="hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-8 text-center max-w-xl mx-auto space-y-6">
-					<div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-500 flex items-center justify-center mx-auto">
-						<svg class="w-10 h-10 animate-bounce" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-					</div>
-					
-					<div class="space-y-2">
-						<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">ENVÍO COMPLETADO</span>
-						<h2 class="text-2xl font-black text-slate-800 dark:text-white font-display">Solicitud Ingresada Exitosamente</h2>
-						<p class="text-xs text-slate-500 dark:text-slate-400">
-							Su solicitud ha sido recibida en el sistema de trámites gubernamentales del Estado de Yucatán. Se le ha asignado un Folio Único de Seguimiento.
-						</p>
-					</div>
-
-					<!-- Folio and QR Card -->
-					<div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-6 max-w-md mx-auto">
-						<div class="text-left space-y-2">
-							<span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-wider block">FOLIO DE SEGUIMIENTO</span>
-							<span id="lbl-success-folio" class="text-2xl font-black font-mono text-slate-900 dark:text-white tracking-wide block">TRM-2026-00000</span>
-							<span class="text-[10px] text-slate-400 block">Guardado en su bandeja el <span id="lbl-success-date">...</span></span>
-						</div>
-						<!-- Mock QR Code SVG -->
-						<div class="w-24 h-24 p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-center shrink-0">
-							<svg viewBox="0 0 100 100" class="w-20 h-20 text-slate-800">
-								<!-- QR pattern simulation -->
-								<rect x="0" y="0" width="30" height="30" fill="currentColor"/>
-								<rect x="5" y="5" width="20" height="20" fill="white"/>
-								<rect x="10" y="10" width="10" height="10" fill="currentColor"/>
-								
-								<rect x="70" y="0" width="30" height="30" fill="currentColor"/>
-								<rect x="75" y="5" width="20" height="20" fill="white"/>
-								<rect x="80" y="10" width="10" height="10" fill="currentColor"/>
-								
-								<rect x="0" y="70" width="30" height="30" fill="currentColor"/>
-								<rect x="5" y="75" width="20" height="20" fill="white"/>
-								<rect x="10" y="80" width="10" height="10" fill="currentColor"/>
-
-								<!-- Random QR modules -->
-								<rect x="40" y="5" width="10" height="10" fill="currentColor"/>
-								<rect x="50" y="15" width="10" height="10" fill="currentColor"/>
-								<rect x="35" y="40" width="20" height="10" fill="currentColor"/>
-								<rect x="70" y="45" width="10" height="15" fill="currentColor"/>
-								<rect x="45" y="70" width="15" height="10" fill="currentColor"/>
-								<rect x="80" y="80" width="15" height="15" fill="currentColor"/>
-							</svg>
-						</div>
-					</div>
-
-					<div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-						<button id="btn-download-pdf" class="px-5 py-3 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 border border-slate-700">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
-							<span>Descargar Comprobante PDF</span>
-						</button>
-						<a id="lnk-success-tracker" href="#" class="px-6 py-3 bg-yuc-green hover:bg-yuc-green-light text-white font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 shadow-md">
-							<span>Rastrear Estado en Tiempo Real</span>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"></path></svg>
-						</a>
-					</div>
-				</div>
-
-			</div>
-
-			<!-- Right side: AI assistant -->
-			<div class="lg:col-span-1">
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm overflow-hidden flex flex-col h-[520px] sticky top-24">
-					
-					<!-- Header AI -->
-					<div class="bg-slate-900 text-white px-5 py-4 flex items-center gap-3 border-b border-slate-850">
-						<div class="w-10 h-10 rounded-full bg-yuc-green text-yuc-gold flex items-center justify-center shadow-md animate-pulse-soft border border-yuc-green-light shrink-0">
-							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-								<path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.982-11.795m-9 0L9 15.904m0 0L3 18.15V3.75A2.25 2.25 0 015.25 1.5h13.5A2.25 2.25 0 0121 3.75v10.5a2.25 2.25 0 01-2.25 2.25h-3m-9 0h9" />
-							</svg>
-						</div>
-						<div>
-							<div class="flex items-center gap-1.5">
-								<h4 class="font-extrabold text-sm leading-tight">Asistente AI In óolal Yucatan</h4>
-								<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-							</div>
-							<p class="text-[10px] text-slate-400">Preguntas y respuestas sobre requisitos</p>
-						</div>
-					</div>
-
-					<!-- Chat Dialogue Window -->
-					<div id="chat-messages" class="flex-grow p-5 overflow-y-auto space-y-4 text-xs scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
-						<!-- Bot welcome message rendered dynamically from script -->
-					</div>
-
-					<!-- Loader typing effect (hidden by default) -->
-					<div id="chat-typing" class="hidden px-5 py-2 text-slate-400 dark:text-slate-500 text-xs italic flex items-center gap-1.5">
-						<span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
-						<span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce delay-75"></span>
-						<span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce delay-150"></span>
-						<span>Asistente está escribiendo...</span>
-					</div>
-
-					<!-- Input panel -->
-					<div class="p-3.5 border-t border-slate-100 dark:border-slate-850 bg-slate-50 dark:bg-slate-950/20">
-						<form id="chat-form" class="flex gap-2">
+						<div class="border-t border-slate-200 pt-6">
+							<label class="block text-sm font-bold text-yuc-green-dark mb-2 text-center font-display">Ingrese su Token (6 dígitos alfanuméricos)</label>
 							<input 
-								id="chat-input"
 								type="text" 
-								class="flex-grow px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:ring-2 focus:ring-yuc-green focus:outline-none"
-								placeholder="Preguntar sobre requisitos, costos..."
+								id="frm-token" 
+								required
+								maxlength="9"
+								placeholder="TK-XXXXXX" 
+								class="w-full text-center px-4 py-3 rounded-lg border-2 border-slate-300 focus:ring-2 focus:ring-yuc-green focus:border-yuc-green text-lg font-mono font-bold tracking-widest uppercase transition-colors" 
 							/>
-							<button type="submit" class="p-2.5 bg-yuc-green hover:bg-yuc-green-light text-white rounded-xl shadow-md transition-colors flex items-center justify-center shrink-0">
-								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-								</svg>
+							<p class="text-[10px] text-slate-400 text-center mt-2">El Token le fue asignado al subir sus documentos en la pestaña "Mi Expediente Digital".</p>
+						</div>
+
+						<div class="flex items-start gap-2 pt-2">
+							<input id="frm-confirm-check" type="checkbox" required class="mt-0.5 h-4 w-4 text-yuc-green focus:ring-yuc-green border-slate-300 rounded" />
+							<label for="frm-confirm-check" class="block text-xs text-slate-600 leading-tight">
+								He verificado mis datos y autorizo a In óolal Yucatan vincular los documentos de mi Expediente Digital con esta solicitud de trámite.
+							</label>
+						</div>
+
+						<div class="text-center pt-2">
+							<button type="submit" class="px-8 py-3 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-lg transition-colors shadow-sm font-display flex items-center justify-center mx-auto gap-2">
+								<span>Validar y Solicitar Trámite</span>
+								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
 							</button>
-						</form>
+						</div>
+
 					</div>
 
-				</div>
-			</div>
+					<!-- Si selecciona NO -->
+					<div id="section-no-token" class="hidden text-center space-y-4 py-6">
+						<div class="w-16 h-16 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center mx-auto">
+							<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+						</div>
+						<p class="text-sm font-bold text-slate-800">Necesita integrar su Expediente Digital Primero</p>
+						<p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
+							Para evitar pedirle documentos físicos cada vez que realice un trámite, suba su Identificación Oficial y Comprobante de Domicilio una sola vez. Al terminar se le dará un Token para iniciar todos sus trámites.
+						</p>
+						<div class="pt-2">
+							<a href="/ciudadano" class="inline-block px-6 py-2.5 bg-yuc-gold text-white font-bold rounded-lg shadow-sm hover:bg-yuc-gold-light transition-colors text-sm font-display">
+								Ir a Mi Expediente Digital
+							</a>
+						</div>
+					</div>
 
+				</form>
+
+			</div>
 		</div>
 
 	</div>
@@ -309,9 +134,11 @@ import Layout from '../../layouts/Layout.astro';
 		if (citizenLogged !== 'true') {
 			window.location.href = '/ciudadano/login';
 		} else {
-			// Populate user session data
+			
+			// Populate user session data (Mockup of identity)
 			document.getElementById('frm-curp').value = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('frm-email').value = localStorage.getItem('citizen_email') || 'N/A';
+			document.getElementById('frm-fullname').value = localStorage.getItem('citizen_fullname') || 'Ciudadano de Prueba';
 
 			// Parse URL parameter to determine selected procedure
 			const params = new URLSearchParams(window.location.search);
@@ -321,296 +148,114 @@ import Layout from '../../layouts/Layout.astro';
 				residencia: {
 					title: "Constancia de Residencia",
 					dept: "Catastro y Registro del Estado de Yucatán",
-					cost: "Gratuito",
-					time: "3 días hábiles",
-					reqs: "Identificación Oficial (INE), Comprobante de domicilio reciente (agua/luz) no mayor a 3 meses y Carta firmada por 2 testigos ejidales o vecinos."
 				},
 				licencia: {
 					title: "Licencia de Funcionamiento Comercial",
 					dept: "Dirección de Fomento Económico del Estado",
-					cost: "Sujeto a tabulador según dimensiones físicas del local",
-					time: "5 días hábiles",
-					reqs: "Identificación Oficial, Comprobante de domicilio local, Plano croquis, RFC o acta constitutiva e Inspección favorable de protección civil."
 				},
 				henequenero: {
 					title: "Acreditación de Productor Henequenero",
 					dept: "Secretaría de Desarrollo Rural del Estado",
-					cost: "Gratuito",
-					time: "10 días hábiles",
-					reqs: "Certificado Ejidal o Título de propiedad parcelaria de henequén, Identificación Oficial (INE), Censo parcelario avalado por comisario y Comprobante de domicilio."
 				},
 				suelo: {
 					title: "Permiso de Uso de Suelo",
 					dept: "Secretaría de Desarrollo Urbano y Obras Públicas",
-					cost: "$850.00 MXN cuota fija",
-					time: "7 días hábiles",
-					reqs: "Identificación del propietario, Boleta predial del año corriente, Plano topográfico georreferenciado y Escrituras de propiedad."
 				}
 			};
 
-			const currentProcedure = procedures[procedureId] || procedures.residencia;
+			// Fallback if the procedure ID comes from API (Mocking title for demo)
+			const currentProcedure = procedures[procedureId] || { title: "Trámite Estatal (ID: " + procedureId + ")", dept: "Dependencia Gubernamental" };
 
 			document.getElementById('lbl-tramite-title').textContent = currentProcedure.title;
 			document.getElementById('lbl-tramite-dept').textContent = `Dependencia: ${currentProcedure.dept}`;
 
-			// Setup step transitions
-			const panel1 = document.getElementById('panel-step-1');
-			const panel2 = document.getElementById('panel-step-2');
-			const panel3 = document.getElementById('panel-step-3');
+			// Radio Button Logic
+			const radios = document.querySelectorAll('input[name="hasToken"]');
+			const sectionYes = document.getElementById('section-yes-token');
+			const sectionNo = document.getElementById('section-no-token');
 
-			const ind1 = document.getElementById('step-ind-1');
-			const ind2 = document.getElementById('step-ind-2');
-			const ind3 = document.getElementById('step-ind-3');
-
-			document.getElementById('btn-to-step-2').addEventListener('click', () => {
-				const fullname = document.getElementById('frm-fullname').value.trim();
-				const phone = document.getElementById('frm-phone').value.trim();
-				const address = document.getElementById('frm-address').value.trim();
-
-				if (!fullname || !phone || !address) {
-					window.showToast("Complete todos los campos requeridos", "error");
-					return;
-				}
-
-				panel1.classList.add('hidden');
-				panel2.classList.remove('hidden');
-				ind2.className = "flex items-center gap-2 text-yuc-green dark:text-yuc-green-light";
-				ind2.firstElementChild.className = "w-6 h-6 rounded-full border-2 border-yuc-green dark:border-yuc-green-light flex items-center justify-center font-bold text-xs bg-yuc-green/10";
+			radios.forEach(radio => {
+				radio.addEventListener('change', (e) => {
+					if (e.target.value === 'yes') {
+						sectionYes.classList.remove('hidden');
+						sectionNo.classList.add('hidden');
+						document.getElementById('frm-token').setAttribute('required', 'true');
+					} else {
+						sectionYes.classList.add('hidden');
+						sectionNo.classList.remove('hidden');
+						document.getElementById('frm-token').removeAttribute('required');
+					}
+				});
 			});
 
-			document.getElementById('btn-back-to-1').addEventListener('click', () => {
-				panel2.classList.add('hidden');
-				panel1.classList.remove('hidden');
-				ind2.className = "flex items-center gap-2 text-slate-400";
-				ind2.firstElementChild.className = "w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center font-bold text-xs";
-			});
-
-			document.getElementById('btn-to-step-3').addEventListener('click', () => {
-				const ine = document.getElementById('file-ine').files.length || window.mockIneFile;
-				const dom = document.getElementById('file-dom').files.length || window.mockDomFile;
-
-				if (!ine || !dom) {
-					window.showToast("Cargue todos los documentos obligatorios", "error");
-					return;
-				}
-
-				// Populate check block
-				document.getElementById('chk-name').textContent = document.getElementById('frm-fullname').value;
-				document.getElementById('chk-phone').textContent = document.getElementById('frm-phone').value;
-				document.getElementById('chk-address').textContent = document.getElementById('frm-address').value;
-
-				panel2.classList.add('hidden');
-				panel3.classList.remove('hidden');
-				ind3.className = "flex items-center gap-2 text-yuc-green dark:text-yuc-green-light";
-				ind3.firstElementChild.className = "w-6 h-6 rounded-full border-2 border-yuc-green dark:border-yuc-green-light flex items-center justify-center font-bold text-xs bg-yuc-green/10";
-			});
-
-			document.getElementById('btn-back-to-2').addEventListener('click', () => {
-				panel3.classList.add('hidden');
-				panel2.classList.remove('hidden');
-				ind3.className = "flex items-center gap-2 text-slate-400";
-				ind3.firstElementChild.className = "w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center font-bold text-xs";
-			});
-
-			// File names label update
-			document.getElementById('file-ine').addEventListener('change', (e) => {
-				if(e.target.files.length > 0) {
-					document.getElementById('lbl-file-ine').textContent = `✓ ${e.target.files[0].name}`;
-					document.getElementById('lbl-file-ine').parentElement.className = "text-xs text-emerald-500 font-extrabold";
-				}
-			});
-			document.getElementById('file-dom').addEventListener('change', (e) => {
-				if(e.target.files.length > 0) {
-					document.getElementById('lbl-file-dom').textContent = `✓ ${e.target.files[0].name}`;
-					document.getElementById('lbl-file-dom').parentElement.className = "text-xs text-emerald-500 font-extrabold";
-					window.mockDomFile = null; // Reset import if user manually selected a file
-				}
-			});
-
-			// Hook import button click
-			document.getElementById('btn-import-from-dossier').addEventListener('click', () => {
-				const dossier = JSON.parse(localStorage.getItem('civicflow_dossier') || '[]');
-				const ineDoc = dossier.find(d => d.id === 'ine');
-				const domDoc = dossier.find(d => d.id === 'dom');
-
-				let imported = false;
-
-				if (ineDoc && ineDoc.status === 'Cargado' && ineDoc.file) {
-					document.getElementById('lbl-file-ine').textContent = `✓ ${ineDoc.file} (Importado de Expediente)`;
-					document.getElementById('lbl-file-ine').parentElement.className = "text-xs text-emerald-500 font-extrabold";
-					window.mockIneFile = ineDoc.file;
-					imported = true;
-				}
-
-				if (domDoc && domDoc.status === 'Cargado' && domDoc.file) {
-					document.getElementById('lbl-file-dom').textContent = `✓ ${domDoc.file} (Importado de Expediente)`;
-					document.getElementById('lbl-file-dom').parentElement.className = "text-xs text-emerald-500 font-extrabold";
-					window.mockDomFile = domDoc.file;
-					imported = true;
-				}
-
-				if (imported) {
-					window.showToast("Documentos importados exitosamente del Expediente Digital", "success");
-				} else {
-					window.showToast("No se encontraron documentos cargados en su Expediente Digital", "warning");
-				}
-			});
-
-			// Form submission (Simulate entry creation)
-			document.getElementById('tramite-form').addEventListener('submit', (e) => {
+			// Form Submit Logic
+			document.getElementById('token-form').addEventListener('submit', (e) => {
 				e.preventDefault();
 
+				const tokenInput = document.getElementById('frm-token').value.trim().toUpperCase();
 				const confirmCheck = document.getElementById('frm-confirm-check').checked;
+
 				if (!confirmCheck) {
-					window.showToast("Debe aceptar la declaración de veracidad", "error");
+					window.showToast("Debe aceptar la casilla de verificación", "error");
 					return;
 				}
 
-				// Generate Folio TRM-2026-XXXXX
-				const randNum = Math.floor(10000 + Math.random() * 90000);
-				const folio = `TRM-2026-${randNum}`;
-				const currentDate = new Date().toISOString().split('T')[0];
+				// Validate Token against localStorage (civicflow_tokens)
+				const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+				// We also allow the current active token in 'jwt_token' for demo purposes
+				const activeToken = localStorage.getItem('jwt_token');
 
-				// Save new request to localStorage
-				const localRequests = localStorage.getItem('civicflow_requests') || '[]';
-				const requests = JSON.parse(localRequests);
+				if (!tokensDict[tokenInput] && tokenInput !== activeToken) {
+					window.showToast("Token inválido o no encontrado. Verifique que lo haya escrito correctamente.", "error");
+					return;
+				}
+
+				// Generate Folio
+				const randomNum = Math.floor(100 + Math.random() * 900);
+				const randomFolio = `TRM-2026-00${randomNum}`;
+				const currentDateStr = new Date().toISOString().split('T')[0];
+
+				// Save new request in local requests array
+				const requests = JSON.parse(localStorage.getItem('in_oolal_requests') || localStorage.getItem('civicflow_requests')) || [];
+				
 				const newReq = {
-					folio: folio,
+					folio: randomFolio,
 					name: currentProcedure.title,
 					dept: currentProcedure.dept,
-					date: currentDate,
+					date: currentDateStr,
 					status: "Recibido",
-					citizen_fullname: document.getElementById('frm-fullname').value.trim(),
-					citizen_phone: document.getElementById('frm-phone').value.trim(),
-					citizen_address: document.getElementById('frm-address').value.trim(),
+					token: tokenInput,
 					citizen_curp: localStorage.getItem('citizen_curp'),
-					citizen_email: localStorage.getItem('citizen_email'),
-					files: {
-						ine: document.getElementById('file-ine').files[0]?.name || window.mockIneFile || 'ine.pdf',
-						dom: document.getElementById('file-dom').files[0]?.name || window.mockDomFile || 'comprobante.pdf'
-					}
+					citizen_fullname: localStorage.getItem('citizen_fullname'),
+					citizen_email: localStorage.getItem('citizen_email')
 				};
-				requests.push(newReq);
-				localStorage.setItem('civicflow_requests', JSON.stringify(requests));
 
-				// Initialize audit log
-				const localLogs = localStorage.getItem('civicflow_audit_logs') || '[]';
-				const logs = JSON.parse(localLogs);
-				logs.push({
+				requests.push(newReq);
+				localStorage.setItem('in_oolal_requests', JSON.stringify(requests));
+				localStorage.setItem('civicflow_requests', JSON.stringify(requests)); // Backup for compatibility
+
+				// Audit Log
+				const localLogs = JSON.parse(localStorage.getItem('in_oolal_audit_logs') || localStorage.getItem('civicflow_audit_logs')) || [];
+				localLogs.push({
 					id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-					folio: folio,
+					folio: randomFolio,
 					user_id: localStorage.getItem('citizen_email'),
 					rol: "Ciudadano",
 					estado_anterior: "-",
 					estado_nuevo: "Recibido",
-					ip: "192.168.1.48",
+					ip: "Portal Ciudadano",
 					timestamp: new Date().toLocaleString()
 				});
-				localStorage.setItem('civicflow_audit_logs', JSON.stringify(logs));
+				localStorage.setItem('in_oolal_audit_logs', JSON.stringify(localLogs));
+				localStorage.setItem('civicflow_audit_logs', JSON.stringify(localLogs)); // Backup
 
-				// Show success screen
-				document.getElementById('form-container').classList.add('hidden');
-				const successContainer = document.getElementById('success-container');
-				successContainer.classList.remove('hidden');
-
-				document.getElementById('lbl-success-folio').textContent = folio;
-				document.getElementById('lbl-success-date').textContent = new Date().toLocaleDateString();
-				document.getElementById('lnk-success-tracker').href = `/ciudadano/tracker?folio=${folio}`;
-
-				window.showToast("¡Solicitud enviada exitosamente!", "success");
-			});
-
-			// Voucher download PDF mock
-			document.getElementById('btn-download-pdf').addEventListener('click', () => {
-				const folio = document.getElementById('lbl-success-folio').textContent;
-				let csvContent = "data:text/csv;charset=utf-8,";
-				csvContent += `CIVICFLOW - GOBIERNO DEL ESTADO DE YUCATAN\n`;
-				csvContent += `COMPROBANTE OFICIAL DE INGRESO DE SOLICITUD\n\n`;
-				csvContent += `Folio de Seguimiento: ${folio}\n`;
-				csvContent += `Fecha: ${new Date().toLocaleString()}\n`;
-				csvContent += `Tramite: ${currentProcedure.title}\n`;
-				csvContent += `Dependencia: ${currentProcedure.dept}\n`;
-				csvContent += `CURP del Solicitante: ${localStorage.getItem('citizen_curp')}\n`;
-				csvContent += `Estado Inicial: Recibido\n\n`;
-				csvContent += `Conserve este folio para rastrear su tramite en el portal o mediante Codigo QR.\n`;
+				window.showToast(`¡Solicitud enviada exitosamente!`, "success");
 				
-				const encodedUri = encodeURI(csvContent);
-				const link = document.createElement("a");
-				link.setAttribute("href", encodedUri);
-				link.setAttribute("download", `comprobante_${folio}.txt`);
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-				window.showToast("Comprobante oficial descargado", "success");
-			});
-
-			// ==========================================
-			// CHATBOT ASSISTANT LOGIC (AI ENGINE MOCK)
-			// ==========================================
-			const chatMessages = document.getElementById('chat-messages');
-			const chatForm = document.getElementById('chat-form');
-			const chatInput = document.getElementById('chat-input');
-			const chatTyping = document.getElementById('chat-typing');
-
-			const appendMessage = (text, sender) => {
-				const msg = document.createElement('div');
-				const isBot = sender === 'bot';
-				msg.className = `flex gap-2.5 max-w-[85%] ${isBot ? '' : 'ml-auto flex-row-reverse'}`;
-				
-				const avatar = isBot 
-					? `<div class="w-8 h-8 rounded-full bg-yuc-green text-yuc-gold flex items-center justify-center font-bold text-xs shadow-sm shrink-0">AI</div>`
-					: `<div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-extrabold text-[10px] shrink-0">YO</div>`;
-				
-				const bubbleBg = isBot
-					? 'bg-slate-100 dark:bg-slate-850 text-slate-800 dark:text-slate-250 rounded-tr-2xl rounded-br-2xl rounded-bl-2xl'
-					: 'bg-yuc-green text-white rounded-tl-2xl rounded-br-2xl rounded-bl-2xl';
-
-				msg.innerHTML = `
-					${avatar}
-					<div class="p-3 rounded-2xl leading-relaxed ${bubbleBg}">
-						${text}
-					</div>
-				`;
-				chatMessages.appendChild(msg);
-				chatMessages.scrollTop = chatMessages.scrollHeight;
-			};
-
-			// Initial Bot Message
-			appendMessage(`¡Hola! Soy tu Asistente Digital In óolal Yucatan para el trámite de <strong>${currentProcedure.title}</strong>. Pregúntame qué documentos necesitas, costos, plazos o dudas de llenado.`, 'bot');
-
-			chatForm.addEventListener('submit', (e) => {
-				e.preventDefault();
-				const text = chatInput.value.trim();
-				if (!text) return;
-
-				appendMessage(text, 'user');
-				chatInput.value = '';
-				
-				// Show typing indicator
-				chatTyping.classList.remove('hidden');
-
-				// Simulate AI response
+				// Redirect to Success
 				setTimeout(() => {
-					chatTyping.classList.add('hidden');
-					const lowerText = text.toLowerCase();
-					let reply = `Para el trámite de ${currentProcedure.title}, le recordamos que los documentos obligatorios son: la Identificación Oficial Vigente y un Comprobante de Domicilio reciente en el Estado de Yucatán.`;
+					window.location.href = `/ciudadano/exito?token=${tokenInput}&folio=${randomFolio}&tramite=${procedureId}`;
+				}, 1500);
 
-					if (lowerText.includes('requisito') || lowerText.includes('documento') || lowerText.includes('papel') || lowerText.includes('necesito')) {
-						reply = `Los requisitos indispensables para este trámite son:<br/><br/>${currentProcedure.reqs.split('•').join('<br/>•')}`;
-					} else if (lowerText.includes('costo') || lowerText.includes('cuesta') || lowerText.includes('pagar') || lowerText.includes('precio')) {
-						reply = `El costo oficial para <strong>${currentProcedure.title}</strong> es: <strong class="text-yuc-green dark:text-yuc-green-light">${currentProcedure.cost}</strong>.`;
-					} else if (lowerText.includes('tiempo') || lowerText.includes('tarda') || lowerText.includes('plazo') || lowerText.includes('dias') || lowerText.includes('resolucion')) {
-						reply = `El plazo máximo legal de resolución de la dependencia (${currentProcedure.dept}) es de <strong>${currentProcedure.time}</strong> a partir de su envío.`;
-					} else if (lowerText.includes('curp') || lowerText.includes('error') || lowerText.includes('llenar')) {
-						reply = `El CURP se carga automáticamente del registro de sesión. Rellene con cuidado su nombre completo tal como figura en su INE, número telefónico y domicilio en Yucatán. Si tiene dudas sobre algún campo, déjemelo saber.`;
-					} else if (lowerText.includes('hola') || lowerText.includes('buenas')) {
-						reply = `¡Hola! ¿En qué puedo orientarle hoy sobre la postulación de su trámite?`;
-					} else {
-						reply = `Entiendo su consulta. Le recuerdo que para el trámite de <strong>${currentProcedure.title}</strong> ante la <strong>${currentProcedure.dept}</strong>, debe asegurarse de cargar documentos claros en PDF o imagen para evitar rechazos de documentación incompleta.`;
-					}
-
-					appendMessage(reply, 'bot');
-				}, 1000);
 			});
 		}
 	</script>
