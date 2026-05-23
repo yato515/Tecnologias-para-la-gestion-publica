@@ -190,17 +190,16 @@ export const AuthController = {
       // Normalizar el rol a minúsculas para que coincida con los valores de la BD
       const rolNormalizado = String(rol).toLowerCase();
 
-      // 1. Crear usuario en Supabase Auth (guarda municipio/tramite en metadata)
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // 1. Crear usuario directamente en la BD con Supabase Admin (bypasses Auth policies and email restrictions)
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
-        options: {
-          data: {
-            nombre_completo,
-            rol: rolNormalizado,
-            tipo_solicitud: tipo_solicitud || null,
-            municipio: municipio || null
-          }
+        email_confirm: true,
+        user_metadata: {
+          nombre_completo,
+          rol: rolNormalizado,
+          tipo_solicitud: tipo_solicitud || null,
+          municipio: municipio || null
         }
       });
 
@@ -211,25 +210,19 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: 'No se pudo crear el usuario.' });
       }
 
-      // Detectar email duplicado (Supabase devuelve identities vacío en ese caso)
-      if (authData.user.identities && authData.user.identities.length === 0) {
-        return res.status(400).json({ success: false, message: 'El correo electrónico ya está registrado.' });
-      }
-
-      // 2. Insertar en la tabla perfiles (solo columnas que SÍ existen en la BD)
-      const { error: profileError } = await supabase.from('perfiles').insert([{
+      // 2. Insertar directamente en la BD en la tabla perfiles ignorando RLS
+      const { error: profileError } = await supabaseAdmin.from('perfiles').insert([{
         id: authData.user.id,
         nombre_completo,
         rol: rolNormalizado,
-        dependencia_id: null    // nullable según el esquema real
+        dependencia_id: null
       }]);
 
       if (profileError) {
         console.error('[registrarGestor] Error al insertar perfil:', profileError.message);
-        // El usuario ya existe en Auth, así que avisamos pero NO bloqueamos
         return res.status(201).json({
           success: true,
-          message: 'Usuario creado en el sistema de autenticación. Perfil pendiente de sincronización.',
+          message: 'Usuario creado en autenticación, pero hubo un error al agregarlo al perfil de la BD.',
           warning: profileError.message
         });
       }

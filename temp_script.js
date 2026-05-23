@@ -1,315 +1,4 @@
----
-import Layout from '../../layouts/Layout.astro';
-import SolicitudCard from '../../components/SolicitudCard.astro';
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
----
 
-<Layout title="Mesa de Trabajo del Gestor - In óolal Yucatan">
-	
-	<!-- Manager Sub-navigation header -->
-	<div class="bg-yuc-green-dark text-white transition-colors border-b border-white/20">
-		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 gap-4">
-				<div>
-					<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
-					<h1 class="text-2xl font-black font-display mt-1">Mesa de Trabajo Gubernamental</h1>
-					<p class="text-xs text-slate-200 mt-1">Funcionario: <span id="lbl-gestor-email" class="font-bold text-white font-sans">...</span> | Rol: <span id="lbl-gestor-role" class="font-bold text-yuc-gold">...</span></p>
-				</div>
-				<div class="flex items-center gap-3">
-					<button id="btn-gestor-logout" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-lg text-xs font-bold transition-all">
-						Cerrar Sesión
-					</button>
-				</div>
-			</div>
-
-			<!-- Submenu -->
-			<div class="flex gap-6 text-sm border-t border-white/10 pt-1">
-				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all">Mesa de Trabajo</a>
-				<a href="/gestor/cola" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Bandeja de Entrada</a>
-				<a href="/gestor/vencidas" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
-					<span>Solicitudes Vencidas</span>
-					<span id="badge-vencidas-count" class="hidden px-1.5 py-0.5 rounded-full bg-red-600 text-white font-extrabold text-[9px]">0</span>
-				</a>
-				<a href="/gestor/audit" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Logs de Auditoría</a>
-				<a href="#" id="tab-admin" class="hidden pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
-					<svg class="w-4 h-4 text-yuc-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-					<span>Administrar Cuentas</span>
-				</a>
-			</div>
-		</div>
-	</div>
-
-
-	<!-- Main Workspace -->
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-		
-		<!-- Protected Route Alert overlay (hidden by default) -->
-		<div id="gestor-overlay" class="hidden bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center max-w-lg mx-auto space-y-6 shadow-sm">
-			<div class="w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mx-auto">
-				<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-			</div>
-			<div class="space-y-2">
-				<h3 class="text-xl font-bold text-slate-800">Acceso Restringido</h3>
-				<p class="text-sm text-slate-500">Esta sección es para uso exclusivo de funcionarios del Gobierno de Yucatán.</p>
-			</div>
-			<a href="/gestor" class="inline-block px-6 py-3 bg-yuc-green text-white hover:bg-yuc-green-light font-bold rounded-xl shadow-sm transition-all text-sm">
-				Iniciar Sesión
-			</a>
-		</div>
-
-		<!-- Dashboard Content -->
-		<div id="gestor-dashboard-content" class="space-y-10">
-			
-			<div id="main-dashboard-view" class="space-y-10">
-			<!-- Workload traffic light (Semáforo de Carga) & Metrics Quick Overview -->
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-				
-				<!-- Semáforo de Carga Card -->
-				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-					<div>
-						<h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider font-display mb-4">Semáforo de Carga Laboral</h3>
-						<div class="flex items-center gap-4 p-4 rounded-xl border border-slate-100" id="semaforo-bg">
-							<!-- Color Node Light -->
-							<div id="semaforo-light" class="w-12 h-12 rounded-full shadow-inner flex items-center justify-center shrink-0"></div>
-							<div>
-								<h4 id="semaforo-title" class="font-bold text-sm text-slate-800">Calculando...</h4>
-								<p id="semaforo-desc" class="text-[11px] text-slate-500 mt-0.5">Analizando tiempos de respuesta...</p>
-							</div>
-						</div>
-					</div>
-					<div class="pt-4 border-t border-slate-100 mt-4 text-[10px] text-slate-500">
-						<span>Verde: Bajo control | Amarillo: Saturación media | Rojo: Solicitud vencida (&gt;3 días).</span>
-					</div>
-				</div>
-
-				<!-- Metrics Quick Cards -->
-				<div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
-					
-					<!-- Metric 1 -->
-					<div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-						<span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">SOLICITUDES PENDIENTES</span>
-						<span id="metric-pending" class="text-3xl font-black font-display block text-slate-800">0</span>
-						<p class="text-[10px] text-slate-500">En bandeja de revisión</p>
-					</div>
-
-					<!-- Metric 2 -->
-					<div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
-						<span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">TRÁMITES VENCIDOS</span>
-						<span id="metric-overdue" class="text-3xl font-black font-display block text-red-600">0</span>
-						<p class="text-[10px] text-slate-500">Plazo excedido</p>
-					</div>
-
-					<!-- Metric 3 -->
-					<div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm col-span-2 sm:col-span-1 space-y-2">
-						<span class="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider block">DICTÁMENES EMITIDOS</span>
-						<span id="metric-approved" class="text-3xl font-black font-display block text-yuc-green">0</span>
-						<p class="text-[10px] text-slate-500">Aprobados por firma digital</p>
-					</div>
-
-				</div>
-
-			</div>
-
-			<!-- Mesa de Trabajo: Islas de Solicitudes (Solo Lectura) -->
-			<div class="space-y-6">
-				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-4">
-					<div>
-						<h3 class="text-lg font-bold text-slate-800 font-display">Mesa de Trabajo Ciudadana</h3>
-						<p class="text-xs text-slate-500">Bandeja de expedientes validados algorítmicamente y listos para supervisión.</p>
-					</div>
-					<div class="text-xs font-bold text-slate-500">
-						Mostrando <span id="lbl-island-count" class="text-slate-800">0</span> solicitudes
-					</div>
-				</div>
-
-				<!-- Grid of Islands -->
-				<div id="requests-islands-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					<!-- Rendered dynamically matching the SolicitudCard style -->
-				</div>
-
-				<!-- Empty State -->
-				<div id="islands-empty-msg" class="hidden text-center py-16 bg-white border border-slate-200 rounded-2xl space-y-3">
-					<p class="text-slate-500 text-xs font-semibold">No se encontraron solicitudes registradas en la mesa de trabajo.</p>
-				</div>
-			</div>
-
-			<!-- Visual Analytics: Charts -->
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				
-				<!-- Chart 1: Average Resolution Time -->
-				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-					<h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-6">Tiempos de Respuesta por Dependencia (Días)</h3>
-					<div class="h-60 flex items-center justify-center relative">
-						<canvas id="chart-resolution-time"></canvas>
-					</div>
-				</div>
-
-				<!-- Chart 2: Category Distribution -->
-				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-					<h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-6">Proporción de Dictámenes Algorítmicos</h3>
-					<div class="h-60 flex items-center justify-center relative">
-						<canvas id="chart-distribution"></canvas>
-					</div>
-				</div>
-
-			</div>
-			</div>
-
-			<!-- Admin View (Hidden by default) -->
-			<div id="admin-view" class="hidden space-y-8">
-				<div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
-					<div class="absolute top-0 left-0 w-full h-1 bg-yuc-green"></div>
-					<div class="flex items-center gap-3 border-b border-slate-200 pb-4 mb-6 relative z-10">
-						<div class="w-10 h-10 rounded-full bg-yuc-green/10 flex items-center justify-center text-yuc-green">
-							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
-						</div>
-						<div>
-							<h3 class="text-lg font-bold text-slate-800 font-display">Registrar Nuevo Funcionario</h3>
-							<p class="text-xs text-slate-500">Agrega cuentas para revisores u otros aprobadores de dependencias.</p>
-						</div>
-					</div>
-
-					<form id="form-register-gestor" class="space-y-5 max-w-3xl relative z-10">
-						<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-							<div class="sm:col-span-2">
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre Completo</label>
-								<input type="text" id="reg-name" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none placeholder-slate-400" placeholder="Juan Pérez" />
-							</div>
-							
-							<div class="sm:col-span-2">
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Correo Institucional</label>
-								<input type="email" id="reg-email" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none placeholder-slate-400" placeholder="funcionario@yucatan.gob.mx" />
-							</div>
-
-							<div>
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Contraseña Inicial</label>
-								<input type="password" id="reg-pwd" required minlength="6" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none placeholder-slate-400" placeholder="••••••••" />
-							</div>
-
-							<div>
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Rol en el Sistema</label>
-								<select id="reg-role" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none">
-									<option value="Revisor">Revisor Operativo</option>
-									<option value="Aprobador">Director / Aprobador</option>
-								</select>
-							</div>
-
-							<div>
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Tipo de Servicio / Trámite</label>
-								<select id="reg-tipo-solicitud" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none">
-									<option value="">Cargando trámites...</option>
-								</select>
-							</div>
-
-							<div>
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Municipio / Lugar</label>
-								<select id="reg-municipio" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none">
-									<option value="">Cargando municipios...</option>
-								</select>
-							</div>
-						</div>
-
-						<div class="pt-4 border-t border-slate-200 flex justify-end">
-							<button type="submit" class="px-6 py-2.5 bg-yuc-green hover:bg-yuc-green-light text-white font-bold rounded-xl shadow-sm transition-all text-sm flex items-center gap-2">
-								<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
-								<span>Crear Cuenta</span>
-							</button>
-						</div>
-					</form>
-				</div>
-
-				<!-- Tabla de Personal -->
-				<div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
-					<div class="absolute inset-0 opacity-5 z-0 pointer-events-none"></div>
-					<div class="flex items-center justify-between border-b border-slate-200 pb-4 mb-6 relative z-10">
-						<div class="flex items-center gap-3">
-							<div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
-								<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-							</div>
-							<div>
-								<h3 class="text-lg font-bold text-slate-800 font-display">Personal Registrado</h3>
-								<p class="text-xs text-slate-500">Listado de gestores, revisores y aprobadores actuales.</p>
-							</div>
-						</div>
-						<button id="btn-refresh-personal" class="p-2 text-slate-500 hover:text-yuc-green transition-colors rounded-lg bg-slate-100 hover:bg-slate-200" title="Actualizar lista">
-							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-						</button>
-					</div>
-					
-					<div class="overflow-x-auto relative z-10">
-						<table class="w-full text-left text-sm whitespace-nowrap">
-							<thead class="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
-								<tr>
-									<th class="pb-3 font-bold">Nombre Completo</th>
-									<th class="pb-3 font-bold">Rol</th>
-									<th class="pb-3 font-bold">Filtro Trámite</th>
-									<th class="pb-3 font-bold">Filtro Lugar</th>
-									<th class="pb-3 font-bold text-right">Acciones</th>
-								</tr>
-							</thead>
-							<tbody id="tbl-personal-body" class="divide-y divide-slate-100 text-slate-700 text-xs">
-								<tr>
-									<td colspan="6" class="py-8 text-center text-slate-500">Cargando personal...</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
-
-		</div>
-
-	</div>
-
-	<!-- Modal Editar Personal -->
-	<div id="modal-edit-personal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-		<div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-lg transform transition-all relative overflow-hidden">
-			<div class="absolute top-0 left-0 w-full h-1 bg-yuc-green"></div>
-			<div class="p-6 border-b border-slate-200 flex items-center justify-between relative z-10">
-				<h3 class="text-lg font-bold text-slate-800 font-display">Modificar Funcionario</h3>
-				<button id="btn-close-edit-modal" class="text-slate-500 hover:text-slate-800 transition-colors">
-					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-				</button>
-			</div>
-			<div class="p-6 space-y-4 relative z-10">
-				<input type="hidden" id="edit-id" />
-				<div>
-					<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Nombre Completo</label>
-					<input type="text" id="edit-name" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none" />
-				</div>
-				<div>
-					<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Rol</label>
-					<select id="edit-role" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
-						<option value="revisor">Revisor Operativo</option>
-						<option value="aprobador">Director / Aprobador</option>
-					</select>
-				</div>
-				<div>
-					<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Tipo de Trámite/Documento Atendido</label>
-					<select id="edit-tipo-solicitud" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
-						<option value="">Cargando trámites...</option>
-					</select>
-				</div>
-				<div>
-					<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Municipio / Lugar de las Solicitudes</label>
-					<select id="edit-municipio" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
-						<option value="">Cargando municipios...</option>
-					</select>
-				</div>
-				<div class="pt-4 flex gap-3 justify-end">
-					<button id="btn-cancel-edit" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">Cancelar</button>
-					<button id="btn-save-edit" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
-						<span>Guardar Cambios</span>
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- ChartJS Script CDN -->
-	<script src="https://cdn.jsdelivr.net/npm/chart.js" is:inline></script>
-
-	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
 		const gestorLogged = localStorage.getItem('gestor_logged');
 		const overlay = document.getElementById('gestor-overlay');
@@ -320,24 +9,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			content.classList.add('hidden');
 		} else {
 			
+			// Populate manager credentials
 			const gestorEmail = localStorage.getItem('gestor_email') || 'N/A';
+			document.getElementById('lbl-gestor-email').textContent = gestorEmail;
 			const role = localStorage.getItem('gestor_role') || 'N/A';
+			document.getElementById('lbl-gestor-role').textContent = role;
 
-			// Populate manager credentials safely
-			try {
-				const emailSpan = document.getElementById('lbl-gestor-email');
-				if (emailSpan) emailSpan.textContent = gestorEmail;
-				
-				const roleSpan = document.getElementById('lbl-gestor-role');
-				if (roleSpan) roleSpan.textContent = role;
-
-				// Enable admin tab if Aprobador
-				if (role.toLowerCase() === 'aprobador') {
-					const tabAdminBtn = document.getElementById('tab-admin');
-					if (tabAdminBtn) tabAdminBtn.classList.remove('hidden');
-				}
-			} catch (err) {
-				console.error("Error populating header:", err);
+			// Enable admin tab if Aprobador
+			if (role.toLowerCase() === 'aprobador') {
+				document.getElementById('tab-admin').classList.remove('hidden');
 			}
 
 			// Tab Switching Logic
@@ -345,34 +25,17 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			const tabDashboard = document.querySelector('a[href="/gestor/dashboard"]');
 			const mainView = document.getElementById('main-dashboard-view');
 			const adminView = document.getElementById('admin-view');
-			const shouldOpenAdmin = new URLSearchParams(window.location.search).get('tab') === 'admin' || window.location.hash === '#admin';
-
-			if (shouldOpenAdmin && (localStorage.getItem('gestor_role') || '').toLowerCase() === 'aprobador') {
-				if (mainView) mainView.classList.add('hidden');
-				if (adminView) adminView.classList.remove('hidden');
-				if (tabAdmin) {
-					tabAdmin.classList.add('border-yuc-gold', 'text-yuc-gold', 'font-bold');
-					tabAdmin.classList.remove('border-transparent', 'text-slate-300');
-				}
-				if (tabDashboard) {
-					tabDashboard.classList.remove('border-yuc-gold', 'text-yuc-gold');
-					tabDashboard.classList.add('border-transparent', 'text-slate-300');
-				}
-			}
 
 			if (tabAdmin) {
 				tabAdmin.addEventListener('click', (e) => {
 					e.preventDefault();
-					if (mainView) mainView.classList.add('hidden');
-					if (adminView) adminView.classList.remove('hidden');
+					mainView.classList.add('hidden');
+					adminView.classList.remove('hidden');
 					tabAdmin.classList.add('border-yuc-gold', 'text-yuc-gold');
 					tabAdmin.classList.remove('border-transparent', 'text-slate-300');
-					if (tabDashboard) {
-						tabDashboard.classList.remove('border-yuc-gold', 'text-yuc-gold');
-						tabDashboard.classList.add('border-transparent', 'text-slate-300');
-					}
-					if (typeof loadPersonal === 'function') loadPersonal();
-					if (typeof loadFiltros === 'function') loadFiltros();
+					tabDashboard.classList.remove('border-yuc-gold', 'text-yuc-gold');
+					tabDashboard.classList.add('border-transparent', 'text-slate-300');
+					loadPersonal();
 				});
 			}
 
@@ -590,7 +253,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							<span>Estatus:</span>
 							<span class="${r.status === 'Aprobado' ? 'text-emerald-500' : (r.status === 'Rechazado' || r.status === 'Declinado' ? 'text-red-500' : 'text-slate-600')}">${r.status}</span>
 						</div>
-					`;
+					\`;
 					grid.appendChild(card);
 				});
 
@@ -737,20 +400,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			const loadFiltros = async () => {
 				const selectTramites = document.getElementById('edit-tipo-solicitud');
 				const selectMunicipios = document.getElementById('edit-municipio');
-				const selectRegTramites = document.getElementById('reg-tipo-solicitud');
-				const selectRegMunicipios = document.getElementById('reg-municipio');
 				
 				// Cargar municipios de Yucatán
 				if (selectMunicipios) {
 					const municipios = ["Abalá","Acanceh","Akil","Baca","Bokobá","Buctzotz","Cacalchén","Calotmul","Cansahcab","Cantamayec","Celestún","Cenotillo","Conkal","Cuncunul","Cuzamá","Chacsinkín","Chankom","Chapab","Chemax","Chicxulub Pueblo","Chichimilá","Chikindzonot","Chocholá","Chumayel","Dzán","Dzemul","Dzidzantún","Dzilam de Bravo","Dzilam González","Dzitás","Dzoncauich","Espita","Halachó","Hocabá","Hoctún","Homún","Huhí","Hunucmá","Ixil","Izamal","Kanasín","Kantunil","Kaua","Kinchil","Kopomá","Mama","Maní","Maxcanú","Mayapán","Mérida","Mocochá","Motul","Muna","Muxupip","Opichén","Oxkutzcab","Panabá","Peto","Progreso","Quintana Roo","Río Lagartos","Sacalum","Samahil","Sanahcat","San Felipe","Santa Elena","Seyé","Sinanché","Sotuta","Sucilá","Sudzal","Suma","Tahdziú","Tahmek","Teabo","Tecoh","Tekal de Venegas","Tekantó","Tekax","Tekit","Tekom","Telchac Pueblo","Telchac Puerto","Temax","Temozón","Tepakán","Tetiz","Teya","Ticul","Timucuy","Tinum","Tixcacalcupul","Tixkokob","Tixmehuac","Tixpéhual","Tizimín","Tunkás","Tzucacab","Uayma","Ucú","Umán","Valladolid","Xocchel","Yaxcabá","Yaxkukul","Yobaín"];
 					selectMunicipios.innerHTML = '<option value="">Todos los municipios</option>';
-					if (selectRegMunicipios) selectRegMunicipios.innerHTML = '<option value="">Todos los municipios</option>';
 					municipios.forEach(m => {
 						const opt = document.createElement('option');
 						opt.value = m;
 						opt.textContent = m;
 						selectMunicipios.appendChild(opt);
-						if (selectRegMunicipios) selectRegMunicipios.appendChild(opt.cloneNode(true));
 					});
 				}
 
@@ -769,58 +428,47 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						"Renovación de Licencia de Conducir (Automovilista - 2 años)"
 					];
 					selectTramites.innerHTML = '<option value="">Todos los trámites</option>';
-					if (selectRegTramites) selectRegTramites.innerHTML = '<option value="">Todos los trámites</option>';
 					tramitesFijos.forEach(t => {
 						const opt = document.createElement('option');
 						opt.value = t;
 						opt.textContent = t;
 						selectTramites.appendChild(opt);
-						if (selectRegTramites) selectRegTramites.appendChild(opt.cloneNode(true));
 					});
 				}
 			};
 
 			// Admin UI logic
-			const tabAdminBtn2 = document.getElementById('tab-admin');
-			if (tabAdminBtn2) {
-				tabAdminBtn2.addEventListener('click', (e) => {
-					e.preventDefault();
-					const mainView = document.getElementById('main-dashboard-view');
-					if (mainView) mainView.classList.add('hidden');
-					
-					const adminView = document.getElementById('admin-view');
-					if (adminView) adminView.classList.remove('hidden');
-					
-					// Set active styling on Admin tab
-					tabAdminBtn2.className = "pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all flex items-center gap-1.5";
-					
-					// Set inactive styling on Mesa de Trabajo link (which is the first child of the submenu container)
-					const submenu = tabAdminBtn2.parentElement;
-					if (submenu && submenu.children.length > 0) {
-						submenu.children[0].className = "pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all";
-					}
-					
-					if (typeof loadPersonal === 'function') loadPersonal();
-					if (typeof loadFiltros === 'function') loadFiltros();
-				});
-			}
+			document.getElementById('tab-admin')?.addEventListener('click', (e) => {
+				e.preventDefault();
+				const mainView = document.getElementById('main-dashboard-view');
+				if (mainView) mainView.classList.add('hidden');
+				
+				const adminView = document.getElementById('admin-view');
+				if (adminView) adminView.classList.remove('hidden');
+				
+				// Set active styling on Admin tab
+				document.getElementById('tab-admin').className = "pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all flex items-center gap-1.5";
+				// Set inactive styling on Mesa de Trabajo link (which is the first child of the submenu container)
+				const submenu = document.getElementById('tab-admin').parentElement;
+				submenu.children[0].className = "pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all";
+				
+				loadPersonal();
+				loadFiltros();
+			});
 
 			// Auto-open admin if URL hash is #admin
 			if (window.location.hash === '#admin') {
-				const tb = document.getElementById('tab-admin');
-				if (tb) tb.click();
+				document.getElementById('tab-admin')?.click();
 			}
 
 			// If URL contains tab=admin query parameter, auto activate admin tab
 			if (new URLSearchParams(window.location.search).get('tab') === 'admin') {
 				setTimeout(() => {
-					const tb = document.getElementById('tab-admin');
-					if (tb) tb.click();
+					document.getElementById('tab-admin')?.click();
 				}, 100);
 			}
 
-			const btnRefreshPersonal = document.getElementById('btn-refresh-personal');
-			if (btnRefreshPersonal) btnRefreshPersonal.addEventListener('click', loadPersonal);
+			document.getElementById('btn-refresh-personal')?.addEventListener('click', loadPersonal);
 
 			// Edit modal events
 			const closeEditModal = () => document.getElementById('modal-edit-personal').classList.add('hidden');
@@ -865,8 +513,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const password = document.getElementById('reg-pwd').value;
 				const nombre_completo = document.getElementById('reg-name').value.trim();
 				const rol = document.getElementById('reg-role').value;
-				const tipo_solicitud = document.getElementById('reg-tipo-solicitud').value || null;
-				const municipio = document.getElementById('reg-municipio').value || null;
 
 				try {
 					const res = await fetch(`${API_URL}/api/auth/registrar-gestor`, {
@@ -877,8 +523,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							password, 
 							rol, 
 							nombre_completo,
-							tipo_solicitud,
-							municipio,
 							director_email: gestorEmail // Validate authority
 						})
 					});
@@ -896,5 +540,4 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			});
 
 		}
-	</script>
-</Layout>
+	

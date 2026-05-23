@@ -56,7 +56,7 @@ export const GestorController = {
             userData.users.forEach(u => {
               usersMap[u.id] = u.email;
             });
-            mappedData = data.map(s => {
+            mappedData = mappedData.map(s => {
               if (s.ciudadano) {
                 return {
                   ...s,
