@@ -51,5 +51,15 @@ export const UsersService = {
       .single();
     if (error) throw error;
     return data;
+  },
+
+  getByCurp: async (curp) => {
+    const { data, error } = await supabase
+      .from('perfiles')
+      .select('*')
+      .eq('curp', curp)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
   }
 };

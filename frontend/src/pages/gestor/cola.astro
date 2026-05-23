@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Cola de Solicitudes">
@@ -92,32 +93,48 @@ import Layout from '../../layouts/Layout.astro';
 
 	</div>
 
-	<script is:inline>
-		// Protect page access
+	<script is:inline define:vars={{ API_URL }}>
 		const gestorLogged = localStorage.getItem('gestor_logged');
 		if (gestorLogged !== 'true') {
 			window.location.href = '/gestor';
 		} else {
-			
+
 			const defaultRequests = [
 				{ folio: "TRM-2026-00104", name: "Acreditación de Productor Henequenero", dept: "Desarrollo Rural", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech" },
 				{ folio: "TRM-2026-00201", name: "Constancia de Residencia", dept: "Catastro y Registro del Estado de Yucatán", date: "2026-05-18", status: "Recibido", citizen_fullname: "Eduardo Chan" },
 				{ folio: "TRM-2026-00202", name: "Licencia de Funcionamiento Comercial", dept: "Dirección de Fomento Económico del Estado", date: "2026-05-15", status: "En revisión", citizen_fullname: "Marisela Puc" }
 			];
 
-			const getRequests = () => {
+			// Cache de solicitudes (cargadas desde API o localStorage)
+			let cachedRequests = null;
+
+			const loadRequests = async () => {
+				if (cachedRequests) return cachedRequests;
+				try {
+					const res = await fetch(`${API_URL}/api/gestores/solicitudes`);
+					const json = await res.json();
+					if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+						cachedRequests = json.data.map(s => ({
+							folio: s.folio || s.id,
+							name: s.tramite?.nombre || 'Trámite',
+							dept: s.dependencia?.nombre || '-',
+							date: (s.created_at || '').split('T')[0],
+							status: s.estado || 'recibido',
+							citizen_fullname: s.ciudadano?.nombre_completo || 'N/A'
+						}));
+						return cachedRequests;
+					}
+				} catch (_) {}
+				// Fallback a localStorage/defaults
 				const local = localStorage.getItem('civicflow_requests');
-				if (!local) {
-					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
-					return defaultRequests;
-				}
-				return JSON.parse(local);
+				cachedRequests = local ? JSON.parse(local) : defaultRequests;
+				return cachedRequests;
 			};
 
-			const renderQueue = () => {
+			const renderQueue = async () => {
 				const tbody = document.getElementById('cola-tbody');
 				const emptyMsg = document.getElementById('cola-empty-msg');
-				const requests = getRequests();
+				const requests = await loadRequests();
 
 				const statusFilter = document.getElementById('filter-status').value;
 				const nameFilter = document.getElementById('filter-name').value;
@@ -200,13 +217,13 @@ import Layout from '../../layouts/Layout.astro';
 
 			document.getElementById('filter-status').addEventListener('change', renderQueue);
 			document.getElementById('filter-name').addEventListener('change', renderQueue);
-			
+
 			// Initial load
 			renderQueue();
 
 			// Export to CSV
-			document.getElementById('btn-export-csv').addEventListener('click', () => {
-				const requests = getRequests();
+			document.getElementById('btn-export-csv').addEventListener('click', async () => {
+				const requests = await loadRequests();
 				
 				let csvContent = "data:text/csv;charset=utf-8,";
 				csvContent += "Folio,Tramite,Dependencia,Fecha,Ciudadano,Estado\n";

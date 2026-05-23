@@ -102,6 +102,23 @@ export const TramiteController = {
     }
   },
 
+  // GET /api/tramites/solicitudes/folio/:folio
+  getSolicitudByFolio: async (req, res) => {
+    try {
+      const { folio } = req.params;
+      const { data, error } = await supabase
+        .from('solicitudes')
+        .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo, curp)')
+        .eq('folio', folio)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
   // POST /api/tramites/solicitudes/:id/calificar
   calificar: async (req, res) => {
     try {

@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Mi Portal Ciudadano">
@@ -347,7 +348,7 @@ import Layout from '../../layouts/Layout.astro';
 
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
 		const citizenLogged = localStorage.getItem('citizen_logged');
 		const overlay = document.getElementById('login-required-overlay');
@@ -399,6 +400,35 @@ import Layout from '../../layouts/Layout.astro';
 			tabCatalog.addEventListener('click', () => activateTab('catalog'));
 			tabInbox.addEventListener('click', () => activateTab('inbox'));
 			tabFolder.addEventListener('click', () => activateTab('folder'));
+
+			// Cargar catálogo desde API (si hay datos en DB los agrega al grid)
+			fetch(`${API_URL}/api/tramites/catalogo`)
+				.then(r => r.json())
+				.then(json => {
+					if (!json.success || !json.data || json.data.length === 0) return;
+					const grid = document.getElementById('catalog-grid');
+					json.data.forEach(t => {
+						const card = document.createElement('div');
+						card.className = "catalog-card bg-white dark:bg-slate-900 border border-yuc-green/30 dark:border-yuc-green/20 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between";
+						card.setAttribute('data-title', (t.nombre || '').toLowerCase());
+						card.innerHTML = `
+							<div>
+								<div class="flex justify-between items-start gap-4">
+									<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green dark:text-yuc-green-light font-bold text-[10px] uppercase">${t.dependencia?.nombre || 'Dependencia'}</span>
+									<span class="text-xs text-slate-400 font-medium">Resolución: ${t.plazo_dias_habiles ? t.plazo_dias_habiles + ' días' : 'Variable'}</span>
+								</div>
+								<h3 class="text-lg font-bold text-slate-800 dark:text-white mt-3 font-display">${t.nombre}</h3>
+								<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">${t.descripcion || ''}</p>
+							</div>
+							<div class="pt-6 border-t border-slate-100 dark:border-slate-850 mt-6 flex justify-between items-center">
+								<span class="text-xs font-bold text-yuc-green dark:text-yuc-green-light">Costo: ${t.costo_referencia || 'Consultar'}</span>
+								<a href="/ciudadano/tramite?id=${t.id}" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors">Iniciar Trámite</a>
+							</div>
+						`;
+						grid.prepend(card);
+					});
+				})
+				.catch(() => {});
 
 			// Search filter
 			const searchInput = document.getElementById('txt-search');
@@ -607,10 +637,30 @@ import Layout from '../../layouts/Layout.astro';
 				return JSON.parse(local);
 			};
 
-			const renderInbox = () => {
+			const renderInbox = async () => {
 				const tbody = document.getElementById('inbox-tbody');
 				const emptyMsg = document.getElementById('inbox-empty-msg');
-				const requests = getRequests();
+
+				// Intentar cargar solicitudes desde la API
+				let apiRequests = [];
+				const citizenId = localStorage.getItem('citizen_id');
+				if (citizenId) {
+					try {
+						const res = await fetch(`${API_URL}/api/tramites/solicitudes/${citizenId}`);
+						const json = await res.json();
+						if (json.success && Array.isArray(json.data)) {
+							apiRequests = json.data.map(s => ({
+								folio: s.folio || s.id,
+								name: s.tramite?.nombre || 'Trámite',
+								dept: s.dependencia?.nombre || '-',
+								date: (s.created_at || '').split('T')[0],
+								status: s.estado || 'recibido'
+							}));
+						}
+					} catch (_) {}
+				}
+
+				const requests = apiRequests.length > 0 ? apiRequests : getRequests();
 
 				tbody.innerHTML = '';
 				
