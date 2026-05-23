@@ -71,6 +71,20 @@ import Layout from '../../layouts/Layout.astro';
 					</div>
 				</div>
 
+				<!-- Citizen History Card (Compact) -->
+				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
+					<div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-850 pb-3">
+						<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display">Historial de Trámites</h3>
+						<button id="btn-open-history-modal" class="text-[10px] font-bold text-yuc-gold hover:text-yuc-gold-dark uppercase tracking-wider flex items-center gap-1">
+							Ver Completo <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+						</button>
+					</div>
+					
+					<div id="compact-history-list" class="space-y-3">
+						<div class="text-xs text-slate-500 italic py-2 text-center">Cargando historial previo...</div>
+					</div>
+				</div>
+
 				<!-- Attached Documents Card -->
 				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
 					<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display border-b border-slate-100 dark:border-slate-850 pb-3">Expediente de Documentos Adjuntos</h3>
@@ -203,6 +217,70 @@ import Layout from '../../layouts/Layout.astro';
 
 	</div>
 
+	<!-- FULL HISTORY MODAL -->
+	<div id="history-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+		<div class="bg-slate-900 border border-yuc-gold/30 max-w-3xl w-full rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+			<div class="h-1 bg-yuc-gold w-full"></div>
+			<div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900 z-10 relative">
+				<h3 class="text-lg font-bold text-white font-display flex items-center gap-2">
+					<svg class="w-5 h-5 text-yuc-gold" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+					Historial Completo del Ciudadano
+				</h3>
+				<button id="btn-close-history-modal" class="text-slate-400 hover:text-white">&times;</button>
+			</div>
+
+			<div class="p-5 bg-slate-800/30 border-b border-slate-800 flex flex-wrap gap-4 items-end">
+				<div>
+					<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Año</label>
+					<select id="filter-year" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white text-xs focus:ring-1 focus:ring-yuc-gold focus:outline-none">
+						<option value="all">Todos</option>
+						<option value="2026">2026</option>
+						<option value="2025">2025</option>
+						<option value="2024">2024</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mes</label>
+					<select id="filter-month" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white text-xs focus:ring-1 focus:ring-yuc-gold focus:outline-none">
+						<option value="all">Todos</option>
+						<option value="0">Enero</option>
+						<option value="1">Febrero</option>
+						<option value="2">Marzo</option>
+						<option value="3">Abril</option>
+						<option value="4">Mayo</option>
+						<option value="5">Junio</option>
+						<option value="6">Julio</option>
+						<option value="7">Agosto</option>
+						<option value="8">Septiembre</option>
+						<option value="9">Octubre</option>
+						<option value="10">Noviembre</option>
+						<option value="11">Diciembre</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="overflow-y-auto p-5 flex-1 custom-scrollbar">
+				<div class="overflow-x-auto">
+					<table class="w-full text-left text-sm whitespace-nowrap">
+						<thead class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
+							<tr>
+								<th class="pb-3 font-bold">Folio</th>
+								<th class="pb-3 font-bold">Trámite</th>
+								<th class="pb-3 font-bold">Fecha</th>
+								<th class="pb-3 font-bold">Estado</th>
+							</tr>
+						</thead>
+						<tbody id="tbl-history-body" class="divide-y divide-slate-800 text-slate-300 text-xs">
+							<tr>
+								<td colspan="4" class="py-8 text-center text-slate-500">Buscando registros...</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- REJECTION TEMPLATE MODAL OVERLAY (Initially Hidden) -->
 	<div id="rejection-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
 		<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 transform scale-95 transition-transform duration-300">
@@ -280,6 +358,7 @@ import Layout from '../../layouts/Layout.astro';
 				window.showToast("Folio no encontrado en base de datos", "error");
 			} else {
 				const req = requests[reqIdx];
+				const ciudadanoId = req.ciudadano_id; // Added citizen ID extraction
 
 				// Fill labels
 				document.getElementById('lbl-solicitud-folio').textContent = req.folio;
@@ -552,6 +631,107 @@ import Layout from '../../layouts/Layout.astro';
 					}, 800);
 				});
 
+				// --- CITIZEN HISTORY LOGIC ---
+				let allHistory = [];
+
+				async function loadHistory() {
+					if(!ciudadanoId) return;
+					try {
+						const res = await fetch(`http://localhost:3000/api/gestores/ciudadano/${ciudadanoId}/historial`);
+						const data = await res.json();
+						if(data.success) {
+							allHistory = data.data;
+							renderCompactHistory();
+							renderFullHistory();
+						}
+					} catch (e) {
+						console.error("Error fetching history", e);
+						document.getElementById('compact-history-list').innerHTML = `<div class="text-xs text-red-400 py-2">Error al cargar historial</div>`;
+					}
+				}
+
+				function getStatusBadgeClass(status) {
+					if (status === 'Aprobado') return 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/20';
+					if (status === 'Rechazado') return 'bg-red-500/15 text-red-500 border border-red-500/20';
+					if (status === 'En revisión') return 'bg-amber-500/15 text-amber-500 border border-amber-500/20';
+					if (status === 'Documentación incompleta') return 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
+					return 'bg-blue-500/15 text-blue-500 border border-blue-500/20';
+				}
+
+				function renderCompactHistory() {
+					const container = document.getElementById('compact-history-list');
+					if(allHistory.length === 0) {
+						container.innerHTML = `<div class="text-xs text-slate-500 py-2">No hay trámites previos.</div>`;
+						return;
+					}
+					// Show up to 3 most recent
+					const recent = allHistory.slice(0, 3);
+					let html = '';
+					recent.forEach(h => {
+						const d = new Date(h.created_at);
+						html += `
+							<div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/20 flex flex-col gap-1.5">
+								<div class="flex justify-between items-start">
+									<span class="font-bold text-xs text-slate-800 dark:text-white">${h.tramite?.nombre || 'Trámite'}</span>
+									<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(h.estado)}">${h.estado}</span>
+								</div>
+								<div class="flex justify-between items-center text-[10px] text-slate-500">
+									<span class="font-mono">${h.folio}</span>
+									<span>${d.toLocaleDateString()}</span>
+								</div>
+							</div>
+						`;
+					});
+					container.innerHTML = html;
+				}
+
+				function renderFullHistory() {
+					const tbody = document.getElementById('tbl-history-body');
+					const selYear = document.getElementById('filter-year').value;
+					const selMonth = document.getElementById('filter-month').value;
+
+					const filtered = allHistory.filter(h => {
+						const d = new Date(h.created_at);
+						if (selYear !== 'all' && d.getFullYear().toString() !== selYear) return false;
+						if (selMonth !== 'all' && d.getMonth().toString() !== selMonth) return false;
+						return true;
+					});
+
+					if(filtered.length === 0) {
+						tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-500">No se encontraron registros con estos filtros.</td></tr>`;
+						return;
+					}
+
+					let html = '';
+					filtered.forEach(h => {
+						const d = new Date(h.created_at);
+						html += `
+							<tr class="hover:bg-slate-800/50 transition-colors">
+								<td class="py-3 font-mono text-[10px]">${h.folio}</td>
+								<td class="py-3 font-medium text-white">${h.tramite?.nombre || 'Trámite'}</td>
+								<td class="py-3 text-slate-400">${d.toLocaleDateString()}</td>
+								<td class="py-3">
+									<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(h.estado)}">${h.estado}</span>
+								</td>
+							</tr>
+						`;
+					});
+					tbody.innerHTML = html;
+				}
+
+				// Modal controls
+				const historyModal = document.getElementById('history-modal');
+				document.getElementById('btn-open-history-modal').addEventListener('click', () => {
+					historyModal.classList.remove('hidden');
+				});
+				document.getElementById('btn-close-history-modal').addEventListener('click', () => {
+					historyModal.classList.add('hidden');
+				});
+				document.getElementById('filter-year').addEventListener('change', renderFullHistory);
+				document.getElementById('filter-month').addEventListener('change', renderFullHistory);
+
+				// Trigger load
+				loadHistory();
 			}
 		}
 	</script>

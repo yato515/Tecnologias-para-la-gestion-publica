@@ -181,5 +181,28 @@ export const GestorController = {
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
+  },
+
+  // GET /api/gestores/ciudadano/:ciudadano_id/historial
+  getHistorialCiudadano: async (req, res) => {
+    try {
+      const { ciudadano_id } = req.params;
+      const { data, error } = await supabase
+        .from('solicitudes')
+        .select(`
+          id,
+          folio,
+          estado,
+          created_at,
+          tramite:tramites_catalogo(nombre),
+          dependencia:dependencias(nombre)
+        `)
+        .eq('ciudadano_id', ciudadano_id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json({ success: true, data });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
   }
 };

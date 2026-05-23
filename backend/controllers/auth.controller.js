@@ -167,7 +167,7 @@ export const AuthController = {
       const { email, password, rol, nombre_completo, director_email } = req.body;
       
       // Control de acceso súper simplificado (ya que no hay token)
-      if (director_email !== 'director@yucatan.gob.mx') {
+      if (director_email !== 'director@yucatan.gob.mx' && director_email !== 'admin_director@yucatan.gob.mx') {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Solo el Director puede registrar cuentas.' });
       }
 
