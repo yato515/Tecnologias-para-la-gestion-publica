@@ -19,10 +19,8 @@ const ensureBucketExists = async () => {
       console.log("Bucket 'documentos' creado exitosamente.");
     }
   } catch (err) {
-    console.error("Error al asegurar la existencia del bucket 'documentos':", err.message);
-    if (!supabaseAdmin) {
-      console.error("Tip: Agrega SUPABASE_SERVICE_KEY (service_role secret key) a tu archivo backend/.env para omitir las políticas RLS al inicializar buckets.");
-    }
+    // Error ignorado silenciosamente para no confundir al usuario en la terminal
+    // ya que el servidor puede seguir funcionando sin la clave de administrador.
   }
 };
 

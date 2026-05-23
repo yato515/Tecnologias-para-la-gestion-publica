@@ -25,8 +25,9 @@ export const AuthController = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
+
       if (!email || !password) {
-        return res.status(400).json({ success: false, message: 'Email y contraseña son requeridos' });
+        return res.status(400).json({ success: false, message: 'Email y contraseña requeridos' });
       }
 
       // 1. Autenticar con el sistema nativo de Supabase Auth
