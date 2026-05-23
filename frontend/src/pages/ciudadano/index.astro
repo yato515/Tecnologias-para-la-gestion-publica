@@ -290,7 +290,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 	</div>
 
 	<script is:inline define:vars={{ API_URL }}>
-		// Safe localStorage reader — never throws, returns fallback on corrupt data
+		// ── Helpers ──────────────────────────────────────────────────────────────
 		function safeJSONParse(key, fallback) {
 			if (fallback === undefined) fallback = null;
 			try {
@@ -298,554 +298,393 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				if (!value || value === 'undefined' || value === 'null') return fallback;
 				return JSON.parse(value);
 			} catch (err) {
-				console.error('[CivicFlow] localStorage parse error for key "' + key + '":', err);
 				localStorage.removeItem(key);
 				return fallback;
 			}
 		}
 
-		// Protect page access
-		const logged = localStorage.getItem('citizen_logged');
+		const DEFAULT_DOSSIER = [
+			{ id: 'ine',      name: 'Identificación Oficial Vigente (INE)', file: '', status: 'Pendiente', date: '-' },
+			{ id: 'domicilio',name: 'Comprobante de Domicilio',             file: '', status: 'Pendiente', date: '-' },
+			{ id: 'acta',     name: 'Acta de Nacimiento Certificada',       file: '', status: 'Pendiente', date: '-' },
+			{ id: 'curp',     name: 'Cédula CURP Oficial',                  file: '', status: 'Pendiente', date: '-' }
+		];
 
-		if (logged !== 'true') {
-			window.location.href = '/ciudadano/login';
-		} else {
-			// Remove seed/mock data if present (one-time migration to clean state)
-			const token = localStorage.getItem('jwt_token');
-			if (!token || token === 'mock-jwt-token-demo' || token === 'N/A') {
-				localStorage.removeItem('civicflow_dossier');
-			} else {
+		function getDossier() {
+			const parsed = safeJSONParse('civicflow_dossier', null);
+			if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+			localStorage.setItem('civicflow_dossier', JSON.stringify(DEFAULT_DOSSIER));
+			return DEFAULT_DOSSIER;
+		}
+
+		function getRequests() {
+			const parsed = safeJSONParse('civicflow_requests', []);
+			return Array.isArray(parsed) ? parsed : [];
+		}
+
+		function renderDossier() {
+			const grid = document.getElementById('dossier-grid');
+			if (!grid) return;
+			const dossier = getDossier();
+			grid.innerHTML = '';
+			let loadedCount = 0;
+
+			dossier.forEach(function(doc) {
 				try {
-					const rawSd = localStorage.getItem('civicflow_dossier');
-					if (rawSd) {
-						const _sd = JSON.parse(rawSd);
-						if (Array.isArray(_sd) && _sd.some(d => d && (d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf'))) {
-							localStorage.removeItem('civicflow_dossier');
-						}
-					}
-				} catch (e) {
-					localStorage.removeItem('civicflow_dossier');
-				}
-			}
-			try {
-				const rawSr = localStorage.getItem('civicflow_requests');
-				if (rawSr) {
-					const _sr = JSON.parse(rawSr);
-					if (Array.isArray(_sr) && _sr.some(r => r && r.folio === 'TRM-2026-00104')) {
-						localStorage.removeItem('civicflow_requests');
-					}
-				}
-			} catch (e) {}
-			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
-			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
-			
-			const tokenEl = document.getElementById('lbl-token');
-			if (token && token !== 'mock-jwt-token-demo') {
-				tokenEl.textContent = token;
-				tokenEl.title = "Ver completo (Haga clic)";
-			} else {
-				tokenEl.textContent = "N/A (No generado)";
-				tokenEl.title = "Sube tus documentos en tu expediente o realiza un trámite para generar tu token";
-			}
-			tokenEl.addEventListener('click', () => {
-				const currentT = localStorage.getItem('jwt_token');
-				if (currentT && currentT !== 'mock-jwt-token-demo') {
-					alert("Token de Expediente Completo:\n\n" + currentT);
-				} else {
-					alert("No tienes un token generado aún. Se creará automáticamente cuando subas tu primer trámite o cargues un archivo en tu expediente digital.");
-				}
-			});
-
-			// Enable tabs
-			const tabCatalog = document.getElementById('tab-btn-catalog');
-			const tabInbox = document.getElementById('tab-btn-inbox');
-			const tabFolder = document.getElementById('tab-btn-folder');
-			
-			const contentCatalog = document.getElementById('tab-content-catalog');
-			const contentInbox = document.getElementById('tab-content-inbox');
-			const contentFolder = document.getElementById('tab-content-folder');
-
-			const activateTab = (tab) => {
-				// Reset tabs classes
-				const activeClass = "pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green focus:outline-none flex items-center gap-2";
-				const inactiveClass = "pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 focus:outline-none flex items-center gap-2 relative";
-				
-				tabCatalog.className = inactiveClass;
-				tabInbox.className = inactiveClass;
-				tabFolder.className = inactiveClass;
-				
-				contentCatalog.classList.add('hidden');
-				contentInbox.classList.add('hidden');
-				contentFolder.classList.add('hidden');
-
-				if (tab === 'catalog') {
-					tabCatalog.className = activeClass;
-					contentCatalog.classList.remove('hidden');
-				} else if (tab === 'inbox') {
-					tabInbox.className = activeClass + " relative";
-					contentInbox.classList.remove('hidden');
-					renderInbox();
-				} else if (tab === 'folder') {
-					tabFolder.className = activeClass;
-					contentFolder.classList.remove('hidden');
-					renderDossier();
-				}
-			};
-
-			tabCatalog.addEventListener('click', () => activateTab('catalog'));
-			tabInbox.addEventListener('click', () => activateTab('inbox'));
-			tabFolder.addEventListener('click', () => activateTab('folder'));
-
-			// Activar tab desde la URL si existe
-			const urlParams = new URLSearchParams(window.location.search);
-			if (urlParams.get('tab') === 'folder') {
-				activateTab('folder');
-			} else if (urlParams.get('tab') === 'inbox') {
-				activateTab('inbox');
-			}
-
-			// Cargar catálogo desde API (si hay datos en DB los agrega al grid)
-			fetch(`${API_URL}/api/tramites/catalogo`, {
-				headers: { 'Authorization': `Bearer ${token}` }
-			})
-				.then(r => {
-					if (r.status === 401 || r.status === 403) {
-						localStorage.clear();
-						window.location.href = '/ciudadano/login';
-						return;
-					}
-					return r.json();
-				})
-				.then(json => {
-					if (!json || !json.success || !json.data || json.data.length === 0) return;
-					const grid = document.getElementById('catalog-grid');
-					json.data.forEach(t => {
-						const card = document.createElement('div');
-						card.className = "catalog-card bg-white border border-slate-200 hover:border-yuc-green/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between";
-						card.setAttribute('data-title', (t.nombre || '').toLowerCase());
-						card.innerHTML = `
-							<div>
-								<div class="flex justify-between items-start gap-4">
-									<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase">${t.dependencia?.nombre || 'Dependencia'}</span>
-									<span class="text-xs text-slate-500 font-medium">Resolución: ${t.plazo_dias_habiles ? t.plazo_dias_habiles + ' días' : 'Variable'}</span>
-								</div>
-								<h3 class="text-lg font-bold text-slate-800 mt-3 font-display">${t.nombre}</h3>
-								<p class="text-xs text-slate-500 mt-2 leading-relaxed">${t.descripcion || ''}</p>
-							</div>
-							<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
-								<span class="text-xs font-bold text-yuc-gold">Costo: ${t.costo_referencia || 'Consultar'}</span>
-								<a href="/ciudadano/tramite?id=${t.id}" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all shadow-sm">Iniciar Trámite</a>
-							</div>
-						`;
-						grid.prepend(card);
-					});
-				})
-				.catch(() => {});
-
-			// Search filter
-			const searchInput = document.getElementById('txt-search');
-			const cards = document.querySelectorAll('.catalog-card');
-			const noResults = document.getElementById('no-results-msg');
-			const clearSearch = document.getElementById('btn-clear-search');
-
-			const filterCatalog = () => {
-				const query = searchInput.value.toLowerCase().trim();
-				let visibleCount = 0;
-				cards.forEach(card => {
-					const title = card.getAttribute('data-title') || '';
-					const cardText = card.textContent.toLowerCase();
-					if (cardText.includes(query) || title.includes(query)) {
-						card.classList.remove('hidden');
-						visibleCount++;
-					} else {
-						card.classList.add('hidden');
-					}
-				});
-
-				if (visibleCount === 0) {
-					noResults.classList.remove('hidden');
-				} else {
-					noResults.classList.add('hidden');
-				}
-			};
-
-			searchInput.addEventListener('input', filterCatalog);
-			clearSearch.addEventListener('click', () => {
-				searchInput.value = '';
-				filterCatalog();
-			});
-
-			const DEFAULT_DOSSIER = [
-				{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "", status: "Pendiente", date: "-" },
-				{ id: "domicilio", name: "Comprobante de Domicilio", file: "", status: "Pendiente", date: "-" },
-				{ id: "acta", name: "Acta de Nacimiento Certificada", file: "", status: "Pendiente", date: "-" },
-				{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
-			];
-
-			const getDossier = () => {
-				const parsed = safeJSONParse('civicflow_dossier', null);
-				if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-				localStorage.setItem('civicflow_dossier', JSON.stringify(DEFAULT_DOSSIER));
-				return DEFAULT_DOSSIER;
-			};
-
-			const renderDossier = () => {
-				const grid = document.getElementById('dossier-grid');
-				if (!grid) { console.error('[CivicFlow] dossier-grid not found'); return; }
-				const dossier = getDossier();
-				grid.innerHTML = '';
-
-				const requiredDocs = DEFAULT_DOSSIER.length;
-				let loadedCount = 0;
-
-				dossier.forEach(doc => {
-				  try {
 					const isLoaded = doc.status === 'Cargado';
 					if (isLoaded) loadedCount++;
 
 					const card = document.createElement('div');
-					card.className = "bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between h-44 shadow-sm";
-					
-					let statusBadge = `<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-250 font-bold text-[9px] uppercase tracking-wide font-display">Pendiente</span>`;
-					let actionButtons = `
-						<div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 hover:border-yuc-green hover:bg-yuc-green/5 rounded-lg p-4 cursor-pointer text-center h-16 w-full transition-colors">
-							<input type="file" id="upload-${doc.id}" class="absolute inset-0 opacity-0 cursor-pointer" />
-							<span class="text-xs font-bold text-slate-550 font-display">Subir Archivo</span>
-						</div>
-					`;
+					card.className = 'bg-white border border-slate-200 rounded-xl p-5 flex flex-col justify-between h-44 shadow-sm';
 
-					if (isLoaded) {
-						statusBadge = `<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-250 font-bold text-[9px] uppercase tracking-wide font-display">✓ Cargado</span>`;
-						actionButtons = `
-							<div class="flex justify-between items-center gap-3 w-full">
-								<div class="text-left">
-									<p class="text-[10px] text-slate-700 font-mono truncate max-w-[150px]" title="${doc.file}">${doc.file}</p>
-									<p class="text-[9px] text-slate-500">Fecha: ${doc.date}</p>
-								</div>
-								<div class="flex gap-2">
-									<button id="btn-dl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded border border-slate-200 font-display transition-colors">Descargar</button>
-									<button id="btn-repl-${doc.id}" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded border border-slate-200 font-display transition-colors">Reemplazar</button>
-								</div>
-							</div>
-						`;
-					}
+					const statusBadge = isLoaded
+						? '<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-250 font-bold text-[9px] uppercase tracking-wide font-display">✓ Cargado</span>'
+						: '<span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-250 font-bold text-[9px] uppercase tracking-wide font-display">Pendiente</span>';
 
-					card.innerHTML = `
-						<div class="flex justify-between items-start gap-4">
-							<h4 class="font-bold text-xs text-slate-800 font-display">${doc.name}</h4>
-							${statusBadge}
-						</div>
-						<div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-center w-full">
-							${actionButtons}
-						</div>
-					`;
+					const actionButtons = isLoaded
+						? '<div class="flex justify-between items-center gap-3 w-full">' +
+							'<div class="text-left">' +
+								'<p class="text-[10px] text-slate-700 font-mono truncate max-w-[150px]" title="' + doc.file + '">' + doc.file + '</p>' +
+								'<p class="text-[9px] text-slate-500">Fecha: ' + doc.date + '</p>' +
+							'</div>' +
+							'<div class="flex gap-2">' +
+								'<button data-action="dl" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded border border-slate-200 font-display transition-colors">Descargar</button>' +
+								'<button data-action="repl" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded border border-slate-200 font-display transition-colors">Reemplazar</button>' +
+							'</div>' +
+						'</div>'
+						: '<div class="relative flex items-center justify-center border-2 border-dashed border-slate-200 hover:border-yuc-green hover:bg-yuc-green/5 rounded-lg p-4 cursor-pointer text-center h-16 w-full transition-colors">' +
+							'<input type="file" accept=".pdf,application/pdf" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />' +
+							'<span class="text-xs font-bold text-slate-550 font-display pointer-events-none">Subir Archivo (PDF)</span>' +
+						'</div>';
+
+					card.innerHTML =
+						'<div class="flex justify-between items-start gap-4">' +
+							'<h4 class="font-bold text-xs text-slate-800 font-display">' + doc.name + '</h4>' +
+							statusBadge +
+						'</div>' +
+						'<div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-center w-full">' +
+							actionButtons +
+						'</div>';
 
 					grid.appendChild(card);
 
-					// Hook listeners safely
 					if (isLoaded) {
-						// Download mock action
-						const dlBtn = card.querySelector(`#btn-dl-${doc.id}`);
-						if (dlBtn) {
-							dlBtn.addEventListener('click', () => {
-								let csvContent = "data:text/plain;charset=utf-8,";
-								csvContent += `CIVICFLOW - GOBIERNO DE YUCATAN\n`;
-								csvContent += `DOCUMENTO DIGITAL AUTENTICADO: ${doc.name}\n`;
-								csvContent += `Archivo: ${doc.file}\n`;
-								csvContent += `Fecha de Carga: ${doc.date}\n`;
-								csvContent += `Sello Digital de Seguridad: CF-DOC-YUC-${doc.id.toUpperCase()}-2026\n`;
-								
-								const encodedUri = encodeURI(csvContent);
-								const link = document.createElement("a");
-								link.setAttribute("href", encodedUri);
-								link.setAttribute("download", doc.file);
-								document.body.appendChild(link);
-								link.click();
-								document.body.removeChild(link);
-								window.showToast(`Descargando ${doc.name}`, "success");
-							});
-						}
+						var dlBtn = card.querySelector('[data-action="dl"]');
+						if (dlBtn) dlBtn.addEventListener('click', function() {
+							var csv = 'data:text/plain;charset=utf-8,CIVICFLOW - GOBIERNO DE YUCATAN\n' +
+								'DOCUMENTO: ' + doc.name + '\nArchivo: ' + doc.file + '\nFecha: ' + doc.date + '\n' +
+								'Sello: CF-DOC-YUC-' + doc.id.toUpperCase() + '-2026\n';
+							var a = document.createElement('a');
+							a.href = encodeURI(csv);
+							a.download = doc.file;
+							document.body.appendChild(a); a.click(); document.body.removeChild(a);
+							window.showToast('Descargando ' + doc.name, 'success');
+						});
 
-						// Replace action
-						const replBtn = card.querySelector(`#btn-repl-${doc.id}`);
-						if (replBtn) {
-							replBtn.addEventListener('click', () => {
-								const newDossier = dossier.map(d => {
-									if (d.id === doc.id) {
-										return { ...d, status: 'Pendiente', file: '' };
-									}
-									return d;
-								});
-								localStorage.setItem('civicflow_dossier', JSON.stringify(newDossier));
-								renderDossier();
-								window.showToast("Carga restablecida. Seleccione nuevo archivo.", "info");
+						var replBtn = card.querySelector('[data-action="repl"]');
+						if (replBtn) replBtn.addEventListener('click', function() {
+							var updated = getDossier().map(function(d) {
+								return d.id === doc.id ? Object.assign({}, d, { status: 'Pendiente', file: '' }) : d;
 							});
-						}
+							localStorage.setItem('civicflow_dossier', JSON.stringify(updated));
+							renderDossier();
+							window.showToast('Carga restablecida. Seleccione nuevo archivo.', 'info');
+						});
 					} else {
-						// File input upload action
-						const uploadInp = card.querySelector(`#upload-${doc.id}`);
-						if (uploadInp) {
-							uploadInp.addEventListener('change', (e) => {
-								if (e.target.files.length > 0) {
-									const file = e.target.files[0];
-									if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
-										window.showToast("Solo se permiten archivos PDF", "error");
-										e.target.value = "";
-										return;
-									}
-									
-									const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
-									const timestamp = Date.now();
-									const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
-									const currentDate = new Date().toISOString().split('T')[0];
-									
-
-									const newDossier = dossier.map(d => {
-										if (d.id === doc.id) {
-											return { ...d, status: 'Cargado', file: uniqueName, date: currentDate };
-										}
-										return d;
-									});
-									localStorage.setItem('civicflow_dossier', JSON.stringify(newDossier));
-									renderDossier();
-									window.showToast(`Documento ${doc.name} subido exitosamente`, "success");
-								}
+						var inp = card.querySelector('input[type="file"]');
+						if (inp) inp.addEventListener('change', function(e) {
+							var f = e.target.files[0];
+							if (!f) return;
+							if (f.type !== 'application/pdf' && !f.name.toLowerCase().endsWith('.pdf')) {
+								window.showToast('Solo se permiten archivos PDF', 'error');
+								e.target.value = '';
+								return;
+							}
+							var curp = localStorage.getItem('citizen_curp') || 'XMOCK';
+							var uniqueName = curp + '_' + doc.id + '_' + Date.now() + '.pdf';
+							var today = new Date().toISOString().split('T')[0];
+							var updated = getDossier().map(function(d) {
+								return d.id === doc.id ? Object.assign({}, d, { status: 'Cargado', file: uniqueName, date: today }) : d;
 							});
-						}
+							localStorage.setItem('civicflow_dossier', JSON.stringify(updated));
+							renderDossier();
+							window.showToast('Documento ' + doc.name + ' subido exitosamente', 'success');
+						});
 					}
-				  } catch (docErr) {
-					console.error('[CivicFlow] Error renderizando documento:', docErr);
-				  }
-				});
-
-				// Calculate progress dynamically
-				const progress = Math.round((loadedCount / requiredDocs) * 100);
-				const lblProgress = document.getElementById('lbl-dossier-progress');
-				const barProgress = document.getElementById('bar-dossier-progress');
-				if (lblProgress) lblProgress.textContent = `${progress}%`;
-				if (barProgress) barProgress.style.width = `${progress}%`;
-
-				// Token Generation on Completion
-				if (loadedCount === requiredDocs && loadedCount > 0) {
-					let currentToken = localStorage.getItem('jwt_token');
-					if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
-						currentToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
-						localStorage.setItem('jwt_token', currentToken);
-
-						const tokensDict = safeJSONParse('civicflow_tokens', {});
-						const currentFiles = {};
-						dossier.forEach(d => { if(d.status==='Cargado') currentFiles[d.id] = d.file; });
-						tokensDict[currentToken] = currentFiles;
-						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
-
-						const tokenEl = document.getElementById('lbl-token');
-						if(tokenEl) {
-							tokenEl.textContent = currentToken;
-							tokenEl.title = "Ver completo (Haga clic)";
-						}
-						window.showToast(`¡Expediente completo! Se ha generado tu Token de Expediente: ${currentToken}`, "success");
-					} else {
-						const tokensDict = safeJSONParse('civicflow_tokens', {});
-						if (!tokensDict[currentToken]) tokensDict[currentToken] = {};
-						dossier.forEach(d => { if(d.status==='Cargado') tokensDict[currentToken][d.id] = d.file; });
-						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
-					}
+				} catch (err) {
+					console.error('[CivicFlow] Error en tarjeta:', doc && doc.id, err);
 				}
-			};
-
-			// Full Folder download
-			document.getElementById('btn-download-dossier-zip').addEventListener('click', () => {
-				const dossier = getDossier();
-				let csvContent = "data:text/plain;charset=utf-8,";
-				csvContent += `=====================================================\n`;
-				csvContent += `CIVICFLOW - GOBIERNO DEL ESTADO DE YUCATAN\n`;
-				csvContent += `EXPEDIENTE DIGITAL UNICO DEL CIUDADANO (PAQUETE COMPLETO)\n`;
-				csvContent += `=====================================================\n\n`;
-				csvContent += `CURP: ${localStorage.getItem('citizen_curp')}\n`;
-				csvContent += `Correo: ${localStorage.getItem('citizen_email')}\n`;
-				csvContent += `Fecha de empaquetado: ${new Date().toLocaleString()}\n\n`;
-				csvContent += `DOCUMENTOS COMPILADOS:\n`;
-				
-				dossier.forEach(doc => {
-					csvContent += `- ${doc.name}: ${doc.status === 'Cargado' ? doc.file + ' (Cargado el ' + doc.date + ')' : 'PENDIENTE'}\n`;
-				});
-
-				csvContent += `\nEste paquete de texto simula el empaque ZIP de los expedientes digitales autenticados ante el Gobierno del Estado.\n`;
-
-				const encodedUri = encodeURI(csvContent);
-				const link = document.createElement("a");
-				link.setAttribute("href", encodedUri);
-				link.setAttribute("download", `expediente_completo_${localStorage.getItem('citizen_curp')}.txt`);
-				document.body.appendChild(link);
-				link.click();
-				document.body.removeChild(link);
-				window.showToast("Expediente completo (ZIP) descargado", "success");
 			});
 
-			const getRequests = () => {
-				const parsed = safeJSONParse('civicflow_requests', []);
-				return Array.isArray(parsed) ? parsed : [];
-			};
+			// Progress
+			var pct = Math.round((loadedCount / DEFAULT_DOSSIER.length) * 100);
+			var lblP = document.getElementById('lbl-dossier-progress');
+			var barP = document.getElementById('bar-dossier-progress');
+			if (lblP) lblP.textContent = pct + '%';
+			if (barP) barP.style.width = pct + '%';
 
-			const renderInbox = async () => {
-				const tbody = document.getElementById('inbox-tbody');
-				const emptyMsg = document.getElementById('inbox-empty-msg');
-
-				// Intentar cargar solicitudes desde la API
-				let apiRequests = [];
-				const citizenId = localStorage.getItem('citizen_id');
-				if (citizenId) {
-					try {
-						const res = await fetch(`${API_URL}/api/tramites/solicitudes/${citizenId}`, {
-							headers: { 'Authorization': `Bearer ${token}` }
-						});
-						if (res.status === 401 || res.status === 403) {
-							localStorage.clear();
-							window.location.href = '/ciudadano/login';
-							return;
-						}
-						const json = await res.json();
-						if (json.success && Array.isArray(json.data)) {
-							apiRequests = json.data.map(s => ({
-								folio: s.folio || s.id,
-								name: s.tramite?.nombre || 'Trámite',
-								dept: s.dependencia?.nombre || '-',
-								date: (s.created_at || '').split('T')[0],
-								status: s.estado || 'recibido'
-							}));
-						}
-					} catch (_) {}
+			// Token auto-generation when all docs uploaded
+			if (loadedCount === DEFAULT_DOSSIER.length) {
+				var currentToken = localStorage.getItem('jwt_token');
+				if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
+					currentToken = 'TK-' + Math.floor(100000 + Math.random() * 900000);
+					localStorage.setItem('jwt_token', currentToken);
+					var tokDict = safeJSONParse('civicflow_tokens', {});
+					tokDict[currentToken] = {};
+					getDossier().forEach(function(d) { if (d.status === 'Cargado') tokDict[currentToken][d.id] = d.file; });
+					localStorage.setItem('civicflow_tokens', JSON.stringify(tokDict));
+					var tEl = document.getElementById('lbl-token');
+					if (tEl) { tEl.textContent = currentToken; tEl.title = 'Ver completo (Haga clic)'; }
+					window.showToast('¡Expediente completo! Token generado: ' + currentToken, 'success');
 				}
+			}
+		}
 
-				const storedRequests = getRequests();
-				const requests = apiRequests.length > 0 ? apiRequests : storedRequests;
+		// ── Auth guard ────────────────────────────────────────────────────────────
+		if (localStorage.getItem('citizen_logged') !== 'true') {
+			window.location.href = '/ciudadano/login';
+		} else {
+				// Limpiar datos mock/seed (migración única)
+			var rawSd = localStorage.getItem('civicflow_dossier');
+			if (rawSd) {
+				try {
+					var _sd = JSON.parse(rawSd);
+					if (Array.isArray(_sd) && _sd.some(function(d) {
+						return d && (d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf');
+					})) localStorage.removeItem('civicflow_dossier');
+				} catch(e) { localStorage.removeItem('civicflow_dossier'); }
+			}
+			var rawSr = localStorage.getItem('civicflow_requests');
+			if (rawSr) {
+				try {
+					var _sr = JSON.parse(rawSr);
+					if (Array.isArray(_sr) && _sr.some(function(r) { return r && r.folio === 'TRM-2026-00104'; }))
+						localStorage.removeItem('civicflow_requests');
+				} catch(e) {}
+			}
 
-				tbody.innerHTML = '';
-				
-				if (requests.length === 0) {
-					emptyMsg.classList.remove('hidden');
-					document.getElementById('badge-inbox-count').classList.add('hidden');
-					return;
-				}
+			// Header info
+			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
+			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
+			var tokenEl = document.getElementById('lbl-token');
+			if (token && token !== 'mock-jwt-token-demo') {
+				tokenEl.textContent = token;
+				tokenEl.title = 'Ver completo (Haga clic)';
+			} else {
+				tokenEl.textContent = 'N/A (No generado)';
+				tokenEl.title = 'Sube tus documentos en tu expediente para generar tu token';
+			}
+			tokenEl.addEventListener('click', function() {
+				var t = localStorage.getItem('jwt_token');
+				alert(t && t !== 'mock-jwt-token-demo'
+					? 'Token de Expediente Completo:\n\n' + t
+					: 'No tienes un token aún. Se generará al completar tu expediente digital.');
+			});
 
-				emptyMsg.classList.add('hidden');
-				document.getElementById('badge-inbox-count').classList.remove('hidden');
-				document.getElementById('badge-inbox-count').textContent = requests.length;
+			// ── Tabs ─────────────────────────────────────────────────────────────
+			var tabCatalog  = document.getElementById('tab-btn-catalog');
+			var tabInbox    = document.getElementById('tab-btn-inbox');
+			var tabFolder   = document.getElementById('tab-btn-folder');
+			var contCatalog = document.getElementById('tab-content-catalog');
+			var contInbox   = document.getElementById('tab-content-inbox');
+			var contFolder  = document.getElementById('tab-content-folder');
 
-				// Order requests newest first
-				requests.reverse().forEach(req => {
-					let badgeClass = 'bg-slate-100 text-slate-700';
-					if (req.status === 'En revisión') badgeClass = 'bg-amber-500/10 text-amber-500 border border-amber-500/20';
-					else if (req.status === 'Aprobado') badgeClass = 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
-					else if (req.status === 'Documentación incompleta') badgeClass = 'bg-orange-500/10 text-orange-500 border border-orange-500/20';
-					else if (req.status === 'Rechazado') badgeClass = 'bg-red-500/10 text-red-500 border border-red-500/20';
-					else if (req.status === 'Recibido') badgeClass = 'bg-yuc-green/10 text-yuc-green border border-yuc-green/20';
+			var ACTIVE   = 'pb-4 px-1 text-sm font-extrabold border-b-2 border-yuc-green text-yuc-green focus:outline-none flex items-center gap-2';
+			var INACTIVE = 'pb-4 px-1 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 focus:outline-none flex items-center gap-2 relative';
 
-					const tr = document.createElement('tr');
-					tr.className = "hover:bg-slate-50 border-b border-slate-100 transition-colors";
-					tr.innerHTML = `
-						<td class="px-6 py-4 font-mono font-bold text-slate-800">${req.folio}</td>
-						<td class="px-6 py-4 font-semibold text-slate-700">${req.name}</td>
-						<td class="px-6 py-4 text-xs text-slate-500">${req.dept}</td>
-						<td class="px-6 py-4 text-xs text-slate-500">${req.date}</td>
-						<td class="px-6 py-4">
-							<span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">
-								${req.status}
-							</span>
-						</td>
-						<td class="px-6 py-4 text-right">
-							<a href="/ciudadano/tracker?folio=${req.folio}" class="px-3.5 py-1.5 bg-slate-50 hover:bg-yuc-green hover:text-white text-slate-700 border border-slate-200 text-xs font-extrabold rounded-lg transition-all inline-flex items-center gap-1 font-display">
-								<span>Rastrear</span>
-								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-								</svg>
-							</a>
-						</td>
-					`;
-					tbody.appendChild(tr);
+			function activateTab(tab) {
+				tabCatalog.className = INACTIVE; tabInbox.className = INACTIVE; tabFolder.className = INACTIVE;
+				contCatalog.classList.add('hidden'); contInbox.classList.add('hidden'); contFolder.classList.add('hidden');
+				if (tab === 'catalog') { tabCatalog.className = ACTIVE; contCatalog.classList.remove('hidden'); }
+				else if (tab === 'inbox')  { tabInbox.className = ACTIVE + ' relative'; contInbox.classList.remove('hidden'); renderInbox(); }
+				else if (tab === 'folder') { tabFolder.className = ACTIVE; contFolder.classList.remove('hidden'); renderDossier(); }
+			}
+
+			tabCatalog.addEventListener('click', function() { activateTab('catalog'); });
+			tabInbox.addEventListener('click',   function() { activateTab('inbox'); });
+			tabFolder.addEventListener('click',  function() { activateTab('folder'); });
+
+			// Activar tab por URL param
+			var urlTab = new URLSearchParams(window.location.search).get('tab');
+			if (urlTab === 'folder') activateTab('folder');
+			else if (urlTab === 'inbox') activateTab('inbox');
+
+			// ── Catálogo API ──────────────────────────────────────────────────────
+			fetch(API_URL + '/api/tramites/catalogo', { headers: { 'Authorization': 'Bearer ' + token } })
+				.then(function(r) {
+					if (r.status === 401 || r.status === 403) { localStorage.clear(); window.location.href = '/ciudadano/login'; return null; }
+					return r.json();
+				})
+				.then(function(json) {
+					if (!json || !json.success || !json.data || !json.data.length) return;
+					var grid = document.getElementById('catalog-grid');
+					json.data.forEach(function(t) {
+						var card = document.createElement('div');
+						card.className = 'catalog-card bg-white border border-slate-200 hover:border-yuc-green/30 rounded-xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between';
+						card.setAttribute('data-title', (t.nombre || '').toLowerCase());
+						card.innerHTML =
+							'<div><div class="flex justify-between items-start gap-4">' +
+								'<span class="px-2 py-0.5 rounded bg-yuc-green/10 text-yuc-green font-bold text-[10px] uppercase">' + (t.dependencia && t.dependencia.nombre ? t.dependencia.nombre : 'Dependencia') + '</span>' +
+								'<span class="text-xs text-slate-500 font-medium">Resolución: ' + (t.plazo_dias_habiles ? t.plazo_dias_habiles + ' días' : 'Variable') + '</span>' +
+							'</div><h3 class="text-lg font-bold text-slate-800 mt-3 font-display">' + t.nombre + '</h3>' +
+							'<p class="text-xs text-slate-500 mt-2 leading-relaxed">' + (t.descripcion || '') + '</p></div>' +
+							'<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">' +
+								'<span class="text-xs font-bold text-yuc-gold">Costo: ' + (t.costo_referencia || 'Consultar') + '</span>' +
+								'<a href="/ciudadano/tramite?id=' + t.id + '" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg border border-yuc-gold/20 transition-all shadow-sm">Iniciar Trámite</a>' +
+							'</div>';
+						grid.prepend(card);
+					});
+				})
+				.catch(function() {});
+
+			// ── Búsqueda catálogo ─────────────────────────────────────────────────
+			var searchInput = document.getElementById('txt-search');
+			var noResults   = document.getElementById('no-results-msg');
+			searchInput.addEventListener('input', function() {
+				var q = searchInput.value.toLowerCase().trim();
+				var visible = 0;
+				document.querySelectorAll('.catalog-card').forEach(function(c) {
+					var match = c.textContent.toLowerCase().includes(q) || (c.getAttribute('data-title') || '').includes(q);
+					c.classList.toggle('hidden', !match);
+					if (match) visible++;
 				});
-			};
+				noResults.classList.toggle('hidden', visible > 0);
+			});
+			document.getElementById('btn-clear-search').addEventListener('click', function() {
+				searchInput.value = '';
+				searchInput.dispatchEvent(new Event('input'));
+			});
 
-			document.getElementById('btn-refresh-inbox').addEventListener('click', () => {
-				renderInbox();
-				window.showToast("Bandeja de solicitudes actualizada", "success");
+			// ── ZIP download ──────────────────────────────────────────────────────
+			document.getElementById('btn-download-dossier-zip').addEventListener('click', function() {
+				var dossier = getDossier();
+				var csv = 'data:text/plain;charset=utf-8,' +
+					'=====================================================\n' +
+					'CIVICFLOW - GOBIERNO DEL ESTADO DE YUCATAN\nEXPEDIENTE DIGITAL UNICO\n' +
+					'=====================================================\n\n' +
+					'CURP: ' + localStorage.getItem('citizen_curp') + '\n' +
+					'Correo: ' + localStorage.getItem('citizen_email') + '\n' +
+					'Fecha: ' + new Date().toLocaleString() + '\n\nDOCUMENTOS:\n' +
+					dossier.map(function(d) {
+						return '- ' + d.name + ': ' + (d.status === 'Cargado' ? d.file + ' (' + d.date + ')' : 'PENDIENTE');
+					}).join('\n');
+				var a = document.createElement('a');
+				a.href = encodeURI(csv);
+				a.download = 'expediente_' + localStorage.getItem('citizen_curp') + '.txt';
+				document.body.appendChild(a); a.click(); document.body.removeChild(a);
+				window.showToast('Expediente completo (ZIP) descargado', 'success');
+			});
+
+			// ── renderInbox ───────────────────────────────────────────────────────
+			function renderInbox() {
+				var tbody   = document.getElementById('inbox-tbody');
+				var emptyMsg = document.getElementById('inbox-empty-msg');
+				var badge   = document.getElementById('badge-inbox-count');
+				var citizenId = localStorage.getItem('citizen_id');
+
+				var apiCall = citizenId
+					? fetch(API_URL + '/api/tramites/solicitudes/' + citizenId, { headers: { 'Authorization': 'Bearer ' + token } })
+						.then(function(r) {
+							if (r.status === 401 || r.status === 403) { localStorage.clear(); window.location.href = '/ciudadano/login'; return null; }
+							return r.json();
+						})
+						.then(function(json) {
+							if (json && json.success && Array.isArray(json.data)) {
+								return json.data.map(function(s) { return {
+									folio: s.folio || s.id,
+									name:  (s.tramite && s.tramite.nombre) || 'Trámite',
+									dept:  (s.dependencia && s.dependencia.nombre) || '-',
+									date:  (s.created_at || '').split('T')[0],
+									status: s.estado || 'recibido'
+								}; });
+							}
+							return [];
+						}).catch(function() { return []; })
+					: Promise.resolve([]);
+
+				apiCall.then(function(apiRequests) {
+					var stored = getRequests();
+					var requests = apiRequests.length > 0 ? apiRequests : stored;
+					tbody.innerHTML = '';
+					if (!requests.length) {
+						emptyMsg.classList.remove('hidden');
+						if (badge) badge.classList.add('hidden');
+						return;
+					}
+					emptyMsg.classList.add('hidden');
+					if (badge) { badge.classList.remove('hidden'); badge.textContent = requests.length; }
+
+					var STATUS = {
+						'En revisión': 'bg-amber-500/10 text-amber-500 border border-amber-500/20',
+						'Aprobado': 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20',
+						'Documentación incompleta': 'bg-orange-500/10 text-orange-500 border border-orange-500/20',
+						'Rechazado': 'bg-red-500/10 text-red-500 border border-red-500/20',
+						'Recibido': 'bg-yuc-green/10 text-yuc-green border border-yuc-green/20'
+					};
+					requests.slice().reverse().forEach(function(req) {
+						var bc = STATUS[req.status] || 'bg-slate-100 text-slate-700';
+						var tr = document.createElement('tr');
+						tr.className = 'hover:bg-slate-50 border-b border-slate-100 transition-colors';
+						tr.innerHTML =
+							'<td class="px-6 py-4 font-mono font-bold text-slate-800">' + req.folio + '</td>' +
+							'<td class="px-6 py-4 font-semibold text-slate-700">' + req.name + '</td>' +
+							'<td class="px-6 py-4 text-xs text-slate-500">' + req.dept + '</td>' +
+							'<td class="px-6 py-4 text-xs text-slate-500">' + req.date + '</td>' +
+							'<td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ' + bc + '">' + req.status + '</span></td>' +
+							'<td class="px-6 py-4 text-right"><a href="/ciudadano/tracker?folio=' + req.folio + '" class="px-3.5 py-1.5 bg-slate-50 hover:bg-yuc-green hover:text-white text-slate-700 border border-slate-200 text-xs font-extrabold rounded-lg transition-all inline-flex items-center gap-1 font-display">Rastrear</a></td>';
+						tbody.appendChild(tr);
+					});
+				});
+			}
+
+			document.getElementById('btn-refresh-inbox').addEventListener('click', function() {
+				renderInbox(); window.showToast('Bandeja actualizada', 'success');
 			});
 
 			// Logout
-			document.getElementById('btn-logout').addEventListener('click', () => {
+			document.getElementById('btn-logout').addEventListener('click', function() {
 				localStorage.clear();
-				window.showToast("Sesión cerrada", "info");
-				setTimeout(() => {
-					window.location.href = '/ciudadano/login';
-				}, 600);
+				window.showToast('Sesión cerrada', 'info');
+				setTimeout(function() { window.location.href = '/ciudadano/login'; }, 600);
 			});
 
-			// SAT RFC Check Logic
-			const satModal = document.getElementById('sat-rfc-modal');
-			const btnSat = document.getElementById('btn-sat-tramite');
-			const btnCloseSatModal = document.getElementById('btn-close-sat-modal');
-			const satCloseBg = document.getElementById('sat-modal-close-bg');
-			const btnSaveRfc = document.getElementById('btn-save-rfc');
-			const rfcInput = document.getElementById('sat-rfc-input');
-			const btnGoToSat = document.getElementById('btn-go-to-sat');
+			// SAT modal (elementos opcionales — el modal HTML puede no existir)
+			var satModal       = document.getElementById('sat-rfc-modal');
+			var btnSat         = document.getElementById('btn-sat-tramite');
+			var btnCloseSat    = document.getElementById('btn-close-sat-modal');
+			var satCloseBg     = document.getElementById('sat-modal-close-bg');
+			var btnSaveRfc     = document.getElementById('btn-save-rfc');
+			var rfcInput       = document.getElementById('sat-rfc-input');
+			var btnGoToSat     = document.getElementById('btn-go-to-sat');
+			var storedRfc      = localStorage.getItem('citizen_rfc');
+			if (rfcInput && storedRfc) rfcInput.value = storedRfc;
 
-			// Populate RFC input if already in local storage (guard: modal may not exist)
-			const storedRfc = localStorage.getItem('citizen_rfc');
-			if (rfcInput && storedRfc) {
-				rfcInput.value = storedRfc;
-			}
+			function openSatModal()  { if (satModal) satModal.classList.remove('hidden'); }
+			function closeSatModal() { if (satModal) satModal.classList.add('hidden'); }
 
-			const openSatModal = () => {
-				if (satModal) satModal.classList.remove('hidden');
-			};
+			if (btnSat) btnSat.addEventListener('click', function() {
+				localStorage.getItem('citizen_rfc') ? window.location.href = '/ciudadano/tramite?id=sat' : (openSatModal(), window.showToast('Se requiere RFC para trámites fiscales', 'warning'));
+			});
+			if (btnCloseSat) btnCloseSat.addEventListener('click', closeSatModal);
+			if (satCloseBg)  satCloseBg.addEventListener('click', closeSatModal);
+			if (btnSaveRfc)  btnSaveRfc.addEventListener('click', function() {
+				if (!rfcInput) return;
+				var rfc = rfcInput.value.trim().toUpperCase();
+				if (rfc.length < 12 || rfc.length > 13) { window.showToast('RFC debe tener 12 o 13 caracteres', 'error'); return; }
+				localStorage.setItem('citizen_rfc', rfc);
+				window.showToast('RFC configurado exitosamente', 'success');
+				closeSatModal();
+				setTimeout(function() { window.location.href = '/ciudadano/tramite?id=sat'; }, 600);
+			});
+			if (btnGoToSat) btnGoToSat.addEventListener('click', closeSatModal);
 
-			const closeSatModal = () => {
-				if (satModal) satModal.classList.add('hidden');
-			};
-
-			if (btnSat) {
-				btnSat.addEventListener('click', () => {
-					const rfc = localStorage.getItem('citizen_rfc');
-					if (!rfc || rfc.trim() === '') {
-						openSatModal();
-						window.showToast("Se requiere RFC para trámites fiscales", "warning");
-					} else {
-						window.location.href = "/ciudadano/tramite?id=sat";
-					}
-				});
-			}
-
-			if (btnCloseSatModal) btnCloseSatModal.addEventListener('click', closeSatModal);
-			if (satCloseBg) satCloseBg.addEventListener('click', closeSatModal);
-
-			if (btnSaveRfc) {
-				btnSaveRfc.addEventListener('click', () => {
-					if (!rfcInput) return;
-					const rfc = rfcInput.value.trim().toUpperCase();
-					if (rfc.length < 12 || rfc.length > 13) {
-						window.showToast("RFC debe tener 12 o 13 caracteres", "error");
-						return;
-					}
-					localStorage.setItem('citizen_rfc', rfc);
-					window.showToast("RFC configurado exitosamente", "success");
-					closeSatModal();
-					setTimeout(() => {
-						window.location.href = "/ciudadano/tramite?id=sat";
-					}, 600);
-				});
-			}
-
-			if (btnGoToSat) {
-				btnGoToSat.addEventListener('click', closeSatModal);
-			}
-
-			// Count on load
-			const reqs = getRequests();
-			const badgeEl = document.getElementById('badge-inbox-count');
-			if (reqs.length > 0 && badgeEl) {
-				badgeEl.textContent = reqs.length;
-				badgeEl.classList.remove('hidden');
-				badgeEl.classList.add('inline-flex');
+			// Badge de bandeja al cargar
+			var initReqs = getRequests();
+			var initBadge = document.getElementById('badge-inbox-count');
+			if (initReqs.length > 0 && initBadge) {
+				initBadge.textContent = initReqs.length;
+				initBadge.classList.remove('hidden');
+				initBadge.classList.add('inline-flex');
 			}
 		}
 	</script>
