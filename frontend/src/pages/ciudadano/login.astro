@@ -127,15 +127,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			let loginSuccess = false;
 			// Intentar login contra el backend
 			try {
-				const res = await fetch(`${API_URL}/api/auth/login`, {
+				const res = await fetch(`${API_URL}/api/users/login`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email, password: curp })
+					body: JSON.stringify({ curp, email })
 				});
 				const json = await res.json();
 				if (json.success) {
-					localStorage.setItem('citizen_id', json.user.id);
-					localStorage.setItem('citizen_nombre', json.user.nombre || '');
+					localStorage.setItem('citizen_id', json.data.id);
+					localStorage.setItem('citizen_nombre', json.data.nombre_completo || '');
 					loginSuccess = true;
 				} else {
 					window.showToast(json.message || "Credenciales inválidas en el servidor.", "error");

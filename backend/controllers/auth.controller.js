@@ -28,19 +28,37 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: 'Email y contraseña son requeridos' });
       }
 
-      const { data: user, error } = await supabase
-        .from('usuarios')
-        .select('*')
-        .eq('email', email)
-        .eq('password', password)
-        .single();
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-      if (error || !user) {
+      if (authError || !authData.user) {
         return res.status(401).json({ success: false, message: 'Credenciales inválidas' });
       }
 
-      const token = generarToken(user);
-      return res.status(200).json({ success: true, token, user: { id: user.id, email: user.email, nombre: user.nombre } });
+      const { data: userProfile, error: profileError } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError || !userProfile) {
+        return res.status(404).json({ success: false, message: 'Perfil no encontrado' });
+      }
+
+      // Para el JWT token interno, podemos usar el ID y email
+      const token = generarToken({ id: userProfile.id, email: authData.user.email });
+      return res.status(200).json({ 
+        success: true, 
+        token, 
+        user: { 
+          id: userProfile.id, 
+          email: authData.user.email, 
+          nombre: userProfile.nombre_completo,
+          rol: userProfile.rol 
+        } 
+      });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
