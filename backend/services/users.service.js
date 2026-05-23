@@ -3,39 +3,53 @@ import { supabase } from '../config/supabase.service.js';
 export const UsersService = {
   getAll: async () => {
     const { data, error } = await supabase
-      .from('usuarios')
+      .from('perfiles')
       .select('*')
       .order('created_at', { ascending: false });
     if (error) throw error;
     return data;
   },
 
-  create: async (userData) => {
+  getById: async (id) => {
     const { data, error } = await supabase
-      .from('usuarios')
-      .insert([userData])
-      .select();
+      .from('perfiles')
+      .select('*')
+      .eq('id', id)
+      .single();
     if (error) throw error;
-    return data[0];
+    return data;
+  },
+
+  // id debe ser el UUID del usuario ya registrado en auth.users
+  create: async ({ id, nombre_completo, curp, telefono, rol, dependencia_id }) => {
+    const { data, error } = await supabase
+      .from('perfiles')
+      .insert([{ id, nombre_completo, curp, telefono, rol, dependencia_id }])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   },
 
   update: async (id, updates) => {
     const { data, error } = await supabase
-      .from('usuarios')
-      .update(updates)
+      .from('perfiles')
+      .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .select();
+      .select()
+      .single();
     if (error) throw error;
-    return data[0];
+    return data;
   },
 
   delete: async (id) => {
     const { data, error } = await supabase
-      .from('usuarios')
+      .from('perfiles')
       .delete()
       .eq('id', id)
-      .select();
+      .select()
+      .single();
     if (error) throw error;
-    return data[0];
+    return data;
   }
 };

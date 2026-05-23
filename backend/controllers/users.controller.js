@@ -12,11 +12,11 @@ export const UsersController = {
 
   createUser: async (req, res) => {
     try {
-      const { nombre, email } = req.body;
-      if (!nombre || !email) {
-        return res.status(400).json({ success: false, message: "Nombre y email son requeridos" });
+      const { id, nombre_completo, curp, telefono, rol, dependencia_id } = req.body;
+      if (!id || !nombre_completo) {
+        return res.status(400).json({ success: false, message: "id y nombre_completo son requeridos" });
       }
-      const newUser = await UsersService.create({ nombre, email });
+      const newUser = await UsersService.create({ id, nombre_completo, curp, telefono, rol, dependencia_id });
       return res.status(201).json({ success: true, data: newUser });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
