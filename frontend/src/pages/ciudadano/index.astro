@@ -278,6 +278,132 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					</button>
 				</div>
 
+				<!-- User Info Form -->
+				<div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col gap-4 text-slate-800 mb-6">
+					<h4 class="text-sm font-bold text-slate-800 font-display">Información Adicional del Ciudadano</h4>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label class="block text-xs font-bold text-slate-600 mb-1">Fecha de Nacimiento</label>
+							<input type="date" id="input-dob" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
+						</div>
+						<div>
+							<label class="block text-xs font-bold text-slate-600 mb-1">Lugar de Nacimiento</label>
+							<select id="input-pob" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
+								<option value="">Seleccione un municipio...</option>
+								<option value="Abalá">Abalá</option>
+								<option value="Acanceh">Acanceh</option>
+								<option value="Akil">Akil</option>
+								<option value="Baca">Baca</option>
+								<option value="Bokobá">Bokobá</option>
+								<option value="Buctzotz">Buctzotz</option>
+								<option value="Cacalchén">Cacalchén</option>
+								<option value="Calotmul">Calotmul</option>
+								<option value="Cansahcab">Cansahcab</option>
+								<option value="Cantamayec">Cantamayec</option>
+								<option value="Celestún">Celestún</option>
+								<option value="Cenotillo">Cenotillo</option>
+								<option value="Conkal">Conkal</option>
+								<option value="Cuncunul">Cuncunul</option>
+								<option value="Cuzamá">Cuzamá</option>
+								<option value="Chacsinkín">Chacsinkín</option>
+								<option value="Chankom">Chankom</option>
+								<option value="Chapab">Chapab</option>
+								<option value="Chemax">Chemax</option>
+								<option value="Chicxulub Pueblo">Chicxulub Pueblo</option>
+								<option value="Chichimilá">Chichimilá</option>
+								<option value="Chikindzonot">Chikindzonot</option>
+								<option value="Chocholá">Chocholá</option>
+								<option value="Chumayel">Chumayel</option>
+								<option value="Dzán">Dzán</option>
+								<option value="Dzemul">Dzemul</option>
+								<option value="Dzidzantún">Dzidzantún</option>
+								<option value="Dzilam de Bravo">Dzilam de Bravo</option>
+								<option value="Dzilam González">Dzilam González</option>
+								<option value="Dzitás">Dzitás</option>
+								<option value="Dzoncauich">Dzoncauich</option>
+								<option value="Espita">Espita</option>
+								<option value="Halachó">Halachó</option>
+								<option value="Hocabá">Hocabá</option>
+								<option value="Hoctún">Hoctún</option>
+								<option value="Homún">Homún</option>
+								<option value="Huhí">Huhí</option>
+								<option value="Hunucmá">Hunucmá</option>
+								<option value="Ixil">Ixil</option>
+								<option value="Izamal">Izamal</option>
+								<option value="Kanasín">Kanasín</option>
+								<option value="Kantunil">Kantunil</option>
+								<option value="Kaua">Kaua</option>
+								<option value="Kinchil">Kinchil</option>
+								<option value="Kopomá">Kopomá</option>
+								<option value="Mama">Mama</option>
+								<option value="Maní">Maní</option>
+								<option value="Maxcanú">Maxcanú</option>
+								<option value="Mayapán">Mayapán</option>
+								<option value="Mérida">Mérida</option>
+								<option value="Mocochá">Mocochá</option>
+								<option value="Motul">Motul</option>
+								<option value="Muna">Muna</option>
+								<option value="Muxupip">Muxupip</option>
+								<option value="Opichén">Opichén</option>
+								<option value="Oxkutzcab">Oxkutzcab</option>
+								<option value="Panabá">Panabá</option>
+								<option value="Peto">Peto</option>
+								<option value="Progreso">Progreso</option>
+								<option value="Quintana Roo">Quintana Roo</option>
+								<option value="Río Lagartos">Río Lagartos</option>
+								<option value="Sacalum">Sacalum</option>
+								<option value="Samahil">Samahil</option>
+								<option value="Sanahcat">Sanahcat</option>
+								<option value="San Felipe">San Felipe</option>
+								<option value="Santa Elena">Santa Elena</option>
+								<option value="Seyé">Seyé</option>
+								<option value="Sinanché">Sinanché</option>
+								<option value="Sotuta">Sotuta</option>
+								<option value="Sucilá">Sucilá</option>
+								<option value="Sudzal">Sudzal</option>
+								<option value="Suma">Suma</option>
+								<option value="Tahdziú">Tahdziú</option>
+								<option value="Tahmek">Tahmek</option>
+								<option value="Teabo">Teabo</option>
+								<option value="Tecoh">Tecoh</option>
+								<option value="Tekal de Venegas">Tekal de Venegas</option>
+								<option value="Tekantó">Tekantó</option>
+								<option value="Tekax">Tekax</option>
+								<option value="Tekit">Tekit</option>
+								<option value="Tekom">Tekom</option>
+								<option value="Telchac Pueblo">Telchac Pueblo</option>
+								<option value="Telchac Puerto">Telchac Puerto</option>
+								<option value="Temax">Temax</option>
+								<option value="Temozón">Temozón</option>
+								<option value="Tepakán">Tepakán</option>
+								<option value="Tetiz">Tetiz</option>
+								<option value="Teya">Teya</option>
+								<option value="Ticul">Ticul</option>
+								<option value="Timucuy">Timucuy</option>
+								<option value="Tinum">Tinum</option>
+								<option value="Tixcacalcupul">Tixcacalcupul</option>
+								<option value="Tixkokob">Tixkokob</option>
+								<option value="Tixmehuac">Tixmehuac</option>
+								<option value="Tixpéhual">Tixpéhual</option>
+								<option value="Tizimín">Tizimín</option>
+								<option value="Tunkás">Tunkás</option>
+								<option value="Tzucacab">Tzucacab</option>
+								<option value="Uayma">Uayma</option>
+								<option value="Ucú">Ucú</option>
+								<option value="Umán">Umán</option>
+								<option value="Valladolid">Valladolid</option>
+								<option value="Xocchel">Xocchel</option>
+								<option value="Yaxcabá">Yaxcabá</option>
+								<option value="Yaxkukul">Yaxkukul</option>
+								<option value="Yobaín">Yobaín</option>
+							</select>
+						</div>
+					</div>
+					<div class="flex justify-end">
+						<button id="btn-save-user-info" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shadow-sm font-display">Guardar Información</button>
+					</div>
+				</div>
+
 				<!-- Grid list of core documents -->
 				<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="dossier-grid">
 					<!-- Injected dynamically from JS -->
@@ -556,24 +682,81 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				searchInput.dispatchEvent(new Event('input'));
 			});
 
+			// ── User Info Logic ───────────────────────────────────────────────────
+			var inputDob = document.getElementById('input-dob');
+			var inputPob = document.getElementById('input-pob');
+			var btnSaveUserInfo = document.getElementById('btn-save-user-info');
+			if (inputDob && inputPob && btnSaveUserInfo) {
+				inputDob.value = localStorage.getItem('citizen_dob') || '';
+				inputPob.value = localStorage.getItem('citizen_pob') || '';
+				btnSaveUserInfo.addEventListener('click', function() {
+					localStorage.setItem('citizen_dob', inputDob.value);
+					localStorage.setItem('citizen_pob', inputPob.value);
+					window.showToast('Información guardada exitosamente', 'success');
+				});
+			}
+
 			// ── ZIP download ──────────────────────────────────────────────────────
-			document.getElementById('btn-download-dossier-zip').addEventListener('click', function() {
+			document.getElementById('btn-download-dossier-zip').addEventListener('click', async function() {
+				var btn = this;
+				var originalText = btn.innerHTML;
+				btn.innerHTML = '<span>Generando ZIP...</span>';
+				btn.disabled = true;
+
+				if (typeof JSZip === 'undefined') {
+					await new Promise(function(res, rej) {
+						var script = document.createElement('script');
+						script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+						script.onload = res;
+						script.onerror = rej;
+						document.head.appendChild(script);
+					});
+				}
+
+				var zip = new JSZip();
 				var dossier = getDossier();
-				var csv = 'data:text/plain;charset=utf-8,' +
-					'=====================================================\n' +
+				var dob = localStorage.getItem('citizen_dob') || 'No registrada';
+				var pob = localStorage.getItem('citizen_pob') || 'No registrado';
+				var curp = localStorage.getItem('citizen_curp') || 'N/A';
+				var email = localStorage.getItem('citizen_email') || 'N/A';
+
+				var infoTxt = '=====================================================\n' +
 					'CIVICFLOW - GOBIERNO DEL ESTADO DE YUCATAN\nEXPEDIENTE DIGITAL UNICO\n' +
 					'=====================================================\n\n' +
-					'CURP: ' + localStorage.getItem('citizen_curp') + '\n' +
-					'Correo: ' + localStorage.getItem('citizen_email') + '\n' +
-					'Fecha: ' + new Date().toLocaleString() + '\n\nDOCUMENTOS:\n' +
+					'CURP: ' + curp + '\n' +
+					'Correo: ' + email + '\n' +
+					'Fecha de Nacimiento: ' + dob + '\n' +
+					'Lugar de Nacimiento: ' + pob + '\n' +
+					'Fecha de descarga: ' + new Date().toLocaleString() + '\n\nDOCUMENTOS:\n' +
 					dossier.map(function(d) {
 						return '- ' + d.name + ': ' + (d.status === 'Cargado' ? d.file + ' (' + d.date + ')' : 'PENDIENTE');
 					}).join('\n');
-				var a = document.createElement('a');
-				a.href = encodeURI(csv);
-				a.download = 'expediente_' + localStorage.getItem('citizen_curp') + '.txt';
-				document.body.appendChild(a); a.click(); document.body.removeChild(a);
-				window.showToast('Expediente completo (ZIP) descargado', 'success');
+
+				zip.file('informacion_ciudadano.txt', infoTxt);
+
+				dossier.forEach(function(d) {
+					if (d.status === 'Cargado') {
+						var fileContent = 'CIVICFLOW - GOBIERNO DE YUCATAN\n' +
+							'DOCUMENTO: ' + d.name + '\nArchivo: ' + d.file + '\nFecha: ' + d.date + '\n' +
+							'Sello: CF-DOC-YUC-' + d.id.toUpperCase() + '-2026\n';
+						zip.file(d.file, fileContent);
+					}
+				});
+
+				zip.generateAsync({type:"blob"}).then(function(content) {
+					var url = URL.createObjectURL(content);
+					var a = document.createElement('a');
+					a.href = url;
+					a.download = 'expediente_' + curp + '.zip';
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
+					
+					btn.innerHTML = originalText;
+					btn.disabled = false;
+					window.showToast('Expediente completo (ZIP) descargado exitosamente', 'success');
+				});
 			});
 
 			// ── renderInbox ───────────────────────────────────────────────────────
