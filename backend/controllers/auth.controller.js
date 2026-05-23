@@ -51,8 +51,8 @@ export const AuthController = {
       // Si Supabase se pone estricto con el RLS o caché de red, el backend
       // deduce el rol mediante el correo para que la demo no se rompa.
       // ============================================================
-      let rolFinal = userProfile ? userProfile.rol : (authData.user.user_metadata?.rol || 'ciudadano');
-      let nombreFinal = userProfile ? userProfile.nombre_completo : (authData.user.user_metadata?.nombre_completo || 'Usuario');
+      let rolFinal = userProfile ? userProfile.rol : 'ciudadano';
+      let nombreFinal = userProfile ? userProfile.nombre_completo : 'Usuario';
 
       // ============================================================
       // FORZAR ROL PARA EL DIRECTOR POR SI SE SOBREESCRIBIÓ EN BD
@@ -79,7 +79,7 @@ export const AuthController = {
       const tipo_solicitud = userProfile?.tipo_solicitud || authData.user.user_metadata?.tipo_solicitud || null;
       const municipio = userProfile?.municipio || authData.user.user_metadata?.municipio || null;
 
-      // Retornar todos los datos de sesión del gestor
+      // Respetamos la estructura exacta que configuró tu equipo (sin token para gestores)
       return res.status(200).json({ 
         success: true, 
         user: { 
@@ -87,7 +87,6 @@ export const AuthController = {
           email: authData.user.email, 
           nombre: nombreFinal,
           rol: rolFinal,
-          dependencia_id: userProfile ? userProfile.dependencia_id : null,
           tipo_solicitud,
           municipio
         } 
@@ -177,7 +176,7 @@ export const AuthController = {
 
   registrarGestor: async (req, res) => {
     try {
-      const { email, password, rol, nombre_completo, director_email, dependencia_id, tipo_solicitud, municipio } = req.body;
+      const { email, password, rol, nombre_completo, director_email, tipo_solicitud, municipio } = req.body;
       
       if (director_email !== 'director@yucatan.gob.mx') {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Solo el Director puede registrar cuentas.' });
@@ -221,7 +220,7 @@ export const AuthController = {
         id: authData.user.id,
         nombre_completo,
         rol: rolNormalizado,
-        dependencia_id: (dependencia_id && dependencia_id !== 'null' && dependencia_id !== 'undefined') ? dependencia_id : null
+        dependencia_id: null    // nullable según el esquema real
       }]);
 
       if (profileError) {
