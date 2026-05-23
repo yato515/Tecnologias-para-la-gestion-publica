@@ -31,7 +31,7 @@ app.use(express.json());
 // RUTAS CLEAN ARCHITECTURE (Nuevas)
 // ==========================================
 // Interceptamos rutas específicas generadas con Clean Architecture
-app.use('/api', solicitudesRoutes); 
+app.use('/api/tramites/solicitudes', solicitudesRoutes); 
 app.use('/api/tramites/catalogo', tramitesRoutes);
 app.use('/api/expedientes', expedientesRoutes);
 

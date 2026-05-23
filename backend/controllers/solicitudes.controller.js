@@ -22,6 +22,17 @@ export const SolicitudesController = {
     }
   },
 
+  obtenerPorCiudadano: async (req, res) => {
+    try {
+      const { ciudadano_id } = req.params;
+      const solicitudes = await SolicitudesService.obtenerPorCiudadano(ciudadano_id);
+      return res.status(200).json({ success: true, data: solicitudes });
+    } catch (error) {
+      const status = error.status || 500;
+      return res.status(status).json({ success: false, message: error.message });
+    }
+  },
+
   actualizarEstado: async (req, res) => {
     try {
       const { id } = req.params;
