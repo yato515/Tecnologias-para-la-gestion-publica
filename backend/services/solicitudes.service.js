@@ -5,8 +5,8 @@ export const SolicitudesService = {
     const { ciudadano_id, tramite_id, dependencia_id, campos_respuesta } = data;
     
     // Validación de negocio
-    if (!ciudadano_id || !tramite_id || !dependencia_id) {
-      const error = new Error('ciudadano_id, tramite_id y dependencia_id son requeridos');
+    if (!ciudadano_id) {
+      const error = new Error('ciudadano_id es requerido');
       error.status = 400;
       throw error;
     }
@@ -60,6 +60,22 @@ export const SolicitudesService = {
     }
     
     return data;
+  },
+
+  obtenerPorCiudadano: async (ciudadano_id) => {
+    const { data, error } = await supabase
+      .from('solicitudes')
+      .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre)')
+      .eq('ciudadano_id', ciudadano_id)
+      .order('created_at', { ascending: false });
+      
+    if (error) {
+      const err = new Error(error.message);
+      err.status = 500;
+      throw err;
+    }
+    
+    return data || [];
   },
 
   actualizarEstado: async (id, datosActualizacion) => {

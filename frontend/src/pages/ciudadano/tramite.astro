@@ -151,7 +151,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				pasaporte:   { title: "Trámite de Pasaporte Mexicano",         dept: "Secretaría de Relaciones Exteriores (SRE)" },
 				ine:         { title: "CURP y Actas Certificadas",             dept: "Registro Civil / INE" },
 				henequenero: { title: "Acreditación de Productor Henequenero", dept: "Secretaría de Desarrollo Rural del Estado" },
-				suelo:       { title: "Permiso de Uso de Suelo",               dept: "Secretaría de Desarrollo Urbano y Obras Públicas" }
+				suelo:       { title: "Permiso de Uso de Suelo",               dept: "Secretaría de Desarrollo Urbano y Obras Públicas" },
+				vayeven:     { title: "Tarjeta Va y Ven (Estudiante)",         dept: "Movilidad" },
+				antecedentes:{ title: "Constancia de Antecedentes No Penales", dept: "Seguridad" },
+				licencia_municipal:{ title: "Licencia de Funcionamiento Municipal", dept: "Economía" },
+				paneles_solares:   { title: "Subsidio de Paneles Solares",       dept: "Apoyo Social" },
+				acta_nacimiento_digital: { title: "Copia Certificada de Acta de Nacimiento (Digital)", dept: "Registro Civil" },
+				renovacion_licencia_2a:  { title: "Renovación de Licencia de Conducir (Automovilista - 2 años)", dept: "Trámites Vehiculares (SSP)" }
 			};
 
 			const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(procedureId);
@@ -225,18 +231,21 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 				console.log('🔍 DEBUG submit:', { procedureId, ciudadanoId, tramiteData });
 
-				if (ciudadanoId && ciudadanoId !== 'demo-citizen-id' && tramiteData) {
+				const fb = proceduresFallback[procedureId] || { title: "Trámite", dept: "Gobierno" };
+				if (ciudadanoId && ciudadanoId !== 'demo-citizen-id') {
 					try {
 						const res = await fetch(`${API_URL}/api/tramites/solicitudes`, {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
 								ciudadano_id: ciudadanoId,
-								tramite_id: tramiteData.id,
-								dependencia_id: tramiteData.dependencia_id,
+								tramite_id: tramiteData ? tramiteData.id : null,
+								dependencia_id: tramiteData ? tramiteData.dependencia_id : null,
 								campos_respuesta: { 
 									token_expediente: tokenInput,
-									municipio: localStorage.getItem('citizen_pob') || 'Mérida Centro'
+									municipio: localStorage.getItem('citizen_pob') || 'Mérida Centro',
+									tramite_nombre_fallback: tramiteData ? tramiteData.nombre : fb.title,
+									dependencia_nombre_fallback: tramiteData ? (tramiteData.dependencia?.nombre || '') : fb.dept
 								}
 							})
 						});

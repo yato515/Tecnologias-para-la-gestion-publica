@@ -9,6 +9,7 @@ const router = Router();
 // Se monta sobre /api/tramites/solicitudes
 router.post('/', SolicitudesController.crear);
 router.get('/folio/:folio', SolicitudesController.obtenerPorFolio);
+router.get('/:ciudadano_id', SolicitudesController.obtenerPorCiudadano);
 
 // ==========================================
 // RUTAS PARA GESTORES (Revisión y actualización)
