@@ -51,8 +51,8 @@ export const AuthController = {
       // Si Supabase se pone estricto con el RLS o caché de red, el backend
       // deduce el rol mediante el correo para que la demo no se rompa.
       // ============================================================
-      let rolFinal = userProfile ? userProfile.rol : 'ciudadano';
-      let nombreFinal = userProfile ? userProfile.nombre_completo : 'Usuario';
+      let rolFinal = userProfile ? userProfile.rol : (authData.user.user_metadata?.rol || 'ciudadano');
+      let nombreFinal = userProfile ? userProfile.nombre_completo : (authData.user.user_metadata?.nombre_completo || 'Usuario');
 
       // ============================================================
       // FORZAR ROL PARA EL DIRECTOR POR SI SE SOBREESCRIBIÓ EN BD

@@ -60,6 +60,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 		<!-- Dashboard Content -->
 		<div id="gestor-dashboard-content" class="space-y-10">
 			
+			<div id="main-dashboard-view" class="space-y-10">
 			<!-- Workload traffic light (Semáforo de Carga) & Metrics Quick Overview -->
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				
@@ -151,6 +152,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					</div>
 				</div>
 
+			</div>
 			</div>
 
 			<!-- Admin View (Hidden by default) -->
@@ -315,6 +317,32 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			// Enable admin tab if Aprobador
 			if (role.toLowerCase() === 'aprobador') {
 				document.getElementById('tab-admin').classList.remove('hidden');
+			}
+
+			// Tab Switching Logic
+			const tabAdmin = document.getElementById('tab-admin');
+			const tabDashboard = document.querySelector('a[href="/gestor/dashboard"]');
+			const mainView = document.getElementById('main-dashboard-view');
+			const adminView = document.getElementById('admin-view');
+
+			if (tabAdmin) {
+				tabAdmin.addEventListener('click', (e) => {
+					e.preventDefault();
+					mainView.classList.add('hidden');
+					adminView.classList.remove('hidden');
+					tabAdmin.classList.add('border-yuc-gold', 'text-yuc-gold');
+					tabAdmin.classList.remove('border-transparent', 'text-slate-300');
+					tabDashboard.classList.remove('border-yuc-gold', 'text-yuc-gold');
+					tabDashboard.classList.add('border-transparent', 'text-slate-300');
+					loadPersonal();
+				});
+			}
+
+			if (tabDashboard) {
+				tabDashboard.addEventListener('click', (e) => {
+					// We can either let it reload the page (default link behavior) or switch tabs locally.
+					// Since it's an actual link, let's just let it act as a link to reload the dashboard state.
+				});
 			}
 
 			// Logout handler
