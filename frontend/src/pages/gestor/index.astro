@@ -134,6 +134,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					role = json.user.rol || 'revisor';
 					loginResponseData = json;
 					loginSuccess = true;
+					if (json.user.tipo_solicitud) localStorage.setItem('gestor_tipo_solicitud', json.user.tipo_solicitud);
+					if (json.user.municipio) localStorage.setItem('gestor_municipio', json.user.municipio);
 				} else {
 					window.showToast(json.message || 'Credenciales inválidas en el servidor.', 'error');
 					btnSubmit.disabled = false;
@@ -149,6 +151,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			}
 
 			if (loginSuccess) {
+				// FORZAR DIRECTOR
+				if (email === 'director@yucatan.gob.mx') {
+					role = 'aprobador';
+				}
+				
 				localStorage.setItem('gestor_logged', 'true');
 				localStorage.setItem('gestor_email', email);
 				localStorage.setItem('gestor_role', role);

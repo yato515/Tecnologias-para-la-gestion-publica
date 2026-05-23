@@ -54,7 +54,13 @@ export const AuthController = {
       let rolFinal = userProfile ? userProfile.rol : 'ciudadano';
       let nombreFinal = userProfile ? userProfile.nombre_completo : 'Usuario';
 
-      if (profileError || !userProfile) {
+      // ============================================================
+      // FORZAR ROL PARA EL DIRECTOR POR SI SE SOBREESCRIBIÓ EN BD
+      // ============================================================
+      if (email === 'director@yucatan.gob.mx') {
+        rolFinal = 'aprobador';
+        nombreFinal = 'Director General';
+      } else if (profileError || !userProfile) {
         console.log("-> [CONTINGENCIA] Perfil oculto en BD. Deduciendo por correo institucional...");
         
         if (email.includes('revisor')) {
@@ -69,6 +75,10 @@ export const AuthController = {
         }
       }
 
+      // Recuperar tipo_solicitud y municipio de user_metadata (por si las columnas no existen en perfiles)
+      const tipo_solicitud = userProfile?.tipo_solicitud || authData.user.user_metadata?.tipo_solicitud || null;
+      const municipio = userProfile?.municipio || authData.user.user_metadata?.municipio || null;
+
       // Respetamos la estructura exacta que configuró tu equipo (sin token para gestores)
       return res.status(200).json({ 
         success: true, 
@@ -77,7 +87,12 @@ export const AuthController = {
           email: authData.user.email, 
           nombre: nombreFinal,
           rol: rolFinal,
+<<<<<<< HEAD
           dependencia_id: userProfile ? userProfile.dependencia_id : null
+=======
+          tipo_solicitud,
+          municipio
+>>>>>>> 683a13a8bdc821cfca06260eb3af8ca4594b9eb9
         } 
       });
     } catch (error) {
@@ -165,7 +180,11 @@ export const AuthController = {
 
   registrarGestor: async (req, res) => {
     try {
+<<<<<<< HEAD
       const { email, password, rol, nombre_completo, director_email, dependencia_id } = req.body;
+=======
+      const { email, password, rol, nombre_completo, director_email, tipo_solicitud, municipio } = req.body;
+>>>>>>> 683a13a8bdc821cfca06260eb3af8ca4594b9eb9
       
       if (director_email !== 'director@yucatan.gob.mx') {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Solo el Director puede registrar cuentas.' });
@@ -175,27 +194,59 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: 'Faltan campos obligatorios.' });
       }
 
+      // Normalizar el rol a minúsculas para que coincida con los valores de la BD
+      const rolNormalizado = String(rol).toLowerCase();
+
+      // 1. Crear usuario en Supabase Auth (guarda municipio/tramite en metadata)
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: {
+            nombre_completo,
+            rol: rolNormalizado,
+            tipo_solicitud: tipo_solicitud || null,
+            municipio: municipio || null
+          }
+        }
       });
 
-      if (authError || !authData.user) {
-        return res.status(400).json({ success: false, message: authError?.message || 'Error al registrar credenciales.' });
+      if (authError) {
+        return res.status(400).json({ success: false, message: authError.message });
+      }
+      if (!authData.user) {
+        return res.status(400).json({ success: false, message: 'No se pudo crear el usuario.' });
       }
 
+      // Detectar email duplicado (Supabase devuelve identities vacío en ese caso)
+      if (authData.user.identities && authData.user.identities.length === 0) {
+        return res.status(400).json({ success: false, message: 'El correo electrónico ya está registrado.' });
+      }
+
+      // 2. Insertar en la tabla perfiles (solo columnas que SÍ existen en la BD)
       const { error: profileError } = await supabase.from('perfiles').insert([{
         id: authData.user.id,
         nombre_completo,
+<<<<<<< HEAD
         rol: rol.toLowerCase(),
         dependencia_id: (dependencia_id && dependencia_id !== 'null' && dependencia_id !== 'undefined') ? dependencia_id : null
+=======
+        rol: rolNormalizado,
+        dependencia_id: null    // nullable según el esquema real
+>>>>>>> 683a13a8bdc821cfca06260eb3af8ca4594b9eb9
       }]);
 
       if (profileError) {
-        return res.status(500).json({ success: false, message: 'Error al asignar rol: ' + profileError.message });
+        console.error('[registrarGestor] Error al insertar perfil:', profileError.message);
+        // El usuario ya existe en Auth, así que avisamos pero NO bloqueamos
+        return res.status(201).json({
+          success: true,
+          message: 'Usuario creado en el sistema de autenticación. Perfil pendiente de sincronización.',
+          warning: profileError.message
+        });
       }
 
-      return res.status(201).json({ success: true, message: 'Cuenta creada exitosamente.' });
+      return res.status(201).json({ success: true, message: `Cuenta de ${rolNormalizado} creada exitosamente.` });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
