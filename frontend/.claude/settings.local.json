@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(python -)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)",
+      "Bash(cat)",
+      "Bash(python3 /tmp/fix_subida.py)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

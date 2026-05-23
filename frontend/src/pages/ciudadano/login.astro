@@ -133,8 +133,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					body: JSON.stringify({ email, password: curp })
 				});
 				const json = await res.json();
-				if (json.success && json.token) {
-					localStorage.setItem('jwt_token', json.token);
+				if (json.success) {
 					localStorage.setItem('citizen_id', json.user.id);
 					localStorage.setItem('citizen_nombre', json.user.nombre || '');
 					loginSuccess = true;
@@ -144,7 +143,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				}
 			} catch (_) {
 				// Backend no disponible, continúa con sesión local (modo demo)
-				localStorage.setItem('jwt_token', 'mock-jwt-token-demo');
 				localStorage.setItem('citizen_id', 'demo-citizen-id');
 				localStorage.setItem('citizen_nombre', 'Ciudadano Demo');
 				loginSuccess = true;

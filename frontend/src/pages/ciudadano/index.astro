@@ -350,11 +350,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
-		const token = localStorage.getItem('jwt_token');
+		const logged = localStorage.getItem('citizen_logged');
 		const overlay = document.getElementById('login-required-overlay');
 		const content = document.getElementById('hub-content');
 
-		if (!token) {
+		if (logged !== 'true') {
 			window.location.href = '/ciudadano/login';
 		} else {
 			// Remove seed/mock data if present (one-time migration to clean state)
@@ -365,11 +365,22 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
 			
-			const tokenVal = localStorage.getItem('jwt_token') || 'N/A';
+			const tokenVal = localStorage.getItem('jwt_token');
 			const tokenEl = document.getElementById('lbl-token');
-			tokenEl.textContent = tokenVal;
+			if (tokenVal && tokenVal !== 'mock-jwt-token-demo') {
+				tokenEl.textContent = tokenVal;
+				tokenEl.title = "Ver completo (Haga clic)";
+			} else {
+				tokenEl.textContent = "N/A (No generado)";
+				tokenEl.title = "Sube tus documentos en tu expediente o realiza un trámite para generar tu token";
+			}
 			tokenEl.addEventListener('click', () => {
-				alert("Token JWT Completo:\n\n" + tokenVal);
+				const currentT = localStorage.getItem('jwt_token');
+				if (currentT && currentT !== 'mock-jwt-token-demo') {
+					alert("Token de Expediente Completo:\n\n" + currentT);
+				} else {
+					alert("No tienes un token generado aún. Se creará automáticamente cuando subas tu primer trámite o cargues un archivo en tu expediente digital.");
+				}
 			});
 
 			// Enable tabs
@@ -484,10 +495,19 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			});
 
 			const getDossier = () => {
-					const local = localStorage.getItem('civicflow_dossier');
-					if (!local) return [];
-					return JSON.parse(local);
-				};
+				const local = localStorage.getItem('civicflow_dossier');
+				const defaultDossier = [
+					{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "", status: "Pendiente", date: "-" },
+					{ id: "domicilio", name: "Comprobante de Domicilio", file: "", status: "Pendiente", date: "-" },
+					{ id: "acta", name: "Acta de Nacimiento Certificada", file: "", status: "Pendiente", date: "-" },
+					{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
+				];
+				if (!local) {
+					localStorage.setItem('civicflow_dossier', JSON.stringify(defaultDossier));
+					return defaultDossier;
+				}
+				return JSON.parse(local);
+			};
 
 			const renderDossier = () => {
 				const grid = document.getElementById('dossier-grid');
@@ -593,12 +613,34 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						// File input upload action
 						document.getElementById(`upload-${doc.id}`).addEventListener('change', (e) => {
 							if (e.target.files.length > 0) {
-								const fileName = e.target.files[0].name;
+								const file = e.target.files[0];
+								if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+									window.showToast("Solo se permiten archivos PDF", "error");
+									e.target.value = "";
+									return;
+								}
+								
+								const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
+								const timestamp = Date.now();
+								const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
 								const currentDate = new Date().toISOString().split('T')[0];
+								
+								// Generate token if not exists
+								let currentToken = localStorage.getItem('jwt_token');
+								if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
+									currentToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
+									localStorage.setItem('jwt_token', currentToken);
+									
+									// Update visual display
+									const tokenEl = document.getElementById('lbl-token');
+									tokenEl.textContent = currentToken;
+									tokenEl.title = "Ver completo (Haga clic)";
+									window.showToast(`¡Primer archivo cargado! Se ha generado tu Token de Expediente: ${currentToken}`, "success");
+								}
 								
 								const newDossier = dossier.map(d => {
 									if (d.id === doc.id) {
-										return { ...d, status: 'Cargado', file: fileName, date: currentDate };
+										return { ...d, status: 'Cargado', file: uniqueName, date: currentDate };
 									}
 									return d;
 								});
