@@ -192,11 +192,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								</select>
 							</div>
 
-							<div>
-								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Dependencia Asignada</label>
-								<select id="reg-dependencia" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none">
-									<option value="">Cargando dependencias...</option>
-								</select>
 							</div>
 						</div>
 
@@ -233,12 +228,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								<tr>
 									<th class="pb-3 font-bold">Nombre Completo</th>
 									<th class="pb-3 font-bold">Rol</th>
+									<th class="pb-3 font-bold">Filtro Trámite</th>
+									<th class="pb-3 font-bold">Filtro Lugar</th>
 									<th class="pb-3 font-bold text-right">Acciones</th>
 								</tr>
 							</thead>
 							<tbody id="tbl-personal-body" class="divide-y divide-slate-100 text-slate-700 text-xs">
 								<tr>
-									<td colspan="3" class="py-8 text-center text-slate-500">Cargando personal...</td>
+									<td colspan="6" class="py-8 text-center text-slate-500">Cargando personal...</td>
 								</tr>
 							</tbody>
 						</table>
@@ -271,6 +268,18 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					<select id="edit-role" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
 						<option value="revisor">Revisor Operativo</option>
 						<option value="aprobador">Director / Aprobador</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Tipo de Trámite/Documento Atendido</label>
+					<select id="edit-tipo-solicitud" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
+						<option value="">Cargando trámites...</option>
+					</select>
+				</div>
+				<div>
+					<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Municipio / Lugar de las Solicitudes</label>
+					<select id="edit-municipio" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
+						<option value="">Cargando municipios...</option>
 					</select>
 				</div>
 				<div class="pt-4 flex gap-3 justify-end">
@@ -330,7 +339,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			const getRequests = async () => {
 				try {
 					const depId = localStorage.getItem('gestor_dependencia_id');
-					const url = depId ? `${API_URL}/api/gestores/solicitudes?dependencia_id=${depId}` : `${API_URL}/api/gestores/solicitudes`;
+					const tipoSolicitud = localStorage.getItem('gestor_tipo_solicitud');
+					const municipio = localStorage.getItem('gestor_municipio');
+
+					let url = `${API_URL}/api/gestores/solicitudes?`;
+					const params = [];
+					if (depId) params.push(`dependencia_id=${depId}`);
+					if (tipoSolicitud && tipoSolicitud !== 'null' && tipoSolicitud !== 'undefined') {
+						params.push(`tipo_solicitud=${encodeURIComponent(tipoSolicitud)}`);
+					}
+					if (municipio && municipio !== 'null' && municipio !== 'undefined') {
+						params.push(`municipio=${encodeURIComponent(municipio)}`);
+					}
+					url += params.join('&');
+
 					const res = await fetch(url);
 					const json = await res.json();
 					if (json.success) {
@@ -584,17 +606,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			// Staff Table Logic
 			const loadPersonal = async () => {
 				const tbody = document.getElementById('tbl-personal-body');
-				tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400">Cargando personal...</td></tr>';
+				tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400">Cargando personal...</td></tr>';
 				try {
 					const res = await fetch(`${API_URL}/api/gestores/personal`);
 					const json = await res.json();
 					if (json.success && json.data) {
 						tbody.innerHTML = '';
 						if (json.data.length === 0) {
-							tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400">No hay personal registrado</td></tr>';
+							tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-400">No hay personal registrado</td></tr>';
 						} else {
 							json.data.forEach(p => {
 								const tr = document.createElement('tr');
+								const filterTramite = p.tipo_solicitud || 'Todos';
+								const filterLugar = p.municipio || 'Todos';
+
 								tr.innerHTML = `
 									<td class="py-4 font-semibold">${p.nombre_completo || 'Sin nombre'}</td>
 									<td class="py-4">
@@ -602,8 +627,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 											${p.rol}
 										</span>
 									</td>
+									<td class="py-4 text-xs font-semibold text-slate-500">${filterTramite}</td>
+									<td class="py-4 text-xs font-semibold text-slate-500">${filterLugar}</td>
 									<td class="py-4 text-right">
-										<button class="btn-edit-staff px-3 py-1.5 text-[10px] font-bold text-yuc-green border border-yuc-green/30 hover:bg-yuc-green hover:text-white rounded-lg transition-colors" data-id="${p.id}" data-name="${p.nombre_completo || ''}" data-role="${p.rol}">
+										<button class="btn-edit-staff px-3 py-1.5 text-[10px] font-bold text-yuc-green border border-yuc-green/30 hover:bg-yuc-green hover:text-white rounded-lg transition-colors" 
+											data-id="${p.id}" 
+											data-name="${p.nombre_completo || ''}" 
+											data-role="${p.rol}"
+											data-dependencia="${p.dependencia_id || ''}"
+											data-tipo-solicitud="${p.tipo_solicitud || ''}"
+											data-municipio="${p.municipio || ''}">
 											Modificar
 										</button>
 									</td>
@@ -617,10 +650,18 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 									const id = e.currentTarget.getAttribute('data-id');
 									const name = e.currentTarget.getAttribute('data-name');
 									const r = e.currentTarget.getAttribute('data-role');
+									const tipo = e.currentTarget.getAttribute('data-tipo-solicitud');
+									const muni = e.currentTarget.getAttribute('data-municipio');
 									
 									document.getElementById('edit-id').value = id;
 									document.getElementById('edit-name').value = name;
 									document.getElementById('edit-role').value = r;
+									if (document.getElementById('edit-tipo-solicitud')) {
+										document.getElementById('edit-tipo-solicitud').value = tipo || '';
+									}
+									if (document.getElementById('edit-municipio')) {
+										document.getElementById('edit-municipio').value = muni || '';
+									}
 									
 									document.getElementById('modal-edit-personal').classList.remove('hidden');
 								});
@@ -628,28 +669,46 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						}
 					}
 				} catch (err) {
-					tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-red-500">Error al cargar datos</td></tr>';
+					tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-red-500">Error al cargar datos</td></tr>';
 				}
 			};
-			const loadDependencias = async () => {
-				const selectDep = document.getElementById('reg-dependencia');
-				if (!selectDep) return;
-				try {
-					const res = await fetch(`${API_URL}/api/gestores/dependencias`);
-					const json = await res.json();
-					if (json.success && Array.isArray(json.data)) {
-						selectDep.innerHTML = '';
-						json.data.forEach(d => {
-							const opt = document.createElement('option');
-							opt.value = d.id;
-							opt.textContent = d.nombre;
-							selectDep.appendChild(opt);
-						});
-					} else {
-						selectDep.innerHTML = '<option value="">Error cargando dependencias</option>';
-					}
-				} catch (err) {
-					selectDep.innerHTML = '<option value="">Error de conexión</option>';
+			const loadFiltros = async () => {
+				const selectTramites = document.getElementById('edit-tipo-solicitud');
+				const selectMunicipios = document.getElementById('edit-municipio');
+				
+				// Cargar municipios de Yucatán
+				if (selectMunicipios) {
+					const municipios = ["Abalá","Acanceh","Akil","Baca","Bokobá","Buctzotz","Cacalchén","Calotmul","Cansahcab","Cantamayec","Celestún","Cenotillo","Conkal","Cuncunul","Cuzamá","Chacsinkín","Chankom","Chapab","Chemax","Chicxulub Pueblo","Chichimilá","Chikindzonot","Chocholá","Chumayel","Dzán","Dzemul","Dzidzantún","Dzilam de Bravo","Dzilam González","Dzitás","Dzoncauich","Espita","Halachó","Hocabá","Hoctún","Homún","Huhí","Hunucmá","Ixil","Izamal","Kanasín","Kantunil","Kaua","Kinchil","Kopomá","Mama","Maní","Maxcanú","Mayapán","Mérida","Mocochá","Motul","Muna","Muxupip","Opichén","Oxkutzcab","Panabá","Peto","Progreso","Quintana Roo","Río Lagartos","Sacalum","Samahil","Sanahcat","San Felipe","Santa Elena","Seyé","Sinanché","Sotuta","Sucilá","Sudzal","Suma","Tahdziú","Tahmek","Teabo","Tecoh","Tekal de Venegas","Tekantó","Tekax","Tekit","Tekom","Telchac Pueblo","Telchac Puerto","Temax","Temozón","Tepakán","Tetiz","Teya","Ticul","Timucuy","Tinum","Tixcacalcupul","Tixkokob","Tixmehuac","Tixpéhual","Tizimín","Tunkás","Tzucacab","Uayma","Ucú","Umán","Valladolid","Xocchel","Yaxcabá","Yaxkukul","Yobaín"];
+					selectMunicipios.innerHTML = '<option value="">Todos los municipios</option>';
+					municipios.forEach(m => {
+						const opt = document.createElement('option');
+						opt.value = m;
+						opt.textContent = m;
+						selectMunicipios.appendChild(opt);
+					});
+				}
+
+				// Cargar tipos de trámites fijos (Catálogo)
+				if (selectTramites) {
+					const tramitesFijos = [
+						"Licencia de Conducir y Placas",
+						"Inscripción en el RFC (SAT)",
+						"Trámite de Pasaporte Mexicano",
+						"CURP y Actas Certificadas",
+						"Tarjeta Va y Ven (Estudiante)",
+						"Constancia de Antecedentes No Penales",
+						"Licencia de Funcionamiento Municipal",
+						"Subsidio de Paneles Solares",
+						"Copia Certificada de Acta de Nacimiento (Digital)",
+						"Renovación de Licencia de Conducir (Automovilista - 2 años)"
+					];
+					selectTramites.innerHTML = '<option value="">Todos los trámites</option>';
+					tramitesFijos.forEach(t => {
+						const opt = document.createElement('option');
+						opt.value = t;
+						opt.textContent = t;
+						selectTramites.appendChild(opt);
+					});
 				}
 			};
 
@@ -668,7 +727,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				submenu.children[0].className = "pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all";
 				
 				loadPersonal();
-				loadDependencias();
+				loadFiltros();
 			});
 
 			// If URL contains tab=admin query parameter, auto activate admin tab
@@ -689,12 +748,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const id = document.getElementById('edit-id').value;
 				const nombre_completo = document.getElementById('edit-name').value.trim();
 				const rol = document.getElementById('edit-role').value;
+				const tipo_solicitud = document.getElementById('edit-tipo-solicitud').value || null;
+				const municipio = document.getElementById('edit-municipio').value || null;
 
 				try {
 					const res = await fetch(`${API_URL}/api/gestores/personal/${id}`, {
 						method: 'PUT',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ nombre_completo, rol, director_email: gestorEmail })
+						body: JSON.stringify({ 
+							nombre_completo, 
+							rol, 
+							director_email: gestorEmail,
+							tipo_solicitud,
+							municipio
+						})
 					});
 					const json = await res.json();
 					if (json.success) {
@@ -715,7 +782,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const password = document.getElementById('reg-pwd').value;
 				const nombre_completo = document.getElementById('reg-name').value.trim();
 				const rol = document.getElementById('reg-role').value;
-				const dependencia_id = document.getElementById('reg-dependencia').value;
 
 				try {
 					const res = await fetch(`${API_URL}/api/auth/registrar-gestor`, {
@@ -726,7 +792,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							password, 
 							rol, 
 							nombre_completo,
-							dependencia_id,
 							director_email: gestorEmail // Validate authority
 						})
 					});

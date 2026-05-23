@@ -14,7 +14,7 @@ export const GestorController = {
   // GET /api/gestores/solicitudes
   getSolicitudes: async (req, res) => {
     try {
-      const { dependencia_id } = req.query;
+      const { dependencia_id, tipo_solicitud, municipio } = req.query;
       let query = supabase
         .from('solicitudes')
         .select(`
@@ -56,6 +56,26 @@ export const GestorController = {
         } catch (e) {
           console.error("Error listing users from auth to map emails:", e);
         }
+      }
+
+      // Apply filters for tipo_solicitud and municipio in mappedData
+      if (tipo_solicitud && tipo_solicitud !== 'null' && tipo_solicitud !== 'undefined' && tipo_solicitud !== '') {
+        mappedData = mappedData.filter(s => {
+          const name = s.tramite?.nombre || '';
+          return name.toLowerCase().includes(tipo_solicitud.toLowerCase()) || s.tramite_id === tipo_solicitud;
+        });
+      }
+
+      if (municipio && municipio !== 'null' && municipio !== 'undefined' && municipio !== '') {
+        mappedData = mappedData.filter(s => {
+          const campos = s.campos_respuesta || {};
+          const cMuni = campos.municipio || campos.lugar || '';
+          const cDir = campos.direccion || '';
+          const citizenMuni = s.ciudadano?.municipio || '';
+          return cMuni.toLowerCase().includes(municipio.toLowerCase()) ||
+                 cDir.toLowerCase().includes(municipio.toLowerCase()) ||
+                 citizenMuni.toLowerCase().includes(municipio.toLowerCase());
+        });
       }
 
       return res.status(200).json({ success: true, data: mappedData });
@@ -237,7 +257,29 @@ export const GestorController = {
         .select('*')
         .in('rol', ['revisor', 'aprobador']);
       if (error) throw error;
-      return res.status(200).json({ success: true, data });
+
+      let enrichedData = data;
+      // Enrich with auth metadata (tipo_solicitud, municipio) when admin client is available
+      if (supabaseAdmin && data && data.length > 0) {
+        try {
+          const { data: usersAuth } = await supabaseAdmin.auth.admin.listUsers();
+          if (usersAuth && usersAuth.users) {
+            const metaMap = {};
+            usersAuth.users.forEach(u => {
+              metaMap[u.id] = u.user_metadata || {};
+            });
+            enrichedData = data.map(p => ({
+              ...p,
+              tipo_solicitud: metaMap[p.id]?.tipo_solicitud || null,
+              municipio: metaMap[p.id]?.municipio || null
+            }));
+          }
+        } catch (e) {
+          console.warn('[getPersonal] No se pudo obtener metadata de auth:', e.message);
+        }
+      }
+
+      return res.status(200).json({ success: true, data: enrichedData });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -247,7 +289,7 @@ export const GestorController = {
   updatePersonal: async (req, res) => {
     try {
       const { id } = req.params;
-      const { nombre_completo, rol, director_email } = req.body;
+      const { nombre_completo, rol, director_email, dependencia_id, tipo_solicitud, municipio } = req.body;
 
       // Basic auth check
       if (director_email !== 'director@yucatan.gob.mx' && director_email !== 'admin_director@yucatan.gob.mx') {
@@ -260,15 +302,31 @@ export const GestorController = {
 
       const rolMapeado = rol.toLowerCase();
 
+      // Build perfiles update payload
+      const perfilUpdate = { nombre_completo, rol: rolMapeado, updated_at: new Date().toISOString() };
+
       const { data, error } = await supabase
         .from('perfiles')
-        .update({ nombre_completo, rol: rolMapeado })
+        .update(perfilUpdate)
         .eq('id', id)
         .select()
         .single();
         
       if (error) throw error;
-      return res.status(200).json({ success: true, data });
+
+      // Update tipo_solicitud and municipio in Supabase Auth user_metadata (requires service role)
+      if (supabaseAdmin && (tipo_solicitud !== undefined || municipio !== undefined)) {
+        try {
+          const metaUpdate = {};
+          if (tipo_solicitud !== undefined) metaUpdate.tipo_solicitud = tipo_solicitud || null;
+          if (municipio !== undefined) metaUpdate.municipio = municipio || null;
+          await supabaseAdmin.auth.admin.updateUserById(id, { user_metadata: metaUpdate });
+        } catch (metaErr) {
+          console.warn('[updatePersonal] No se pudo actualizar metadata de auth:', metaErr.message);
+        }
+      }
+
+      return res.status(200).json({ success: true, data: { ...data, tipo_solicitud: tipo_solicitud || null, municipio: municipio || null } });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }

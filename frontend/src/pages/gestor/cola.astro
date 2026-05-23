@@ -135,7 +135,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				if (cachedRequests) return cachedRequests;
 				try {
 					const depId = localStorage.getItem('gestor_dependencia_id');
-					const url = depId ? `${API_URL}/api/gestores/solicitudes?dependencia_id=${depId}` : `${API_URL}/api/gestores/solicitudes`;
+					const tipoSolicitud = localStorage.getItem('gestor_tipo_solicitud');
+					const municipio = localStorage.getItem('gestor_municipio');
+
+					let url = `${API_URL}/api/gestores/solicitudes?`;
+					const params = [];
+					if (depId) params.push(`dependencia_id=${depId}`);
+					if (tipoSolicitud && tipoSolicitud !== 'null' && tipoSolicitud !== 'undefined') {
+						params.push(`tipo_solicitud=${encodeURIComponent(tipoSolicitud)}`);
+					}
+					if (municipio && municipio !== 'null' && municipio !== 'undefined') {
+						params.push(`municipio=${encodeURIComponent(municipio)}`);
+					}
+					url += params.join('&');
+
 					const res = await fetch(url, {
 						headers: { 'Content-Type': 'application/json' }
 					});

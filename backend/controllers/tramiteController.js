@@ -36,7 +36,7 @@ export const TramiteController = {
     try {
       const { data, error } = await supabase
         .from('tramites_catalogo')
-        .select('*, dependencia:dependencias(nombre)')
+        .select('*')
         .eq('activo', true)
         .order('nombre');
       if (error) throw error;
