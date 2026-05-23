@@ -448,6 +448,18 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			return Array.isArray(parsed) ? parsed : [];
 		}
 
+		function refreshExpedienteToken() {
+			var currentToken = 'TK-' + Math.floor(100000 + Math.random() * 900000);
+			localStorage.setItem('jwt_token', currentToken);
+			var tokDict = safeJSONParse('civicflow_tokens', {});
+			tokDict[currentToken] = {};
+			getDossier().forEach(function(d) { if (d.status === 'Cargado') tokDict[currentToken][d.id] = d.file; });
+			localStorage.setItem('civicflow_tokens', JSON.stringify(tokDict));
+			var tEl = document.getElementById('lbl-token');
+			if (tEl) { tEl.textContent = currentToken; tEl.title = 'Ver completo (Haga clic)'; }
+			return currentToken;
+		}
+
 		function renderDossier() {
 			const grid = document.getElementById('dossier-grid');
 			if (!grid) return;
@@ -513,6 +525,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								return d.id === doc.id ? Object.assign({}, d, { status: 'Pendiente', file: '' }) : d;
 							});
 							localStorage.setItem('civicflow_dossier', JSON.stringify(updated));
+							refreshExpedienteToken();
 							renderDossier();
 							window.showToast('Carga restablecida. Seleccione nuevo archivo.', 'info');
 						});
@@ -533,6 +546,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								return d.id === doc.id ? Object.assign({}, d, { status: 'Cargado', file: uniqueName, date: today }) : d;
 							});
 							localStorage.setItem('civicflow_dossier', JSON.stringify(updated));
+							refreshExpedienteToken();
 							renderDossier();
 							window.showToast('Documento ' + doc.name + ' subido exitosamente', 'success');
 						});
@@ -553,15 +567,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			if (loadedCount === DEFAULT_DOSSIER.length) {
 				var currentToken = localStorage.getItem('jwt_token');
 				if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
-					currentToken = 'TK-' + Math.floor(100000 + Math.random() * 900000);
-					localStorage.setItem('jwt_token', currentToken);
-					var tokDict = safeJSONParse('civicflow_tokens', {});
-					tokDict[currentToken] = {};
-					getDossier().forEach(function(d) { if (d.status === 'Cargado') tokDict[currentToken][d.id] = d.file; });
-					localStorage.setItem('civicflow_tokens', JSON.stringify(tokDict));
-					var tEl = document.getElementById('lbl-token');
-					if (tEl) { tEl.textContent = currentToken; tEl.title = 'Ver completo (Haga clic)'; }
-					window.showToast('¡Expediente completo! Token generado: ' + currentToken, 'success');
+					refreshExpedienteToken();
+					window.showToast('¡Expediente completo! Token generado.', 'success');
 				}
 			}
 		}
@@ -692,7 +699,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				btnSaveUserInfo.addEventListener('click', function() {
 					localStorage.setItem('citizen_dob', inputDob.value);
 					localStorage.setItem('citizen_pob', inputPob.value);
-					window.showToast('Información guardada exitosamente', 'success');
+					refreshExpedienteToken();
+					window.showToast('Información guardada y token actualizado', 'success');
 				});
 			}
 

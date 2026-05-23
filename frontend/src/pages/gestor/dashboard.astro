@@ -191,6 +191,130 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 									<option value="Aprobador">Director / Aprobador</option>
 								</select>
 							</div>
+
+							<div>
+								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Tipo de Solicitud Asignada</label>
+								<select id="reg-tramite" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none">
+									<option value="">Todos los trámites (Sin filtro)</option>
+									<option value="Licencia">Licencias de Conducir y Placas (SSP)</option>
+									<option value="Inscripción">Inscripción en el RFC (SAT)</option>
+									<option value="Pasaporte">Trámite de Pasaporte (SRE)</option>
+									<option value="CURP">CURP y Actas (Registro Civil)</option>
+								</select>
+							</div>
+
+							<div>
+								<label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1">Municipio Asignado</label>
+								<select id="reg-municipio" class="block w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm focus:ring-2 focus:ring-yuc-green focus:border-yuc-green focus:outline-none">
+									<option value="">Todos los municipios (Sin filtro)</option>
+									<option value="Abalá">Abalá</option>
+									<option value="Acanceh">Acanceh</option>
+									<option value="Akil">Akil</option>
+									<option value="Baca">Baca</option>
+									<option value="Bokobá">Bokobá</option>
+									<option value="Buctzotz">Buctzotz</option>
+									<option value="Cacalchén">Cacalchén</option>
+									<option value="Calotmul">Calotmul</option>
+									<option value="Cansahcab">Cansahcab</option>
+									<option value="Cantamayec">Cantamayec</option>
+									<option value="Celestún">Celestún</option>
+									<option value="Cenotillo">Cenotillo</option>
+									<option value="Conkal">Conkal</option>
+									<option value="Cuncunul">Cuncunul</option>
+									<option value="Cuzamá">Cuzamá</option>
+									<option value="Chacsinkín">Chacsinkín</option>
+									<option value="Chankom">Chankom</option>
+									<option value="Chapab">Chapab</option>
+									<option value="Chemax">Chemax</option>
+									<option value="Chicxulub Pueblo">Chicxulub Pueblo</option>
+									<option value="Chichimilá">Chichimilá</option>
+									<option value="Chikindzonot">Chikindzonot</option>
+									<option value="Chocholá">Chocholá</option>
+									<option value="Chumayel">Chumayel</option>
+									<option value="Dzán">Dzán</option>
+									<option value="Dzemul">Dzemul</option>
+									<option value="Dzidzantún">Dzidzantún</option>
+									<option value="Dzilam de Bravo">Dzilam de Bravo</option>
+									<option value="Dzilam González">Dzilam González</option>
+									<option value="Dzitás">Dzitás</option>
+									<option value="Dzoncauich">Dzoncauich</option>
+									<option value="Espita">Espita</option>
+									<option value="Halachó">Halachó</option>
+									<option value="Hocabá">Hocabá</option>
+									<option value="Hoctún">Hoctún</option>
+									<option value="Homún">Homún</option>
+									<option value="Huhí">Huhí</option>
+									<option value="Hunucmá">Hunucmá</option>
+									<option value="Ixil">Ixil</option>
+									<option value="Izamal">Izamal</option>
+									<option value="Kanasín">Kanasín</option>
+									<option value="Kantunil">Kantunil</option>
+									<option value="Kaua">Kaua</option>
+									<option value="Kinchil">Kinchil</option>
+									<option value="Kopomá">Kopomá</option>
+									<option value="Mama">Mama</option>
+									<option value="Maní">Maní</option>
+									<option value="Maxcanú">Maxcanú</option>
+									<option value="Mayapán">Mayapán</option>
+									<option value="Mérida">Mérida</option>
+									<option value="Mocochá">Mocochá</option>
+									<option value="Motul">Motul</option>
+									<option value="Muna">Muna</option>
+									<option value="Muxupip">Muxupip</option>
+									<option value="Opichén">Opichén</option>
+									<option value="Oxkutzcab">Oxkutzcab</option>
+									<option value="Panabá">Panabá</option>
+									<option value="Peto">Peto</option>
+									<option value="Progreso">Progreso</option>
+									<option value="Quintana Roo">Quintana Roo</option>
+									<option value="Río Lagartos">Río Lagartos</option>
+									<option value="Sacalum">Sacalum</option>
+									<option value="Samahil">Samahil</option>
+									<option value="Sanahcat">Sanahcat</option>
+									<option value="San Felipe">San Felipe</option>
+									<option value="Santa Elena">Santa Elena</option>
+									<option value="Seyé">Seyé</option>
+									<option value="Sinanché">Sinanché</option>
+									<option value="Sotuta">Sotuta</option>
+									<option value="Sucilá">Sucilá</option>
+									<option value="Sudzal">Sudzal</option>
+									<option value="Suma">Suma</option>
+									<option value="Tahdziú">Tahdziú</option>
+									<option value="Tahmek">Tahmek</option>
+									<option value="Teabo">Teabo</option>
+									<option value="Tecoh">Tecoh</option>
+									<option value="Tekal de Venegas">Tekal de Venegas</option>
+									<option value="Tekantó">Tekantó</option>
+									<option value="Tekax">Tekax</option>
+									<option value="Tekit">Tekit</option>
+									<option value="Tekom">Tekom</option>
+									<option value="Telchac Pueblo">Telchac Pueblo</option>
+									<option value="Telchac Puerto">Telchac Puerto</option>
+									<option value="Temax">Temax</option>
+									<option value="Temozón">Temozón</option>
+									<option value="Tepakán">Tepakán</option>
+									<option value="Tetiz">Tetiz</option>
+									<option value="Teya">Teya</option>
+									<option value="Ticul">Ticul</option>
+									<option value="Timucuy">Timucuy</option>
+									<option value="Tinum">Tinum</option>
+									<option value="Tixcacalcupul">Tixcacalcupul</option>
+									<option value="Tixkokob">Tixkokob</option>
+									<option value="Tixmehuac">Tixmehuac</option>
+									<option value="Tixpéhual">Tixpéhual</option>
+									<option value="Tizimín">Tizimín</option>
+									<option value="Tunkás">Tunkás</option>
+									<option value="Tzucacab">Tzucacab</option>
+									<option value="Uayma">Uayma</option>
+									<option value="Ucú">Ucú</option>
+									<option value="Umán">Umán</option>
+									<option value="Valladolid">Valladolid</option>
+									<option value="Xocchel">Xocchel</option>
+									<option value="Yaxcabá">Yaxcabá</option>
+									<option value="Yaxkukul">Yaxkukul</option>
+									<option value="Yobaín">Yobaín</option>
+								</select>
+							</div>
 						</div>
 
 						<div class="pt-4 border-t border-slate-200 flex justify-end">
@@ -325,7 +449,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					const res = await fetch(`${API_URL}/api/gestores/solicitudes`);
 					const json = await res.json();
 					if (json.success) {
-						return json.data.map(r => ({
+						let allReqs = json.data.map(r => ({
 							id: r.id,
 							folio: r.folio,
 							name: r.tramite?.nombre || 'Trámite Genérico',
@@ -334,9 +458,24 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							status: statusMap[r.estado] || r.estado,
 							citizen_fullname: r.ciudadano?.nombre_completo || 'Ciudadano',
 							token: r.id ? `TK-${r.id.substring(0, 6).toUpperCase()}` : 'TK-0000',
-							delegation: 'Mérida Centro',
+							delegation: 'Mérida',
 							algorithmic_result: r.estado === 'aprobado' ? 'Aprobado' : (r.estado === 'rechazado' ? 'Declinado' : 'Pendiente')
 						}));
+
+						const filterTipo = localStorage.getItem('gestor_tipo_solicitud');
+						const filterMuni = localStorage.getItem('gestor_municipio');
+
+						return allReqs.filter(r => {
+							let matchesTipo = true;
+							let matchesMuni = true;
+							if (filterTipo && filterTipo !== 'null' && filterTipo.trim() !== '') {
+								matchesTipo = r.name.toLowerCase().includes(filterTipo.toLowerCase());
+							}
+							if (filterMuni && filterMuni !== 'null' && filterMuni.trim() !== '') {
+								matchesMuni = r.delegation.toLowerCase().includes(filterMuni.toLowerCase());
+							}
+							return matchesTipo && matchesMuni;
+						});
 					}
 					return [];
 				} catch (e) {
@@ -683,6 +822,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const password = document.getElementById('reg-pwd').value;
 				const nombre_completo = document.getElementById('reg-name').value.trim();
 				const rol = document.getElementById('reg-role').value;
+				const tipo_solicitud = document.getElementById('reg-tramite') ? document.getElementById('reg-tramite').value.trim() : null;
+				const municipio = document.getElementById('reg-municipio') ? document.getElementById('reg-municipio').value.trim() : null;
 
 				try {
 					const res = await fetch(`${API_URL}/api/auth/registrar-gestor`, {
@@ -693,6 +834,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							password, 
 							rol, 
 							nombre_completo,
+							tipo_solicitud,
+							municipio,
 							director_email: gestorEmail // Validate authority
 						})
 					});
