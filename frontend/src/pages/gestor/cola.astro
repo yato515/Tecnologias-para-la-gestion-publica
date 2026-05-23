@@ -94,8 +94,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 	</div>
 
 	<script is:inline define:vars={{ API_URL }}>
-		const token = localStorage.getItem('jwt_token_gestor');
-		if (!token) {
+		const isLogged = localStorage.getItem('gestor_logged');
+		if (isLogged !== 'true') {
 			window.location.href = '/gestor';
 		} else {
 
@@ -112,7 +112,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				if (cachedRequests) return cachedRequests;
 				try {
 					const res = await fetch(`${API_URL}/api/gestores/solicitudes`, {
-						headers: { 'Authorization': `Bearer ${token}` }
+						headers: { 'Content-Type': 'application/json' }
 					});
 					if (res.status === 401 || res.status === 403) {
 						localStorage.clear();

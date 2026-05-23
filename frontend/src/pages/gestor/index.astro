@@ -4,13 +4,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Acceso de Servidores Públicos - Panel Gestor">
-	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
+	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-900 relative overflow-hidden">
 		
-		<div class="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl border border-slate-200 shadow-sm relative z-10">
+		<!-- Background decorative elements -->
+		<div class="absolute inset-0 z-0">
+			<div class="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-10"></div>
+			<div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-yuc-green/20 blur-3xl"></div>
+			<div class="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-yuc-gold/20 blur-3xl"></div>
+		</div>
+
+		<div class="max-w-md w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl shadow-2xl relative z-10 border-t-4 border-t-yuc-gold">
 			
 			<div class="text-center">
-				<div class="mx-auto w-12 h-12 rounded-xl bg-yuc-gold/10 text-yuc-gold-dark flex items-center justify-center mb-4">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+				<div class="mx-auto w-14 h-14 rounded-full bg-slate-900 text-yuc-gold flex items-center justify-center mb-4 shadow-md">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.375m0-10.03L12 3m0 0l2.625 2.67M12 3v15.75m0 0H9m3 0h3.375M9 15h3.375M9 12h3.75m3.75-9H18a2.25 2.25 0 012.25 2.25v13.5A2.25 2.25 0 0118 21h-2.25" />
 					</svg>
 				</div>
@@ -56,13 +63,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				<div>
 					<button 
 						type="submit" 
-						class="w-full flex justify-center py-3.5 px-4 border border-slate-300 rounded-xl shadow-sm text-sm font-bold text-slate-800 bg-white hover:bg-slate-50 transition-colors border border-slate-350"
+						class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-slate-900 hover:bg-yuc-green focus:ring-2 focus:ring-yuc-green transition-colors"
 					>
 						Ingresar al Módulo Gestor
 					</button>
 				</div>
                 <div class="mt-4 text-center">
-                    <a href="#" id="forgot-password" class="font-bold text-xs text-yuc-green hover:underline">¿Olvidó su contraseña?</a>
+                    <a href="#" id="forgot-password" class="font-bold text-xs text-slate-500 hover:text-yuc-green hover:underline transition-colors">¿Olvidó su contraseña institucional?</a>
                 </div>
 			</form>
 
@@ -94,8 +101,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					body: JSON.stringify({ email, password })
 				});
 				const json = await res.json();
-				if (json.success && json.token) {
-					localStorage.setItem('jwt_token_gestor', json.token);
+				if (json.success && json.user) {
 					localStorage.setItem('gestor_logged', 'true');
 					localStorage.setItem('gestor_email', json.user.email);
 					role = json.user.rol;
@@ -106,7 +112,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				}
 			} catch (_) {
 				// Fallback local en desarrollo/modo demo
-				localStorage.setItem('jwt_token_gestor', 'mock-jwt-token-gestor-demo');
 				role = 'Revisor';
 				loginSuccess = true;
 			}

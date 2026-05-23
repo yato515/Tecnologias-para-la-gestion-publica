@@ -38,20 +38,26 @@ export const AuthController = {
       }
 
       // 2. Traer los datos extras desde tu tabla 'perfiles'
-      const { data: perfil } = await supabase
+      const { data: userProfile, error: profileError } = await supabase
         .from('perfiles')
         .select('*')
         .eq('id', authData.user.id)
         .single();
 
-      const userPayload = {
-        id: authData.user.id,
-        email: authData.user.email,
-        nombre: perfil ? perfil.nombre_completo : 'Usuario'
-      };
+      if (profileError || !userProfile) {
+        return res.status(404).json({ success: false, message: 'Perfil no encontrado' });
+      }
 
-      const token = generarToken(userPayload);
-      return res.status(200).json({ success: true, token, user: userPayload });
+      // Se elimina la generación de token para gestores por instrucción explícita
+      return res.status(200).json({ 
+        success: true, 
+        user: { 
+          id: userProfile.id, 
+          email: authData.user.email, 
+          nombre: userProfile.nombre_completo,
+          rol: userProfile.rol 
+        } 
+      });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
@@ -95,6 +101,47 @@ export const AuthController = {
         return res.status(400).json({ success: false, message: error.message });
       }
       return res.status(200).json({ success: true, message: 'Correo enviado' });
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  registrarGestor: async (req, res) => {
+    try {
+      const { email, password, rol, nombre_completo, director_email } = req.body;
+      
+      // Control de acceso súper simplificado (ya que no hay token)
+      if (director_email !== 'director@yucatan.gob.mx') {
+        return res.status(403).json({ success: false, message: 'Acceso denegado. Solo el Director puede registrar cuentas.' });
+      }
+
+      if (!email || !password || !rol || !nombre_completo) {
+        return res.status(400).json({ success: false, message: 'Faltan campos obligatorios.' });
+      }
+
+      // 1. Crear usuario en Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (authError || !authData.user) {
+        return res.status(400).json({ success: false, message: authError?.message || 'Error al registrar credenciales.' });
+      }
+
+      // 2. Insertar perfil
+      const { error: profileError } = await supabase.from('perfiles').insert([{
+        id: authData.user.id,
+        nombre_completo,
+        rol,
+        dependencia_id: 1 // Por defecto o dinámico si hubiera
+      }]);
+
+      if (profileError) {
+        return res.status(500).json({ success: false, message: 'Error al asignar rol: ' + profileError.message });
+      }
+
+      return res.status(201).json({ success: true, message: 'Cuenta creada exitosamente.' });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }
