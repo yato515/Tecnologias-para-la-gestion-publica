@@ -304,7 +304,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			}
 		}
 
-		document.addEventListener('DOMContentLoaded', function () {
 		// Protect page access
 		const logged = localStorage.getItem('citizen_logged');
 
@@ -849,6 +848,5 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				badgeEl.classList.add('inline-flex');
 			}
 		}
-		}); // end DOMContentLoaded
 	</script>
 </Layout>
