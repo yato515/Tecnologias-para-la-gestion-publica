@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import logoYucatan from '../components/img/logo-estado-yucatan.webp';
 ---
 
 <Layout title="Portal de Trámites CivicFlow">
@@ -14,22 +16,13 @@ import Layout from '../layouts/Layout.astro';
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 			<div class="flex flex-col items-center text-center max-w-3xl mx-auto">
 				
-				<!-- Large Official Coat of Arms Shield Icon -->
-				<div class="w-24 h-28 flex items-center justify-center bg-yuc-green border-2 border-yuc-gold text-yuc-gold rounded-b-[40%] rounded-t-[10%] shadow-2xl mb-8 relative animate-pulse-soft">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none" class="w-16 h-18 text-yuc-gold">
-						<!-- Sun & Mountain -->
-						<circle cx="50" cy="50" r="12" stroke="currentColor" stroke-width="2" fill="currentColor" fill-opacity="0.1" />
-						<path d="M50 34v6M34 50h6M60 50h6M40 40l4 4M60 40l-4 4" stroke="currentColor" stroke-width="2" />
-						<!-- Deer (Venado) Jumping -->
-						<path d="M35 75 C45 70, 50 60, 65 65 C70 67, 75 75, 75 75 C70 73, 62 70, 58 72 C50 75, 45 78, 35 75 Z" fill="currentColor" />
-						<path d="M40 76l-3 8M48 76l-2 8M60 74l2 7M66 74l3 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-						<!-- Henequén plant silhouette -->
-						<path d="M50 90c-5-5-15-5-15 0c5 5 15 5 15 0zm0 0c5-5 15-5 15 0c-5 5-15 5-15 0z" stroke="currentColor" stroke-width="2" />
-						<path d="M50 78v15" stroke="currentColor" stroke-width="2" />
-					</svg>
-					<!-- Inner Border decoration -->
-					<div class="absolute inset-1.5 border border-yuc-gold/30 rounded-b-[38%] rounded-t-[8%] pointer-events-none"></div>
-				</div>
+				<!-- Logo Oficial del Estado de Yucatán -->
+				<Image
+					src={logoYucatan}
+					alt="Escudo Oficial del Estado de Yucatán"
+					class="h-28 w-auto object-contain mb-8"
+					loading="eager"
+				/>
 
 				<span class="px-3.5 py-1.5 rounded-full bg-yuc-gold/10 border border-yuc-gold/30 text-yuc-gold text-xs font-bold uppercase tracking-widest mb-6">GOBIERNO DEL ESTADO DE YUCATÁN</span>
 				
