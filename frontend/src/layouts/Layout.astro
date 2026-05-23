@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import { Image } from 'astro:assets';
+import logoYucatan from '../components/img/logo-estado-yucatan.webp';
 
 interface Props {
 	title: string;
@@ -45,14 +47,13 @@ const { title, description = "CivicFlow - Plataforma de Automatización de Trám
 				
 				<!-- Logo and Heraldry -->
 				<a href="/" class="flex items-center gap-3 group focus:outline-none">
-					<div class="w-12 h-12 flex items-center justify-center bg-yuc-green text-yuc-gold rounded-xl shadow-md border border-yuc-green-light transition-transform group-hover:scale-105">
-						<!-- Custom Premium SVG Logo representing Yucatan Shield / Digital Portal -->
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-7 h-7">
-							<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" fill="currentColor" fill-opacity="0.1" />
-							<path d="M12 8v8" stroke="var(--color-yuc-gold)" />
-							<path d="M9 11l3 3 3-3" stroke="var(--color-yuc-gold)" />
-							<circle cx="12" cy="6" r="1" fill="var(--color-yuc-gold)" />
-						</svg>
+					<div class="h-12 flex items-center justify-center transition-transform group-hover:scale-105">
+						<Image
+							src={logoYucatan}
+							alt="Escudo Oficial del Estado de Yucatán"
+							class="h-12 w-auto object-contain"
+							loading="eager"
+						/>
 					</div>
 					<div>
 						<div class="flex items-center gap-1.5">
