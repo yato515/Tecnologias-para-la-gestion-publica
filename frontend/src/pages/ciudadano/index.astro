@@ -115,7 +115,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						</div>
 						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
 							<span class="text-xs font-bold text-yuc-green font-display">Costo: Variable</span>
-							<a href="/ciudadano/subida?tramite=ssp" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+							<a href="/ciudadano/tramite?id=ssp" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</a>
 						</div>
@@ -163,7 +163,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						</div>
 						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
 							<span class="text-xs font-bold text-yuc-green font-display">Costo: Estatal + Federal</span>
-							<a href="/ciudadano/subida?tramite=pasaporte" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+							<a href="/ciudadano/tramite?id=pasaporte" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</a>
 						</div>
@@ -187,7 +187,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						</div>
 						<div class="pt-6 border-t border-slate-100 mt-6 flex justify-between items-center">
 							<span class="text-xs font-bold text-yuc-green font-display">Costo: Gratuito / Variable</span>
-							<a href="/ciudadano/subida?tramite=ine" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
+							<a href="/ciudadano/tramite?id=ine" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors font-display">
 								Iniciar Trámite
 							</a>
 						</div>
@@ -836,7 +836,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						openSatModal();
 						window.showToast("Se requiere RFC para trámites fiscales", "warning");
 					} else {
-						window.location.href = "/ciudadano/subida?tramite=sat";
+						window.location.href = "/ciudadano/tramite?id=sat";
 					}
 				});
 			}
@@ -857,7 +857,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					
 					// Automatically proceed to submit
 					setTimeout(() => {
-						window.location.href = "/ciudadano/subida?tramite=sat";
+						window.location.href = "/ciudadano/tramite?id=sat";
 					}, 600);
 				});
 			}
