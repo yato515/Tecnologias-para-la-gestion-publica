@@ -132,7 +132,8 @@ import Layout from '../../layouts/Layout.astro';
 			document.getElementById('lbl-upload-dept').textContent = `Dependencia: ${currentTramite.dept}`;
 
 			const slotsContainer = document.getElementById('document-slots');
-			const uploadedFiles = {}; // Holds mock file names
+			const uploadedFiles = {}; // Holds generated storage names
+			const uploadedRealNames = {}; // Holds real file names to detect duplicates
 			let hasUploadedNewFiles = false;
 
 			// Render slots
@@ -150,8 +151,8 @@ import Layout from '../../layouts/Layout.astro';
 								id="drop-zone-${doc.id}" 
 								class="border-2 border-dashed ${hasFile ? 'border-yuc-gold bg-yuc-gold/5' : 'border-slate-800 hover:border-yuc-gold/50 bg-slate-950/20'} rounded-xl p-6 text-center transition-all cursor-pointer relative group flex flex-col justify-center items-center min-h-[140px]"
 							>
-								<!-- Hidden file input -->
-								<input type="file" id="file-${doc.id}" class="absolute inset-0 opacity-0 cursor-pointer" />
+								<!-- Hidden file input (only shown when no file) -->
+								${!hasFile ? `<input type="file" id="file-${doc.id}" class="absolute inset-0 opacity-0 cursor-pointer" />` : ''}
 								
 								<div class="space-y-2 pointer-events-none" id="drop-content-${doc.id}">
 									${hasFile ? `
@@ -159,8 +160,8 @@ import Layout from '../../layouts/Layout.astro';
 										<div class="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-1">
 											<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 										</div>
-										<p class="text-xs text-white font-bold">${uploadedFiles[doc.id]}</p>
-										<p class="text-[10px] text-slate-400">Archivo verificado por In óolal Yucatan. Haga clic para reemplazar.</p>
+										<p class="text-xs text-white font-bold">${uploadedRealNames[doc.id] || uploadedFiles[doc.id]}</p>
+										<p class="text-[10px] text-slate-400">Archivo verificado por In óolal Yucatan.</p>
 									` : `
 										<!-- Empty state -->
 										<svg class="mx-auto h-8 w-8 text-slate-500 group-hover:text-yuc-gold transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -180,6 +181,16 @@ import Layout from '../../layouts/Layout.astro';
 									</div>
 								</div>
 							</div>
+
+							<!-- Quitar button (only shown when file uploaded) -->
+							${hasFile ? `
+							<div class="flex justify-end">
+								<button type="button" id="btn-quitar-${doc.id}" class="text-[10px] font-bold text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors">
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+									Quitar documento
+								</button>
+							</div>
+							` : ''}
 						</div>
 					`;
 					
@@ -187,13 +198,44 @@ import Layout from '../../layouts/Layout.astro';
 					tempDiv.innerHTML = slotHtml;
 					slotsContainer.appendChild(tempDiv.firstElementChild);
 
+					// Hook Quitar button
+					if (hasFile) {
+						const btnQuitar = document.getElementById(`btn-quitar-${doc.id}`);
+						if (btnQuitar) {
+							btnQuitar.addEventListener('click', () => {
+								// Invalidate current token if one exists
+								const currentToken = localStorage.getItem('jwt_token');
+								if (currentToken) {
+									const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+									delete tokensDict[currentToken];
+									localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
+									localStorage.removeItem('jwt_token');
+									window.showToast('⚠ Token anterior invalidado. Complete los documentos para generar uno nuevo.', 'warning');
+								}
+								delete uploadedFiles[doc.id];
+								delete uploadedRealNames[doc.id];
+								hasUploadedNewFiles = false;
+								renderSlots();
+							});
+						}
+						return; // No need to hook file input — file is already uploaded
+					}
+
 					// Hook input listener
 					const fileInput = document.getElementById(`file-${doc.id}`);
 					const dropZone = document.getElementById(`drop-zone-${doc.id}`);
 					const scanOverlay = document.getElementById(`scan-overlay-${doc.id}`);
 					const scanStepText = document.getElementById(`scan-step-${doc.id}`);
 
-					const handleUploadSimulation = (fileName) => {
+					const handleUploadSimulation = (file) => {
+						const fileName = file.name;
+						// Check for duplicate: same real filename already uploaded in any other slot
+						const isDuplicate = Object.entries(uploadedRealNames).some(([slotId, name]) => slotId !== doc.id && name === fileName);
+						if (isDuplicate) {
+							window.showToast(`El archivo "${fileName}" ya fue subido en otro apartado. Use documentos distintos.`, 'error');
+							return;
+						}
+
 						// Show validation scanner loader
 						scanOverlay.classList.remove('hidden');
 						scanStepText.textContent = "Cargando archivo...";
@@ -214,7 +256,11 @@ import Layout from '../../layouts/Layout.astro';
 							} else {
 								clearInterval(stepInterval);
 								scanOverlay.classList.add('hidden');
-								uploadedFiles[doc.id] = fileName;
+								const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
+								const timestamp = Date.now();
+								const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
+								uploadedFiles[doc.id] = uniqueName;
+								uploadedRealNames[doc.id] = fileName;
 								hasUploadedNewFiles = true;
 								renderSlots();
 								window.showToast("Cotejo automático completado con éxito", "success");
@@ -230,10 +276,7 @@ import Layout from '../../layouts/Layout.astro';
 								e.target.value = "";
 								return;
 							}
-							const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
-							const timestamp = Date.now();
-							const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
-							handleUploadSimulation(uniqueName);
+							handleUploadSimulation(file);
 						}
 					});
 
@@ -257,14 +300,12 @@ import Layout from '../../layouts/Layout.astro';
 								window.showToast("Solo se permiten archivos PDF", "error");
 								return;
 							}
-							const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
-							const timestamp = Date.now();
-							const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
-							handleUploadSimulation(uniqueName);
+							handleUploadSimulation(file);
 						}
 					});
 				});
 			};
+
 			
 			// Import from dossier section using dossier token input
 			const renderDossierImportSection = () => {

@@ -6,27 +6,33 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 <Layout title="Cola de Solicitudes">
 	
 	<!-- Manager Sub-navigation header -->
-	<div class="bg-slate-900 text-white transition-colors border-b border-slate-800">
+	<div class="bg-yuc-green-dark text-white transition-colors border-b border-yuc-gold/30">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 gap-4">
 				<div>
 					<span class="text-xs font-bold text-yuc-gold uppercase tracking-wider">GOBIERNO DEL ESTADO DE YUCATÁN</span>
 					<h1 class="text-2xl font-black font-display mt-1">Bandeja de Solicitudes Recibidas</h1>
-					<p class="text-xs text-slate-400 mt-1">Gestión operativa de la cola de expedientes digitales.</p>
+					<p class="text-xs text-slate-300 mt-1">Funcionario: <span id="lbl-gestor-email-cola" class="font-bold text-white">...</span> | Rol: <span id="lbl-gestor-role-cola" class="font-bold text-yuc-gold">...</span></p>
 				</div>
-				<div>
-					<button id="btn-export-csv" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+				<div class="flex items-center gap-3">
+					<button id="btn-export-csv" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-md border border-yuc-gold/20">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"></path></svg>
 						<span>Exportar a Excel (CSV)</span>
 					</button>
+					<button id="btn-gestor-logout-cola" class="px-4 py-2 border border-yuc-gold/30 hover:bg-yuc-green text-slate-200 rounded-lg text-xs font-bold transition-all">Cerrar Sesión</button>
 				</div>
 			</div>
 
 			<!-- Submenu -->
-			<div class="flex gap-6 text-sm border-t border-slate-800/60 pt-1">
-				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Dashboard</a>
-				<a href="/gestor/cola" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all">Cola de Solicitudes</a>
-				<a href="/gestor/audit" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-white transition-all">Logs de Auditoría</a>
+			<div class="flex gap-6 text-sm border-t border-yuc-gold/20 pt-1">
+				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Mesa de Trabajo</a>
+				<a href="/gestor/vencidas" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Solicitudes Vencidas</a>
+				<a href="/gestor/cola" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all">Bandeja de Entrada</a>
+				<a href="/gestor/audit" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Logs de Auditoría</a>
+				<a href="#" id="tab-admin-cola" class="hidden pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+					<svg class="w-4 h-4 text-yuc-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+					<span>Administrar Cuentas</span>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -98,6 +104,22 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 		if (isLogged !== 'true') {
 			window.location.href = '/gestor';
 		} else {
+			// Populate header
+			const gestorEmail = localStorage.getItem('gestor_email') || 'N/A';
+			const gestorRole = localStorage.getItem('gestor_role') || 'N/A';
+			document.getElementById('lbl-gestor-email-cola').textContent = gestorEmail;
+			document.getElementById('lbl-gestor-role-cola').textContent = gestorRole;
+			if (gestorRole.toLowerCase() === 'aprobador') {
+				document.getElementById('tab-admin-cola').classList.remove('hidden');
+				document.getElementById('tab-admin-cola').href = '/gestor/dashboard';
+			}
+			document.getElementById('btn-gestor-logout-cola').addEventListener('click', () => {
+				localStorage.removeItem('gestor_logged');
+				localStorage.removeItem('gestor_email');
+				localStorage.removeItem('gestor_role');
+				window.showToast('Sesión cerrada', 'info');
+				setTimeout(() => { window.location.href = '/gestor'; }, 600);
+			});
 
 			const defaultRequests = [
 				{ folio: "TRM-2026-00104", name: "Acreditación de Productor Henequenero", dept: "Desarrollo Rural", date: "2026-04-12", status: "Aprobado", citizen_fullname: "Manuel Pech" },
