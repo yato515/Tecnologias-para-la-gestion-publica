@@ -26,7 +26,7 @@ const { title, description = "In óolal Yucatan - Plataforma de Automatización 
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;550;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 	</head>
-	<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+	<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
 		
 		<!-- Official Federal/State Ribbon -->
 		<div class="bg-yuc-green-dark text-[10px] text-slate-300 font-semibold tracking-wider py-1.5 px-4 flex justify-between items-center border-b border-yuc-green/30 select-none">
@@ -42,7 +42,7 @@ const { title, description = "In óolal Yucatan - Plataforma de Automatización 
 		</div>
 
 		<!-- Main Premium Header -->
-		<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+		<header class="sticky top-0 z-40 bg-yuc-green-dark/95 backdrop-blur-md border-b border-yuc-gold/30 shadow-md">
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 				
 				<!-- Logo and Heraldry -->
@@ -51,16 +51,16 @@ const { title, description = "In óolal Yucatan - Plataforma de Automatización 
 						<Image
 							src={logoYucatan}
 							alt="Escudo Oficial del Estado de Yucatán"
-							class="h-12 w-auto object-contain"
+							class="h-12 w-auto object-contain brightness-0 invert"
 							loading="eager"
 						/>
 					</div>
 					<div>
 						<div class="flex items-center gap-1.5">
-							<span class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-800">In óolal <span class="text-yuc-green">Yucatan</span></span>
-							<span class="px-1.5 py-0.5 rounded bg-yuc-gold/15 text-yuc-gold-dark font-bold text-[9px] uppercase tracking-wider">Yucatán</span>
+							<span class="font-extrabold text-lg sm:text-xl tracking-tight text-white font-display">In óolal <span class="text-yuc-gold">Yucatan</span></span>
+							<span class="px-1.5 py-0.5 rounded bg-yuc-gold/20 text-yuc-gold font-bold text-[9px] uppercase tracking-wider">Yucatán</span>
 						</div>
-						<p class="text-[10px] text-slate-500 font-medium leading-none mt-0.5">Ventanilla Única Digital de Trámites</p>
+						<p class="text-[10px] text-slate-300 font-medium leading-none mt-0.5">Ventanilla Única Digital de Trámites</p>
 					</div>
 				</a>
 
@@ -69,7 +69,7 @@ const { title, description = "In óolal Yucatan - Plataforma de Automatización 
 					<a 
 						id="nav-role-link"
 						href="/gestor" 
-						class="px-4 py-2 text-xs font-bold rounded-lg bg-yuc-green text-white hover:bg-yuc-green-light shadow-sm transition-all focus:ring-2 focus:ring-yuc-green focus:ring-offset-2 flex items-center gap-1.5"
+						class="px-4 py-2 text-xs font-bold rounded-lg bg-yuc-gold text-slate-950 hover:bg-yuc-gold-light shadow-sm transition-all focus:ring-2 focus:ring-yuc-gold flex items-center gap-1.5"
 					>
 						<span>Panel Gestor</span>
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">

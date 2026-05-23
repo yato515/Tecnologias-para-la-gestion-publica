@@ -153,55 +153,125 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			<!-- Admin View (Hidden by default) -->
 			<div id="admin-view" class="hidden space-y-8">
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
-					<div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
-						<div class="w-10 h-10 rounded-full bg-yuc-gold/20 flex items-center justify-center text-yuc-gold-dark">
+				<div class="bg-slate-900 border border-yuc-gold/30 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+					<div class="absolute top-0 left-0 w-full h-1 bg-yuc-gold"></div>
+					<div class="flex items-center gap-3 border-b border-slate-700 pb-4 mb-6 relative z-10">
+						<div class="w-10 h-10 rounded-full bg-yuc-gold/20 flex items-center justify-center text-yuc-gold">
 							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
 						</div>
 						<div>
-							<h3 class="text-lg font-bold text-slate-850 dark:text-white font-display">Registrar Nuevo Funcionario</h3>
-							<p class="text-xs text-slate-500 dark:text-slate-450">Agrega cuentas para revisores u otros aprobadores de dependencias.</p>
+							<h3 class="text-lg font-bold text-white font-display">Registrar Nuevo Funcionario</h3>
+							<p class="text-xs text-slate-400">Agrega cuentas para revisores u otros aprobadores de dependencias.</p>
 						</div>
 					</div>
 
-					<form id="form-register-gestor" class="space-y-5 max-w-xl">
+					<form id="form-register-gestor" class="space-y-5 max-w-xl relative z-10">
 						<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
 							<div class="sm:col-span-2">
-								<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nombre Completo</label>
-								<input type="text" id="reg-name" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none" placeholder="Juan Pérez" />
+								<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nombre Completo</label>
+								<input type="text" id="reg-name" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm focus:ring-2 focus:ring-yuc-gold focus:border-yuc-gold focus:outline-none placeholder-slate-500" placeholder="Juan Pérez" />
 							</div>
 							
 							<div class="sm:col-span-2">
-								<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Correo Institucional</label>
-								<input type="email" id="reg-email" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none" placeholder="funcionario@yucatan.gob.mx" />
+								<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Correo Institucional</label>
+								<input type="email" id="reg-email" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm focus:ring-2 focus:ring-yuc-gold focus:border-yuc-gold focus:outline-none placeholder-slate-500" placeholder="funcionario@yucatan.gob.mx" />
 							</div>
 
 							<div>
-								<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Contraseña Inicial</label>
-								<input type="password" id="reg-pwd" required minlength="6" class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none" placeholder="••••••••" />
+								<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Contraseña Inicial</label>
+								<input type="password" id="reg-pwd" required minlength="6" class="block w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm focus:ring-2 focus:ring-yuc-gold focus:border-yuc-gold focus:outline-none placeholder-slate-500" placeholder="••••••••" />
 							</div>
 
 							<div>
-								<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Rol en el Sistema</label>
-								<select id="reg-role" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-sm focus:ring-2 focus:ring-yuc-green focus:outline-none">
+								<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rol en el Sistema</label>
+								<select id="reg-role" required class="block w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm focus:ring-2 focus:ring-yuc-gold focus:border-yuc-gold focus:outline-none">
 									<option value="Revisor">Revisor Operativo</option>
 									<option value="Aprobador">Director / Aprobador</option>
 								</select>
 							</div>
 						</div>
 
-						<div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
-							<button type="submit" class="px-6 py-2.5 bg-yuc-green hover:bg-yuc-green-light text-white font-bold rounded-xl shadow-md transition-all text-sm flex items-center gap-2">
+						<div class="pt-4 border-t border-slate-800 flex justify-end">
+							<button type="submit" class="px-6 py-2.5 bg-yuc-gold hover:bg-yuc-gold-dark text-white font-bold rounded-xl shadow-md transition-all text-sm flex items-center gap-2">
 								<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
 								<span>Crear Cuenta</span>
 							</button>
 						</div>
 					</form>
 				</div>
+
+				<!-- Tabla de Personal -->
+				<div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+					<div class="absolute inset-0 bg-[url('/bg-pattern.svg')] opacity-5 z-0 pointer-events-none"></div>
+					<div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6 relative z-10">
+						<div class="flex items-center gap-3">
+							<div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+								<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+							</div>
+							<div>
+								<h3 class="text-lg font-bold text-white font-display">Personal Registrado</h3>
+								<p class="text-xs text-slate-400">Listado de gestores, revisores y aprobadores actuales.</p>
+							</div>
+						</div>
+						<button id="btn-refresh-personal" class="p-2 text-slate-400 hover:text-yuc-gold transition-colors rounded-lg bg-slate-800 hover:bg-slate-700" title="Actualizar lista">
+							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+						</button>
+					</div>
+					
+					<div class="overflow-x-auto relative z-10">
+						<table class="w-full text-left text-sm whitespace-nowrap">
+							<thead class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
+								<tr>
+									<th class="pb-3 font-bold">Nombre Completo</th>
+									<th class="pb-3 font-bold">Rol</th>
+									<th class="pb-3 font-bold text-right">Acciones</th>
+								</tr>
+							</thead>
+							<tbody id="tbl-personal-body" class="divide-y divide-slate-800 text-slate-300 text-xs">
+								<tr>
+									<td colspan="3" class="py-8 text-center text-slate-500">Cargando personal...</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 
 		</div>
 
+	</div>
+
+	<!-- Modal Editar Personal -->
+	<div id="modal-edit-personal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+		<div class="bg-slate-900 border border-yuc-gold/30 rounded-2xl w-full max-w-md shadow-2xl transform transition-all relative overflow-hidden">
+			<div class="absolute top-0 left-0 w-full h-1 bg-yuc-gold"></div>
+			<div class="p-6 border-b border-slate-800 flex items-center justify-between relative z-10">
+				<h3 class="text-lg font-bold text-white font-display">Modificar Funcionario</h3>
+				<button id="btn-close-edit-modal" class="text-slate-400 hover:text-white transition-colors">
+					<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+				</button>
+			</div>
+			<div class="p-6 space-y-4 relative z-10">
+				<input type="hidden" id="edit-id" />
+				<div>
+					<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Nombre Completo</label>
+					<input type="text" id="edit-name" class="block w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm focus:ring-2 focus:ring-yuc-gold focus:outline-none" />
+				</div>
+				<div>
+					<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rol</label>
+					<select id="edit-role" class="block w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-white text-sm focus:ring-2 focus:ring-yuc-gold focus:outline-none">
+						<option value="revisor">Revisor Operativo</option>
+						<option value="aprobador">Director / Aprobador</option>
+					</select>
+				</div>
+				<div class="pt-4 flex gap-3 justify-end">
+					<button id="btn-cancel-edit" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">Cancelar</button>
+					<button id="btn-save-edit" class="px-4 py-2 bg-yuc-gold hover:bg-yuc-gold-dark text-white rounded-xl text-xs font-bold shadow-md transition-all flex items-center gap-1.5">
+						<span>Guardar Cambios</span>
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<!-- ChartJS Script CDN -->
@@ -225,7 +295,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			document.getElementById('lbl-gestor-role').textContent = role;
 
 			// Enable admin tab if Aprobador
-			if (role === 'Aprobador') {
+			if (role.toLowerCase() === 'aprobador') {
 				document.getElementById('tab-admin').classList.remove('hidden');
 			}
 
@@ -496,6 +566,57 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			setTimeout(renderCharts, 200);
 
+			// Staff Table Logic
+			const loadPersonal = async () => {
+				const tbody = document.getElementById('tbl-personal-body');
+				tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400">Cargando personal...</td></tr>';
+				try {
+					const res = await fetch(`${API_URL}/api/gestores/personal`);
+					const json = await res.json();
+					if (json.success && json.data) {
+						tbody.innerHTML = '';
+						if (json.data.length === 0) {
+							tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-slate-400">No hay personal registrado</td></tr>';
+						} else {
+							json.data.forEach(p => {
+								const tr = document.createElement('tr');
+								tr.innerHTML = `
+									<td class="py-4 font-semibold">${p.nombre_completo || 'Sin nombre'}</td>
+									<td class="py-4">
+										<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${p.rol === 'aprobador' ? 'bg-yuc-gold/10 text-yuc-gold-dark' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}">
+											${p.rol}
+										</span>
+									</td>
+									<td class="py-4 text-right">
+										<button class="btn-edit-staff px-3 py-1.5 text-[10px] font-bold text-yuc-green border border-yuc-green/30 hover:bg-yuc-green hover:text-white rounded-lg transition-colors" data-id="${p.id}" data-name="${p.nombre_completo || ''}" data-role="${p.rol}">
+											Modificar
+										</button>
+									</td>
+								`;
+								tbody.appendChild(tr);
+							});
+
+							// Attach edit events
+							document.querySelectorAll('.btn-edit-staff').forEach(btn => {
+								btn.addEventListener('click', (e) => {
+									const id = e.currentTarget.getAttribute('data-id');
+									const name = e.currentTarget.getAttribute('data-name');
+									const r = e.currentTarget.getAttribute('data-role');
+									
+									document.getElementById('edit-id').value = id;
+									document.getElementById('edit-name').value = name;
+									document.getElementById('edit-role').value = r;
+									
+									document.getElementById('modal-edit-personal').classList.remove('hidden');
+								});
+							});
+						}
+					}
+				} catch (err) {
+					tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center text-red-500">Error al cargar datos</td></tr>';
+				}
+			};
+
 			// Admin UI logic
 			document.getElementById('tab-admin')?.addEventListener('click', (e) => {
 				e.preventDefault();
@@ -503,6 +624,38 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				document.getElementById('gestor-dashboard-content').children[1].classList.add('hidden'); // hide requests
 				document.getElementById('gestor-dashboard-content').children[2].classList.add('hidden'); // hide charts
 				document.getElementById('admin-view').classList.remove('hidden');
+				loadPersonal();
+			});
+
+			document.getElementById('btn-refresh-personal')?.addEventListener('click', loadPersonal);
+
+			// Edit modal events
+			const closeEditModal = () => document.getElementById('modal-edit-personal').classList.add('hidden');
+			document.getElementById('btn-close-edit-modal')?.addEventListener('click', closeEditModal);
+			document.getElementById('btn-cancel-edit')?.addEventListener('click', closeEditModal);
+			
+			document.getElementById('btn-save-edit')?.addEventListener('click', async () => {
+				const id = document.getElementById('edit-id').value;
+				const nombre_completo = document.getElementById('edit-name').value.trim();
+				const rol = document.getElementById('edit-role').value;
+
+				try {
+					const res = await fetch(`${API_URL}/api/gestores/personal/${id}`, {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ nombre_completo, rol, director_email: gestorEmail })
+					});
+					const json = await res.json();
+					if (json.success) {
+						window.showToast("Datos de funcionario actualizados", "success");
+						closeEditModal();
+						loadPersonal();
+					} else {
+						window.showToast(json.message || "Error al actualizar", "error");
+					}
+				} catch (err) {
+					window.showToast("Error de red", "error");
+				}
 			});
 
 			document.getElementById('form-register-gestor')?.addEventListener('submit', async (e) => {
@@ -528,6 +681,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					if (json.success) {
 						window.showToast("Cuenta de funcionario registrada exitosamente", "success");
 						document.getElementById('form-register-gestor').reset();
+						loadPersonal();
 					} else {
 						window.showToast(json.message || "Error al registrar la cuenta", "error");
 					}

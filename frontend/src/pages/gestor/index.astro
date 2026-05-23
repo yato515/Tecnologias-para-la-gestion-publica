@@ -137,17 +137,22 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				window.showToast("Por favor, ingresa tu correo institucional primero.", "error");
 				return;
 			}
+			
+			const newPassword = prompt(`Introduce la nueva contraseña para ${email}:\n(Mínimo 6 caracteres)`);
+			if (!newPassword) return;
+
 			try {
-				const res = await fetch(`${API_URL}/api/auth/recuperar`, {
+				const res = await fetch(`${API_URL}/api/auth/reset-manual`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email })
+					body: JSON.stringify({ email, new_password: newPassword })
 				});
 				const json = await res.json();
 				if (json.success) {
-					window.showToast("Se ha enviado un enlace de recuperación a tu correo.", "success");
+					window.showToast("Contraseña actualizada exitosamente desde el sistema.", "success");
+					document.getElementById('password').value = newPassword;
 				} else {
-					window.showToast(json.message || "Error al recuperar la contraseña.", "error");
+					window.showToast(json.message || "Error al actualizar contraseña.", "error");
 				}
 			} catch (err) {
 				window.showToast("Error al conectar con el servidor.", "error");

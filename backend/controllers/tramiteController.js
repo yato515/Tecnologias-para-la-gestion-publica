@@ -1,4 +1,33 @@
-import { supabase } from '../config/supabase.service.js';
+import { supabase, supabaseAdmin } from '../config/supabase.service.js';
+
+const ensureBucketExists = async () => {
+  try {
+    const client = supabaseAdmin || supabase;
+    if (!supabaseAdmin) {
+      console.warn("Advertencia: SUPABASE_SERVICE_KEY no está definida en .env. Se intentará asegurar el bucket usando la clave pública, lo cual puede fallar por políticas RLS.");
+    }
+    const { data: buckets, error: getError } = await client.storage.listBuckets();
+    if (getError) throw getError;
+    const exists = buckets.some(b => b.name === 'documentos');
+    if (!exists) {
+      const { error: createError } = await client.storage.createBucket('documentos', {
+        public: false,
+        allowedMimeTypes: ['application/pdf', 'image/jpeg', 'image/png'],
+        fileSizeLimit: 5242880 // 5MB
+      });
+      if (createError) throw createError;
+      console.log("Bucket 'documentos' creado exitosamente.");
+    }
+  } catch (err) {
+    console.error("Error al asegurar la existencia del bucket 'documentos':", err.message);
+    if (!supabaseAdmin) {
+      console.error("Tip: Agrega SUPABASE_SERVICE_KEY (service_role secret key) a tu archivo backend/.env para omitir las políticas RLS al inicializar buckets.");
+    }
+  }
+};
+
+// Ejecutar al iniciar
+ensureBucketExists();
 
 export const TramiteController = {
 
@@ -74,9 +103,18 @@ export const TramiteController = {
         });
       }
 
+      const targetSolicitudId = (id && id !== 'null' && id !== 'undefined') ? id : null;
+
       const { data, error } = await supabase
         .from('documentos')
-        .insert([{ solicitud_id: id, nombre, storage_path, subido_por }])
+        .insert([{ 
+          solicitud_id: targetSolicitudId, 
+          nombre, 
+          storage_path, 
+          subido_por,
+          usuario_id: req.user ? req.user.id : subido_por,
+          vigente: true
+        }])
         .select()
         .single();
       if (error) throw error;
