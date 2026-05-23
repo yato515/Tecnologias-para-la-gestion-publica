@@ -78,7 +78,8 @@ export const TramiteController = {
         });
       }
 
-      const { data, error } = await supabase
+      const client = supabaseAdmin || supabase;
+      const { data, error } = await client
         .from('solicitudes')
         .insert([{ ciudadano_id, tramite_id, dependencia_id, campos_respuesta: campos_respuesta || {} }])
         .select()

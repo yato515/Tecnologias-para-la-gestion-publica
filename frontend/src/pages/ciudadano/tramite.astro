@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Iniciar Solicitud de Trámite">
@@ -129,52 +130,64 @@ import Layout from '../../layouts/Layout.astro';
 		</div>
 	</div>
 
-	<script is:inline>
-		// Protect page access
+	<script is:inline define:vars={{ API_URL }}>
 		const citizenLogged = localStorage.getItem('citizen_logged');
 		if (citizenLogged !== 'true') {
 			window.location.href = '/ciudadano/login';
 		} else {
-			
-			// Populate user session data (Mockup of identity)
+
 			document.getElementById('frm-curp').value = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('frm-email').value = localStorage.getItem('citizen_email') || 'N/A';
 			document.getElementById('frm-fullname').value = localStorage.getItem('citizen_fullname') || 'Ciudadano de Prueba';
 
-			// Parse URL parameter to determine selected procedure
 			const params = new URLSearchParams(window.location.search);
 			const procedureId = params.get('id') || 'residencia';
 
-			const procedures = {
-				residencia: {
-					title: "Constancia de Residencia",
-					dept: "Catastro y Registro del Estado de Yucatán",
-				},
-				licencia: {
-					title: "Licencia de Funcionamiento Comercial",
-					dept: "Dirección de Fomento Económico del Estado",
-				},
-				henequenero: {
-					title: "Acreditación de Productor Henequenero",
-					dept: "Secretaría de Desarrollo Rural del Estado",
-				},
-				suelo: {
-					title: "Permiso de Uso de Suelo",
-					dept: "Secretaría de Desarrollo Urbano y Obras Públicas",
+			const proceduresFallback = {
+				residencia:  { title: "Constancia de Residencia",              dept: "Catastro y Registro del Estado de Yucatán" },
+				licencia:    { title: "Licencia de Funcionamiento Comercial",  dept: "Dirección de Fomento Económico del Estado" },
+				ssp:         { title: "Licencia de Conducir y Placas",         dept: "Secretaría de Seguridad Pública (SSP)" },
+				sat:         { title: "Inscripción en el RFC (SAT)",           dept: "Hacienda / SAT Estatal" },
+				pasaporte:   { title: "Trámite de Pasaporte Mexicano",         dept: "Secretaría de Relaciones Exteriores (SRE)" },
+				ine:         { title: "CURP y Actas Certificadas",             dept: "Registro Civil / INE" },
+				henequenero: { title: "Acreditación de Productor Henequenero", dept: "Secretaría de Desarrollo Rural del Estado" },
+				suelo:       { title: "Permiso de Uso de Suelo",               dept: "Secretaría de Desarrollo Urbano y Obras Públicas" }
+			};
+
+			const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(procedureId);
+			let tramiteData = null;
+
+			const initPage = async () => {
+				try {
+					const res = await fetch(`${API_URL}/api/tramites/catalogo`);
+					const json = await res.json();
+					if (json.success && Array.isArray(json.data)) {
+						if (isUUID) {
+							tramiteData = json.data.find(t => t.id === procedureId);
+						} else {
+							const fb = proceduresFallback[procedureId];
+							if (fb) tramiteData = json.data.find(t => t.nombre === fb.title);
+						}
+					}
+				} catch (err) {
+					console.warn("No se pudo cargar el catálogo desde la API:", err);
+				}
+
+				if (tramiteData) {
+					document.getElementById('lbl-tramite-title').textContent = tramiteData.nombre;
+					document.getElementById('lbl-tramite-dept').textContent = `Dependencia: ${tramiteData.dependencia?.nombre || 'Gobierno de Yucatán'}`;
+				} else {
+					const fb = proceduresFallback[procedureId] || { title: "Trámite Estatal", dept: "Dependencia Gubernamental" };
+					document.getElementById('lbl-tramite-title').textContent = fb.title;
+					document.getElementById('lbl-tramite-dept').textContent = `Dependencia: ${fb.dept}`;
 				}
 			};
 
-			// Fallback if the procedure ID comes from API (Mocking title for demo)
-			const currentProcedure = procedures[procedureId] || { title: "Trámite Estatal (ID: " + procedureId + ")", dept: "Dependencia Gubernamental" };
+			initPage();
 
-			document.getElementById('lbl-tramite-title').textContent = currentProcedure.title;
-			document.getElementById('lbl-tramite-dept').textContent = `Dependencia: ${currentProcedure.dept}`;
-
-			// Radio Button Logic
 			const radios = document.querySelectorAll('input[name="hasToken"]');
 			const sectionYes = document.getElementById('section-yes-token');
 			const sectionNo = document.getElementById('section-no-token');
-
 			radios.forEach(radio => {
 				radio.addEventListener('change', (e) => {
 					if (e.target.value === 'yes') {
@@ -189,8 +202,7 @@ import Layout from '../../layouts/Layout.astro';
 				});
 			});
 
-			// Form Submit Logic
-			document.getElementById('token-form').addEventListener('submit', (e) => {
+			document.getElementById('token-form').addEventListener('submit', async (e) => {
 				e.preventDefault();
 
 				const tokenInput = document.getElementById('frm-token').value.trim().toUpperCase();
@@ -201,62 +213,67 @@ import Layout from '../../layouts/Layout.astro';
 					return;
 				}
 
-				// Validate Token against localStorage (civicflow_tokens)
 				const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
-				// We also allow the current active token in 'jwt_token' for demo purposes
 				const activeToken = localStorage.getItem('jwt_token');
-
 				if (!tokensDict[tokenInput] && tokenInput !== activeToken) {
-					window.showToast("Token inválido o no encontrado. Verifique que lo haya escrito correctamente.", "error");
+					window.showToast("Token inválido o no encontrado.", "error");
 					return;
 				}
 
-				// Generate Folio
-				const randomNum = Math.floor(100 + Math.random() * 900);
-				const randomFolio = `TRM-2026-00${randomNum}`;
-				const currentDateStr = new Date().toISOString().split('T')[0];
+				const ciudadanoId = localStorage.getItem('citizen_id');
+				let folioFinal = null;
 
-				// Save new request in local requests array
-				const requests = JSON.parse(localStorage.getItem('in_oolal_requests') || localStorage.getItem('civicflow_requests')) || [];
-				
-				const newReq = {
-					folio: randomFolio,
-					name: currentProcedure.title,
-					dept: currentProcedure.dept,
-					date: currentDateStr,
+				console.log('🔍 DEBUG submit:', { procedureId, ciudadanoId, tramiteData });
+
+				if (ciudadanoId && ciudadanoId !== 'demo-citizen-id' && tramiteData) {
+					try {
+						const res = await fetch(`${API_URL}/api/tramites/solicitudes`, {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								ciudadano_id: ciudadanoId,
+								tramite_id: tramiteData.id,
+								dependencia_id: tramiteData.dependencia_id,
+								campos_respuesta: { token_expediente: tokenInput }
+							})
+						});
+						const json = await res.json();
+						console.log('Respuesta API:', json);
+						if (json.success && json.data) {
+							folioFinal = json.data.folio || json.data.id;
+							window.showToast("¡Solicitud registrada en el sistema!", "success");
+							setTimeout(() => {
+								window.location.href = `/ciudadano/exito?token=${tokenInput}&folio=${folioFinal}&tramite=${procedureId}`;
+							}, 1500);
+							return;
+						}
+					} catch (err) {
+						console.warn("Error API, usando modo local:", err);
+					}
+				}
+
+				// Fallback localStorage
+				const randomNum = Math.floor(100 + Math.random() * 900);
+				folioFinal = `TRM-2026-00${randomNum}`;
+				const fb = proceduresFallback[procedureId] || { title: "Trámite", dept: "Gobierno" };
+				const requests = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
+				requests.push({
+					folio: folioFinal,
+					name: tramiteData?.nombre || fb.title,
+					dept: tramiteData?.dependencia?.nombre || fb.dept,
+					date: new Date().toISOString().split('T')[0],
 					status: "Recibido",
 					token: tokenInput,
 					citizen_curp: localStorage.getItem('citizen_curp'),
 					citizen_fullname: localStorage.getItem('citizen_fullname'),
 					citizen_email: localStorage.getItem('citizen_email')
-				};
-
-				requests.push(newReq);
-				localStorage.setItem('in_oolal_requests', JSON.stringify(requests));
-				localStorage.setItem('civicflow_requests', JSON.stringify(requests)); // Backup for compatibility
-
-				// Audit Log
-				const localLogs = JSON.parse(localStorage.getItem('in_oolal_audit_logs') || localStorage.getItem('civicflow_audit_logs')) || [];
-				localLogs.push({
-					id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-					folio: randomFolio,
-					user_id: localStorage.getItem('citizen_email'),
-					rol: "Ciudadano",
-					estado_anterior: "-",
-					estado_nuevo: "Recibido",
-					ip: "Portal Ciudadano",
-					timestamp: new Date().toLocaleString()
 				});
-				localStorage.setItem('in_oolal_audit_logs', JSON.stringify(localLogs));
-				localStorage.setItem('civicflow_audit_logs', JSON.stringify(localLogs)); // Backup
-
-				window.showToast(`¡Solicitud enviada exitosamente!`, "success");
-				
-				// Redirect to Success
+				localStorage.setItem('civicflow_requests', JSON.stringify(requests));
+				localStorage.setItem('in_oolal_requests', JSON.stringify(requests));
+				window.showToast("¡Solicitud enviada exitosamente!", "success");
 				setTimeout(() => {
-					window.location.href = `/ciudadano/exito?token=${tokenInput}&folio=${randomFolio}&tramite=${procedureId}`;
+					window.location.href = `/ciudadano/exito?token=${tokenInput}&folio=${folioFinal}&tramite=${procedureId}`;
 				}, 1500);
-
 			});
 		}
 	</script>
