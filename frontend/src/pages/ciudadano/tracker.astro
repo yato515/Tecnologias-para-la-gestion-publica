@@ -252,6 +252,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const json = await res.json();
 				if (json.success && json.data) {
 					const s = json.data;
+					window.currentTrackerReqId = s.id;
 					req = {
 						folio: s.folio || s.id,
 						name: s.tramite?.nombre || 'Trámite',
@@ -292,13 +293,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			// Status badge
 			const badge = document.getElementById('lbl-req-status-badge');
-			badge.textContent = req.status;
-			let badgeClass = 'bg-slate-100 text-slate-700 border border-slate-200';
-			if (req.status === 'En revisión' || req.status === 'En revisión con sistemas oficiales') badgeClass = 'bg-amber-50 text-amber-800 border border-amber-200';
-			else if (req.status === 'Aprobado') badgeClass = 'bg-emerald-50 text-emerald-800 border border-emerald-200';
-			else if (req.status === 'Documentación incompleta') badgeClass = 'bg-orange-50 text-orange-850 border border-orange-200';
-			else if (req.status === 'Rechazado' || req.status === 'Declinado') badgeClass = 'bg-red-50 text-red-800 border border-red-200';
-			else if (req.status === 'Recibido') badgeClass = 'bg-blue-50 text-blue-800 border border-blue-200';
+			let badgeClass = 'bg-slate-100 text-slate-700';
+			let displayStatus = req.status;
+			if (req.status === 'documentacion_incompleta') { badgeClass = 'bg-orange-50 text-orange-800 border border-orange-200'; displayStatus = 'Documentación Incompleta'; }
+			else if (req.status === 'en_revision') { badgeClass = 'bg-purple-50 text-purple-800 border border-purple-200'; displayStatus = 'En Revisión Oficial'; }
+			else if (req.status === 'aprobado') { badgeClass = 'bg-emerald-50 text-emerald-800 border border-emerald-200'; displayStatus = 'Aprobado'; }
+			else if (req.status === 'rechazado' || req.status === 'declinado') { badgeClass = 'bg-red-50 text-red-800 border border-red-200'; displayStatus = 'Declinado'; }
+			else if (req.status === 'recibido') { badgeClass = 'bg-blue-50 text-blue-800 border border-blue-200'; displayStatus = 'Recibido'; }
+			badge.textContent = displayStatus;
 			badge.className = `inline-block px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
 
 			// Timeline Nodes
@@ -320,28 +322,23 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			document.getElementById('approved-box').classList.add('hidden');
 
 			// Check status transitions
-			if (req.status === 'Recibido') {
+			if (req.status === 'recibido') {
 				node1.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs shadow-sm";
 				lineBar.style.width = "0%";
 				lineBar.style.height = "0%";
-			} else if (req.status === 'En revisión' || req.status === 'En revisión con sistemas oficiales') {
+			} else if (req.status === 'en_revision') {
 				node1.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs";
 				node2.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-white text-yuc-green flex items-center justify-center font-bold text-xs shadow-sm ring-4 ring-yuc-green/10";
 				lineBar.style.width = "50%";
 				lineBar.style.height = "50%";
-			} else if (req.status === 'Documentación incompleta') {
-				// Show correction highlight
+			} else if (req.status === 'documentacion_incompleta') {
 				node1.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs";
 				node2.className = "w-6 h-6 rounded-full border-2 border-orange-500 bg-orange-500 text-white flex items-center justify-center font-bold text-xs shadow-sm";
 				lineBar.style.width = "50%";
 				lineBar.style.height = "50%";
 				document.getElementById('warning-correction-box').classList.remove('hidden');
-				
-				// Read reason from last log
-				const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-				const lastLog = auditLogs.reverse().find(l => l.folio === req.folio && l.estado_nuevo === 'Documentación incompleta');
-				document.getElementById('lbl-correction-reason').textContent = lastLog ? lastLog.comentario : 'El comprobante de domicilio no coincide con la INE cargada.';
-			} else if (req.status === 'Aprobado') {
+				document.getElementById('lbl-correction-reason').textContent = req.comments || 'Se requieren correcciones en sus documentos.';
+			} else if (req.status === 'aprobado') {
 				node1.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs";
 				node2.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs";
 				node3.className = "w-6 h-6 rounded-full border-2 border-emerald-500 bg-emerald-500 text-white flex items-center justify-center font-bold text-xs shadow-sm";
@@ -354,7 +351,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				lineBar.style.width = "100%";
 				lineBar.style.height = "100%";
 				document.getElementById('approved-box').classList.remove('hidden');
-			} else if (req.status === 'Rechazado' || req.status === 'Declinado') {
+			} else if (req.status === 'rechazado' || req.status === 'declinado') {
 				node1.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs";
 				node2.className = "w-6 h-6 rounded-full border-2 border-yuc-green bg-yuc-green text-white flex items-center justify-center font-bold text-xs";
 				node3.className = "w-6 h-6 rounded-full border-2 border-red-500 bg-red-500 text-white flex items-center justify-center font-bold text-xs shadow-md";
@@ -426,53 +423,58 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 		});
 
 		// Demo Advance Simulation button click handler
-		document.getElementById('btn-demo-sim').addEventListener('click', () => {
-			if (!activeFolio) return;
-			const localRequests = localStorage.getItem('civicflow_requests') || '[]';
-			const requests = JSON.parse(localRequests);
-			const idx = requests.findIndex(r => r.folio === activeFolio);
-			if(idx === -1) return;
+		document.getElementById('btn-demo-sim').addEventListener('click', async () => {
+			if (!activeFolio || !window.currentTrackerReqId) return;
+			const btn = document.getElementById('btn-demo-sim');
+			btn.disabled = true;
+			btn.textContent = 'Simulando Proceso Automático...';
+			btn.classList.add('opacity-70', 'cursor-not-allowed');
 			
-			const currentStatus = requests[idx].status;
-			let nextStatus = 'En revisión con sistemas oficiales';
-			let comment = "El sistema In óolal Yucatan inició la verificación de identidad del ciudadano.";
-			let actor = 'sistema_automatico@yucatan.gob.mx';
-			let actorRol = 'In óolal Yucatan Algoritmo';
+			try {
+				// Paso 1: En Revisión
+				let res = await fetch(`${API_URL}/api/gestores/solicitudes/${window.currentTrackerReqId}/estado`, {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						estado_nuevo: 'en_revision',
+						notas: 'El sistema In óolal Yucatan inició la verificación de identidad del ciudadano mediante cruce de datos.',
+						usuario_id: 'sistema_automatico@yucatan.gob.mx',
+						ip: '127.0.0.1'
+					})
+				});
+				if(res.ok) {
+					window.showToast("Actualizando: En revisión oficial", "info");
+					await executeTrackingSearch(activeFolio);
+				}
+				
+				// Esperar 2.5 segundos para ver la barra en medio
+				await new Promise(resolve => setTimeout(resolve, 2500));
 
-			if (currentStatus === 'Recibido') {
-				nextStatus = 'En revisión con sistemas oficiales';
-			} else if (currentStatus === 'En revisión con sistemas oficiales') {
-				nextStatus = 'Aprobado';
-				comment = "Cruce de bases catastrales e INE validado. Aprobación emitida con FEA por el Director.";
-				actor = 'director_catastro@yucatan.gob.mx';
-				actorRol = 'Aprobador';
-			} else {
-				nextStatus = 'Recibido';
-				comment = "Re-sometido para demostración.";
-				actor = 'ciudadano@yucatan.gob.mx';
-				actorRol = 'Ciudadano';
+				// Paso 2: Aprobado
+				res = await fetch(`${API_URL}/api/gestores/solicitudes/${window.currentTrackerReqId}/estado`, {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						estado_nuevo: 'aprobado',
+						notas: 'Cruce de bases catastrales e INE validado. Aprobación emitida con Firma Electrónica Avanzada (FEA) por el Director.',
+						usuario_id: 'director_catastro@yucatan.gob.mx',
+						ip: '127.0.0.1',
+						firma_base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+					})
+				});
+				
+				if(res.ok) {
+					window.showToast("Simulación completada: Trámite Aprobado", "success");
+					await executeTrackingSearch(activeFolio);
+				}
+			} catch (e) {
+				console.error(e);
+				window.showToast("Error de conexión al simular", "error");
+			} finally {
+				btn.disabled = false;
+				btn.textContent = 'Simular Avance';
+				btn.classList.remove('opacity-70', 'cursor-not-allowed');
 			}
-
-			requests[idx].status = nextStatus;
-			localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-			const localLogs = localStorage.getItem('civicflow_audit_logs') || '[]';
-			const logs = JSON.parse(localLogs);
-			logs.push({
-				id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-				folio: activeFolio,
-				user_id: actor,
-				rol: actorRol,
-				estado_anterior: currentStatus,
-				estado_nuevo: nextStatus,
-				comentario: comment,
-				ip: "192.168.1.99",
-				timestamp: new Date().toLocaleString()
-			});
-			localStorage.setItem('civicflow_audit_logs', JSON.stringify(logs));
-
-			executeTrackingSearch(activeFolio);
-			window.showToast(`Estado avanzado a: ${nextStatus}`, "success");
 		});
 
 		// Cert download PDF mock
