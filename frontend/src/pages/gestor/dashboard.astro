@@ -739,10 +739,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			// Admin UI logic
 			document.getElementById('tab-admin')?.addEventListener('click', (e) => {
 				e.preventDefault();
-				document.getElementById('gestor-dashboard-content').children[0].classList.add('hidden'); // hide traffic lights
-				document.getElementById('gestor-dashboard-content').children[1].classList.add('hidden'); // hide requests
-				document.getElementById('gestor-dashboard-content').children[2].classList.add('hidden'); // hide charts
-				document.getElementById('admin-view').classList.remove('hidden');
+				const mainView = document.getElementById('main-dashboard-view');
+				if (mainView) mainView.classList.add('hidden');
+				
+				const adminView = document.getElementById('admin-view');
+				if (adminView) adminView.classList.remove('hidden');
 				
 				// Set active styling on Admin tab
 				document.getElementById('tab-admin').className = "pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all flex items-center gap-1.5";
@@ -753,6 +754,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				loadPersonal();
 				loadFiltros();
 			});
+
+			// Auto-open admin if URL hash is #admin
+			if (window.location.hash === '#admin') {
+				document.getElementById('tab-admin')?.click();
+			}
 
 			// If URL contains tab=admin query parameter, auto activate admin tab
 			if (new URLSearchParams(window.location.search).get('tab') === 'admin') {
