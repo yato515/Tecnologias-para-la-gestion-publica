@@ -16,6 +16,7 @@ import reportRoutes  from './routes/reportes.js';
 // Importación de Nuevas Rutas (Clean Architecture)
 import solicitudesRoutes from './routes/solicitudes.routes.js';
 import tramitesRoutes from './routes/tramites.routes.js';
+import expedientesRoutes from './routes/expedientes.routes.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use(express.json());
 // Interceptamos rutas específicas generadas con Clean Architecture
 app.use('/api', solicitudesRoutes); 
 app.use('/api/tramites/catalogo', tramitesRoutes);
+app.use('/api/expedientes', expedientesRoutes);
 
 // ==========================================
 // RUTAS LEGACY (Existentes)

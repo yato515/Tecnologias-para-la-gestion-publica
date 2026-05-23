@@ -692,6 +692,26 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							localStorage.setItem('civicflow_dossier', JSON.stringify(updated));
 							refreshExpedienteToken();
 							renderDossier();
+							
+							// Guardar en la Base de Datos (Hackathon: enviamos solo el nombre del archivo)
+							var ciudadanoId = localStorage.getItem('citizen_id');
+							if (ciudadanoId) {
+								var columnMap = {
+									'ine': 'identificacion_oficial_vigente_ine',
+									'domicilio': 'comprobante_de_domicilio',
+									'acta': 'acta_de_nacimiento_certificada',
+									'curp': 'cedula_curp_oficial'
+								};
+								var bodyPayload = {};
+								bodyPayload[columnMap[doc.id]] = uniqueName;
+								
+								fetch(API_URL + '/api/expedientes/' + ciudadanoId, {
+									method: 'PUT',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify(bodyPayload)
+								}).catch(function(err) { console.error('Error guardando archivo en BD:', err); });
+							}
+
 							window.showToast('Documento ' + doc.name + ' subido exitosamente', 'success');
 						});
 					}
@@ -844,6 +864,20 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					localStorage.setItem('citizen_dob', inputDob.value);
 					localStorage.setItem('citizen_pob', inputPob.value);
 					refreshExpedienteToken();
+					
+					var ciudadanoId = localStorage.getItem('citizen_id');
+					if (ciudadanoId) {
+						var bodyPayload = {
+							fecha_de_nacimiento: inputDob.value || null,
+							lugar_de_nacimiento: inputPob.value || null
+						};
+						fetch(API_URL + '/api/expedientes/' + ciudadanoId, {
+							method: 'PUT',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(bodyPayload)
+						}).catch(function(err) { console.error('Error guardando info en BD:', err); });
+					}
+
 					window.showToast('Información guardada y token actualizado', 'success');
 				});
 			}
