@@ -168,14 +168,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				localStorage.setItem('gestor_email', email);
 				localStorage.setItem('gestor_role', role);
 
-				// Guardar dependencia_id
-				let depId = null;
-				if (loginResponseData && loginResponseData.user && loginResponseData.user.dependencia_id) {
-					depId = loginResponseData.user.dependencia_id;
-				} else if (email.includes('revisor') || email.includes('director')) {
-					// Contingencia/demo: Catastro y Registro del Estado de Yucatán
-					depId = 'a0000001-0000-0000-0000-000000000005';
-				}
+				// Guardar dependencia_id (viene del perfil en la BD)
+				const depId = loginResponseData?.user?.dependencia_id || null;
 				if (depId) {
 					localStorage.setItem('gestor_dependencia_id', depId);
 				} else {

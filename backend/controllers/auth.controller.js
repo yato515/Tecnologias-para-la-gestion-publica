@@ -81,16 +81,17 @@ export const AuthController = {
       const municipio = userProfile?.municipio || authData.user.user_metadata?.municipio || null;
 
       // Respetamos la estructura exacta que configuró tu equipo (sin token para gestores)
-      return res.status(200).json({ 
-        success: true, 
-        user: { 
-          id: userProfile ? userProfile.id : authData.user.id, 
-          email: authData.user.email, 
+      return res.status(200).json({
+        success: true,
+        user: {
+          id: userProfile ? userProfile.id : authData.user.id,
+          email: authData.user.email,
           nombre: nombreFinal,
           rol: rolFinal,
+          dependencia_id: userProfile?.dependencia_id || null,
           tipo_solicitud,
           municipio
-        } 
+        }
       });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
@@ -215,7 +216,7 @@ export const AuthController = {
         id: authData.user.id,
         nombre_completo,
         rol: rolNormalizado,
-        dependencia_id: null
+        dependencia_id: req.body.dependencia_id || null
       }]);
 
       if (profileError) {

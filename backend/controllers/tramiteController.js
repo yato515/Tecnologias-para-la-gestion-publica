@@ -1,4 +1,5 @@
 import { supabase, supabaseAdmin } from '../config/supabase.service.js';
+import { SolicitudesService } from '../services/solicitudes.service.js';
 
 const ensureBucketExists = async () => {
   try {
@@ -151,22 +152,39 @@ export const TramiteController = {
   getSolicitudByFolio: async (req, res) => {
     try {
       const { folio } = req.params;
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(folio);
-      
-      let query = supabase
+      const identifier = decodeURIComponent(folio || '').trim();
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+      const client = supabaseAdmin || supabase;
+
+      let query = client
         .from('solicitudes')
-        .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo, curp, email)');
-        
-      if (isUUID) {
-        query = query.eq('id', folio);
-      } else {
-        query = query.eq('folio', folio);
-      }
-      
-      const { data, error } = await query.maybeSingle();
+        .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp)');
+
+      query = isUUID ? query.eq('id', identifier) : query.eq('folio', identifier);
+      const { data: rows, error } = await query.limit(1);
       if (error) throw error;
+      const data = rows && rows.length > 0 ? rows[0] : null;
       if (!data) return res.status(404).json({ success: false, message: 'Solicitud no encontrada' });
-      return res.status(200).json({ success: true, data });
+
+      // Enriquecer con email del ciudadano desde auth
+      let enriched = data;
+      if (supabaseAdmin && data.ciudadano_id) {
+        try {
+          const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(data.ciudadano_id);
+          if (authUser?.user?.email) {
+            enriched = { ...data, ciudadano: data.ciudadano ? { ...data.ciudadano, email: authUser.user.email } : { email: authUser.user.email } };
+          }
+        } catch (_) {}
+      }
+
+      // Adjuntar audit log de la solicitud
+      const { data: auditRows } = await client
+        .from('audit_log')
+        .select('*')
+        .eq('solicitud_id', data.id)
+        .order('created_at', { ascending: false });
+
+      return res.status(200).json({ success: true, data: { ...enriched, audit_log: auditRows || [] } });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
     }

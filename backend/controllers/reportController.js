@@ -28,7 +28,7 @@ export const ReportController = {
         .from('solicitudes')
         .select(`
           *,
-          tramite:tramites_catalogo(nombre, plazo_dias_habiles),
+          tramite:tramites_catalogo(nombre),
           ciudadano:perfiles!ciudadano_id(nombre_completo)
         `)
         .not('estado', 'in', '("aprobado","rechazado")')
@@ -37,7 +37,7 @@ export const ReportController = {
 
       const hoy = new Date();
       const vencidas = data.filter(s => {
-        const plazo = s.tramite?.plazo_dias_habiles || 5;
+        const plazo = 5; // Default since it doesn't exist
         const creado = new Date(s.created_at);
         const diff = Math.floor((hoy - creado) / (1000 * 60 * 60 * 24));
         return diff > plazo;

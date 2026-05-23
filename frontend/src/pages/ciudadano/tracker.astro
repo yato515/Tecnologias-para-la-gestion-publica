@@ -253,14 +253,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				if (json.success && json.data) {
 					const s = json.data;
 					window.currentTrackerReqId = s.id;
+					window.currentAuditLog = s.audit_log || [];
 					req = {
 						folio: s.folio || s.id,
-						name: s.tramite?.nombre || 'Trámite',
-						dept: s.dependencia?.nombre || '-',
+						name: s.tramite?.nombre || s.campos_respuesta?.tramite_nombre_fallback || 'Trámite',
+						dept: s.dependencia?.nombre || s.campos_respuesta?.dependencia_nombre_fallback || '-',
 						date: (s.created_at || '').split('T')[0],
 						status: s.estado || 'recibido',
-						citizen_fullname: s.ciudadano?.nombre_completo || 'N/A',
-						token: s.token || '-',
+						citizen_fullname: s.ciudadano?.nombre_completo || s.campos_respuesta?.nombre_ciudadano || 'N/A',
+						token: s.campos_respuesta?.token_expediente || s.token || '-',
 						comments: s.notas || ''
 					};
 				}
@@ -270,6 +271,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			if (!req) {
 				const localRequests = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
 				req = localRequests.find(r => r.folio === query || r.token === query);
+				if (req) window.currentAuditLog = [];
 			}
 
 			if (!req) {
@@ -299,7 +301,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			else if (req.status === 'en_revision') { badgeClass = 'bg-purple-50 text-purple-800 border border-purple-200'; displayStatus = 'En Revisión Oficial'; }
 			else if (req.status === 'aprobado') { badgeClass = 'bg-emerald-50 text-emerald-800 border border-emerald-200'; displayStatus = 'Aprobado'; }
 			else if (req.status === 'rechazado' || req.status === 'declinado') { badgeClass = 'bg-red-50 text-red-800 border border-red-200'; displayStatus = 'Declinado'; }
-			else if (req.status === 'recibido') { badgeClass = 'bg-blue-50 text-blue-800 border border-blue-200'; displayStatus = 'Recibido'; }
+			else if (req.status === 'recibido') { badgeClass = 'bg-yuc-green/10 text-yuc-green border border-yuc-green/20'; displayStatus = 'Recibido'; }
 			badge.textContent = displayStatus;
 			badge.className = `inline-block px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
 
@@ -365,30 +367,43 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				lineBar.style.height = "100%";
 			}
 
-			// Render Audit log
-			const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-			const folioLogs = auditLogs.filter(l => l.folio === req.folio);
+			// Render Audit log from API response
+			const folioLogs = window.currentAuditLog || [];
 			const tbody = document.getElementById('audit-tbody');
 			tbody.innerHTML = '';
+
+			const estadoLabel = {
+				'recibido': 'Recibido',
+				'en_revision': 'En revisión',
+				'documentacion_incompleta': 'Doc. incompleta',
+				'aprobado': 'Aprobado',
+				'rechazado': 'Rechazado'
+			};
 
 			if (folioLogs.length === 0) {
 				const tr = document.createElement('tr');
 				tr.innerHTML = `<td colspan="4" class="px-6 py-4 text-center text-slate-400">Ningún cambio de estado registrado aún.</td>`;
 				tbody.appendChild(tr);
 			} else {
-				folioLogs.reverse().forEach(log => {
+				folioLogs.forEach(log => {
 					const tr = document.createElement('tr');
 					tr.className = "hover:bg-slate-50/50 border-b border-slate-100 transition-colors";
-					
-					let transStr = `<span class="font-bold">${log.estado_anterior}</span> → <span class="font-bold text-yuc-green-dark">${log.estado_nuevo}</span>`;
-					if (log.estado_nuevo === 'Documentación incompleta') transStr = `<span class="font-bold">${log.estado_anterior}</span> → <span class="font-bold text-orange-600">${log.estado_nuevo}</span>`;
-					else if (log.estado_nuevo === 'Aprobado') transStr = `<span class="font-bold">${log.estado_anterior}</span> → <span class="font-bold text-emerald-600">${log.estado_nuevo}</span>`;
-					else if (log.estado_nuevo === 'Rechazado' || log.estado_nuevo === 'Declinado') transStr = `<span class="font-bold">${log.estado_anterior}</span> → <span class="font-bold text-red-650">${log.estado_nuevo}</span>`;
+
+					const ant = estadoLabel[log.estado_anterior] || log.estado_anterior || '-';
+					const nvo = estadoLabel[log.estado_nuevo] || log.estado_nuevo || '-';
+					let nuevoColor = 'text-yuc-green-dark';
+					if (log.estado_nuevo === 'documentacion_incompleta') nuevoColor = 'text-orange-600';
+					else if (log.estado_nuevo === 'aprobado') nuevoColor = 'text-emerald-600';
+					else if (log.estado_nuevo === 'rechazado') nuevoColor = 'text-red-600';
+
+					const transStr = `<span class="font-bold">${ant}</span> → <span class="font-bold ${nuevoColor}">${nvo}</span>`;
+					const fecha = log.created_at ? new Date(log.created_at).toLocaleString('es-MX') : '-';
+					const autor = log.usuario_id || 'Sistema';
 
 					tr.innerHTML = `
-						<td class="px-6 py-4 font-mono">${log.timestamp}</td>
-						<td class="px-6 py-4 font-semibold">${log.user_id} (${log.rol})</td>
-						<td class="px-6 py-4 font-medium text-slate-700">${log.comentario || 'Actualización de expediente.'}</td>
+						<td class="px-6 py-4 font-mono">${fecha}</td>
+						<td class="px-6 py-4 font-semibold">${autor}</td>
+						<td class="px-6 py-4 font-medium text-slate-700">${log.notas || 'Actualización de expediente.'}</td>
 						<td class="px-6 py-4">${transStr}</td>
 					`;
 					tbody.appendChild(tr);

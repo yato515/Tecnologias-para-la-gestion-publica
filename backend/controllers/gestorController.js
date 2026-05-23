@@ -21,7 +21,7 @@ export const GestorController = {
         .select(`
           *,
           ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp),
-          tramite:tramites_catalogo(nombre, plazo_dias_habiles),
+          tramite:tramites_catalogo(nombre),
           dependencia:dependencias(nombre)
         `);
 
@@ -35,64 +35,42 @@ export const GestorController = {
 
       let mappedData = data;
 
-      // Filtrar en memoria por municipio y tipo_solicitud si están presentes
-      if (tipo_solicitud && tipo_solicitud !== 'null' && tipo_solicitud !== 'undefined') {
-        const tipoLower = tipo_solicitud.toLowerCase();
-        mappedData = mappedData.filter(r => 
-          r.tramite && r.tramite.nombre && r.tramite.nombre.toLowerCase().includes(tipoLower)
-        );
-      }
-
-      if (municipio && municipio !== 'null' && municipio !== 'undefined') {
-        const muniLower = municipio.toLowerCase();
-        mappedData = mappedData.filter(r => {
-          const resp = JSON.stringify(r.campos_respuesta || {}).toLowerCase();
-          return resp.includes(muniLower);
-        });
-      }
+      // Enriquecer emails desde auth si está disponible el admin client
       if (supabaseAdmin) {
         try {
-          const { data: userData, error: userError } = await supabaseAdmin.auth.admin.listUsers();
-          if (!userError && userData && userData.users) {
+          const { data: userData } = await supabaseAdmin.auth.admin.listUsers();
+          if (userData?.users) {
             const usersMap = {};
-            userData.users.forEach(u => {
-              usersMap[u.id] = u.email;
-            });
-            mappedData = mappedData.map(s => {
-              if (s.ciudadano) {
-                return {
-                  ...s,
-                  ciudadano: {
-                    ...s.ciudadano,
-                    email: usersMap[s.ciudadano.id] || 'demo-citizen-id@yucatan.gob.mx'
-                  }
-                };
-              }
-              return s;
-            });
+            userData.users.forEach(u => { usersMap[u.id] = u.email; });
+            mappedData = mappedData.map(s => ({
+              ...s,
+              ciudadano: s.ciudadano
+                ? { ...s.ciudadano, email: usersMap[s.ciudadano.id] || null }
+                : s.ciudadano
+            }));
           }
-        } catch (e) {
-          console.error("Error listing users from auth to map emails:", e);
-        }
+        } catch (e) {}
       }
 
-      // Apply filters for tipo_solicitud and municipio in mappedData
-      if (tipo_solicitud && tipo_solicitud !== 'null' && tipo_solicitud !== 'undefined' && tipo_solicitud !== '') {
+      // Filtro por tipo_solicitud: incluye solicitudes sin tramite asignado (tramite_id null)
+      if (tipo_solicitud && tipo_solicitud !== 'null' && tipo_solicitud !== 'undefined') {
+        const tipoLower = tipo_solicitud.toLowerCase();
         mappedData = mappedData.filter(s => {
-          const name = s.tramite?.nombre || '';
-          return name.toLowerCase().includes(tipo_solicitud.toLowerCase()) || s.tramite_id === tipo_solicitud;
+          if (!s.tramite_id) return true; // sin tramite asignado, siempre mostrar
+          const nombre = (s.tramite?.nombre || '').toLowerCase();
+          const fallback = (s.campos_respuesta?.tramite_nombre_fallback || '').toLowerCase();
+          return nombre.includes(tipoLower) || fallback.includes(tipoLower);
         });
       }
 
-      if (municipio && municipio !== 'null' && municipio !== 'undefined' && municipio !== '') {
+      // Filtro por municipio
+      if (municipio && municipio !== 'null' && municipio !== 'undefined') {
+        const muniLower = municipio.toLowerCase();
         mappedData = mappedData.filter(s => {
           const campos = s.campos_respuesta || {};
-          const cMuni = campos.municipio || campos.lugar || '';
-          const cDir = campos.direccion || '';
-          const citizenMuni = s.ciudadano?.municipio || '';
-          return cMuni.toLowerCase().includes(municipio.toLowerCase()) ||
-                 cDir.toLowerCase().includes(municipio.toLowerCase()) ||
-                 citizenMuni.toLowerCase().includes(municipio.toLowerCase());
+          return (campos.municipio || '').toLowerCase().includes(muniLower) ||
+                 (campos.lugar || '').toLowerCase().includes(muniLower) ||
+                 (campos.direccion || '').toLowerCase().includes(muniLower);
         });
       }
 
@@ -117,7 +95,7 @@ export const GestorController = {
       const selectFields = `
         *,
         ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp),
-        tramite:tramites_catalogo(nombre, plazo_dias_habiles),
+        tramite:tramites_catalogo(nombre),
         dependencia:dependencias(nombre)
       `;
 
