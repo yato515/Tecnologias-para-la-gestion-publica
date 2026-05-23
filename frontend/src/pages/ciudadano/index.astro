@@ -265,10 +265,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						<div class="space-y-1.5 pt-2 max-w-sm">
 							<div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase font-display">
 								<span>PROGRESO DEL EXPEDIENTE</span>
-								<span id="lbl-dossier-progress">75%</span>
+								<span id="lbl-dossier-progress">0%</span>
 							</div>
 							<div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-								<div id="bar-dossier-progress" class="h-full bg-yuc-green transition-all duration-500" style="width: 75%;"></div>
+								<div id="bar-dossier-progress" class="h-full bg-yuc-green transition-all duration-500" style="width: 0%;"></div>
 							</div>
 						</div>
 					</div>
@@ -290,10 +290,23 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 	</div>
 
 	<script is:inline define:vars={{ API_URL }}>
+		// Safe localStorage reader — never throws, returns fallback on corrupt data
+		function safeJSONParse(key, fallback) {
+			if (fallback === undefined) fallback = null;
+			try {
+				const value = localStorage.getItem(key);
+				if (!value || value === 'undefined' || value === 'null') return fallback;
+				return JSON.parse(value);
+			} catch (err) {
+				console.error('[CivicFlow] localStorage parse error for key "' + key + '":', err);
+				localStorage.removeItem(key);
+				return fallback;
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function () {
 		// Protect page access
 		const logged = localStorage.getItem('citizen_logged');
-		const overlay = document.getElementById('login-required-overlay');
-		const content = document.getElementById('hub-content');
 
 		if (logged !== 'true') {
 			window.location.href = '/ciudadano/login';
@@ -303,11 +316,27 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			if (!token || token === 'mock-jwt-token-demo' || token === 'N/A') {
 				localStorage.removeItem('civicflow_dossier');
 			} else {
-				const _sd = JSON.parse(localStorage.getItem('civicflow_dossier') || '[]');
-				if (_sd.some(d => d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf')) localStorage.removeItem('civicflow_dossier');
+				try {
+					const rawSd = localStorage.getItem('civicflow_dossier');
+					if (rawSd) {
+						const _sd = JSON.parse(rawSd);
+						if (Array.isArray(_sd) && _sd.some(d => d && (d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf'))) {
+							localStorage.removeItem('civicflow_dossier');
+						}
+					}
+				} catch (e) {
+					localStorage.removeItem('civicflow_dossier');
+				}
 			}
-			const _sr = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
-			if (_sr.some(r => r.folio === 'TRM-2026-00104')) localStorage.removeItem('civicflow_requests');
+			try {
+				const rawSr = localStorage.getItem('civicflow_requests');
+				if (rawSr) {
+					const _sr = JSON.parse(rawSr);
+					if (Array.isArray(_sr) && _sr.some(r => r && r.folio === 'TRM-2026-00104')) {
+						localStorage.removeItem('civicflow_requests');
+					}
+				}
+			} catch (e) {}
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
 			
@@ -447,56 +476,31 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				filterCatalog();
 			});
 
+			const DEFAULT_DOSSIER = [
+				{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "", status: "Pendiente", date: "-" },
+				{ id: "domicilio", name: "Comprobante de Domicilio", file: "", status: "Pendiente", date: "-" },
+				{ id: "acta", name: "Acta de Nacimiento Certificada", file: "", status: "Pendiente", date: "-" },
+				{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
+			];
+
 			const getDossier = () => {
-				const local = localStorage.getItem('civicflow_dossier');
-				const defaultDossier = [
-					{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "", status: "Pendiente", date: "-" },
-					{ id: "domicilio", name: "Comprobante de Domicilio", file: "", status: "Pendiente", date: "-" },
-					{ id: "acta", name: "Acta de Nacimiento Certificada", file: "", status: "Pendiente", date: "-" },
-					{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
-				];
-				if (!local || local === 'null' || local === 'undefined') {
-					localStorage.setItem('civicflow_dossier', JSON.stringify(defaultDossier));
-					return defaultDossier;
-				}
-				try {
-					const parsed = JSON.parse(local);
-					if (Array.isArray(parsed)) {
-						return parsed;
-					}
-					localStorage.setItem('civicflow_dossier', JSON.stringify(defaultDossier));
-					return defaultDossier;
-				} catch (e) {
-					localStorage.setItem('civicflow_dossier', JSON.stringify(defaultDossier));
-					return defaultDossier;
-				}
+				const parsed = safeJSONParse('civicflow_dossier', null);
+				if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+				localStorage.setItem('civicflow_dossier', JSON.stringify(DEFAULT_DOSSIER));
+				return DEFAULT_DOSSIER;
 			};
 
 			const renderDossier = () => {
 				const grid = document.getElementById('dossier-grid');
+				if (!grid) { console.error('[CivicFlow] dossier-grid not found'); return; }
 				const dossier = getDossier();
 				grid.innerHTML = '';
 
-				if (dossier.length === 0) {
-					document.getElementById('lbl-dossier-progress').textContent = '0%';
-					document.getElementById('bar-dossier-progress').style.width = '0%';
-					grid.innerHTML = `
-						<div class="col-span-2 py-16 flex flex-col items-center gap-4 bg-white border border-slate-200 rounded-xl">
-							<div class="w-16 h-16 rounded-full bg-yuc-green/10 text-yuc-green flex items-center justify-center">
-								<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-							</div>
-							<div class="text-center space-y-2">
-								<p class="text-slate-800 font-bold text-sm font-display">Tu expediente digital está vacío</p>
-								<p class="text-slate-400 text-xs max-w-xs">Sube tus documentos una sola vez y se vincularán automáticamente a cada trámite.</p>
-							</div>
-						</div>
-					`;
-					return;
-				}
-
+				const requiredDocs = DEFAULT_DOSSIER.length;
 				let loadedCount = 0;
-				
+
 				dossier.forEach(doc => {
+				  try {
 					const isLoaded = doc.status === 'Cargado';
 					if (isLoaded) loadedCount++;
 
@@ -539,88 +543,102 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 					grid.appendChild(card);
 
-					// Hook listeners
+					// Hook listeners safely
 					if (isLoaded) {
 						// Download mock action
-						document.getElementById(`btn-dl-${doc.id}`).addEventListener('click', () => {
-							let csvContent = "data:text/plain;charset=utf-8,";
-							csvContent += `CIVICFLOW - GOBIERNO DE YUCATAN\n`;
-							csvContent += `DOCUMENTO DIGITAL AUTENTICADO: ${doc.name}\n`;
-							csvContent += `Archivo: ${doc.file}\n`;
-							csvContent += `Fecha de Carga: ${doc.date}\n`;
-							csvContent += `Sello Digital de Seguridad: CF-DOC-YUC-${doc.id.toUpperCase()}-2026\n`;
-							
-							const encodedUri = encodeURI(csvContent);
-							const link = document.createElement("a");
-							link.setAttribute("href", encodedUri);
-							link.setAttribute("download", doc.file);
-							document.body.appendChild(link);
-							link.click();
-							document.body.removeChild(link);
-							window.showToast(`Descargando ${doc.name}`, "success");
-						});
+						const dlBtn = card.querySelector(`#btn-dl-${doc.id}`);
+						if (dlBtn) {
+							dlBtn.addEventListener('click', () => {
+								let csvContent = "data:text/plain;charset=utf-8,";
+								csvContent += `CIVICFLOW - GOBIERNO DE YUCATAN\n`;
+								csvContent += `DOCUMENTO DIGITAL AUTENTICADO: ${doc.name}\n`;
+								csvContent += `Archivo: ${doc.file}\n`;
+								csvContent += `Fecha de Carga: ${doc.date}\n`;
+								csvContent += `Sello Digital de Seguridad: CF-DOC-YUC-${doc.id.toUpperCase()}-2026\n`;
+								
+								const encodedUri = encodeURI(csvContent);
+								const link = document.createElement("a");
+								link.setAttribute("href", encodedUri);
+								link.setAttribute("download", doc.file);
+								document.body.appendChild(link);
+								link.click();
+								document.body.removeChild(link);
+								window.showToast(`Descargando ${doc.name}`, "success");
+							});
+						}
 
 						// Replace action
-						document.getElementById(`btn-repl-${doc.id}`).addEventListener('click', () => {
-							const newDossier = dossier.map(d => {
-								if (d.id === doc.id) {
-									return { ...d, status: 'Pendiente', file: '' };
-								}
-								return d;
-							});
-							localStorage.setItem('civicflow_dossier', JSON.stringify(newDossier));
-							renderDossier();
-							window.showToast("Carga restablecida. Seleccione nuevo archivo.", "info");
-						});
-					} else {
-						// File input upload action
-						document.getElementById(`upload-${doc.id}`).addEventListener('change', (e) => {
-							if (e.target.files.length > 0) {
-								const file = e.target.files[0];
-								if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
-									window.showToast("Solo se permiten archivos PDF", "error");
-									e.target.value = "";
-									return;
-								}
-								
-								const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
-								const timestamp = Date.now();
-								const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
-								const currentDate = new Date().toISOString().split('T')[0];
-								
-
+						const replBtn = card.querySelector(`#btn-repl-${doc.id}`);
+						if (replBtn) {
+							replBtn.addEventListener('click', () => {
 								const newDossier = dossier.map(d => {
 									if (d.id === doc.id) {
-										return { ...d, status: 'Cargado', file: uniqueName, date: currentDate };
+										return { ...d, status: 'Pendiente', file: '' };
 									}
 									return d;
 								});
 								localStorage.setItem('civicflow_dossier', JSON.stringify(newDossier));
 								renderDossier();
-								window.showToast(`Documento ${doc.name} subido exitosamente`, "success");
-							}
-						});
+								window.showToast("Carga restablecida. Seleccione nuevo archivo.", "info");
+							});
+						}
+					} else {
+						// File input upload action
+						const uploadInp = card.querySelector(`#upload-${doc.id}`);
+						if (uploadInp) {
+							uploadInp.addEventListener('change', (e) => {
+								if (e.target.files.length > 0) {
+									const file = e.target.files[0];
+									if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+										window.showToast("Solo se permiten archivos PDF", "error");
+										e.target.value = "";
+										return;
+									}
+									
+									const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
+									const timestamp = Date.now();
+									const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
+									const currentDate = new Date().toISOString().split('T')[0];
+									
+
+									const newDossier = dossier.map(d => {
+										if (d.id === doc.id) {
+											return { ...d, status: 'Cargado', file: uniqueName, date: currentDate };
+										}
+										return d;
+									});
+									localStorage.setItem('civicflow_dossier', JSON.stringify(newDossier));
+									renderDossier();
+									window.showToast(`Documento ${doc.name} subido exitosamente`, "success");
+								}
+							});
+						}
 					}
+				  } catch (docErr) {
+					console.error('[CivicFlow] Error renderizando documento:', docErr);
+				  }
 				});
 
-				// Calculate progress
-				const progress = Math.round((loadedCount / dossier.length) * 100);
-				document.getElementById('lbl-dossier-progress').textContent = `${progress}%`;
-				document.getElementById('bar-dossier-progress').style.width = `${progress}%`;
+				// Calculate progress dynamically
+				const progress = Math.round((loadedCount / requiredDocs) * 100);
+				const lblProgress = document.getElementById('lbl-dossier-progress');
+				const barProgress = document.getElementById('bar-dossier-progress');
+				if (lblProgress) lblProgress.textContent = `${progress}%`;
+				if (barProgress) barProgress.style.width = `${progress}%`;
 
 				// Token Generation on Completion
-				if (loadedCount === dossier.length && loadedCount > 0) {
+				if (loadedCount === requiredDocs && loadedCount > 0) {
 					let currentToken = localStorage.getItem('jwt_token');
 					if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
 						currentToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
 						localStorage.setItem('jwt_token', currentToken);
-						
-						const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+
+						const tokensDict = safeJSONParse('civicflow_tokens', {});
 						const currentFiles = {};
 						dossier.forEach(d => { if(d.status==='Cargado') currentFiles[d.id] = d.file; });
 						tokensDict[currentToken] = currentFiles;
 						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
-						
+
 						const tokenEl = document.getElementById('lbl-token');
 						if(tokenEl) {
 							tokenEl.textContent = currentToken;
@@ -628,8 +646,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						}
 						window.showToast(`¡Expediente completo! Se ha generado tu Token de Expediente: ${currentToken}`, "success");
 					} else {
-						// Update existing token's files just in case
-						const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+						const tokensDict = safeJSONParse('civicflow_tokens', {});
 						if (!tokensDict[currentToken]) tokensDict[currentToken] = {};
 						dossier.forEach(d => { if(d.status==='Cargado') tokensDict[currentToken][d.id] = d.file; });
 						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
@@ -667,14 +684,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			});
 
 			const getRequests = () => {
-				const local = localStorage.getItem('civicflow_requests');
-				if (!local || local === 'null' || local === 'undefined') return [];
-				try {
-					const parsed = JSON.parse(local);
-					return Array.isArray(parsed) ? parsed : [];
-				} catch (e) {
-					return [];
-				}
+				const parsed = safeJSONParse('civicflow_requests', []);
+				return Array.isArray(parsed) ? parsed : [];
 			};
 
 			const renderInbox = async () => {
@@ -779,18 +790,18 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			const rfcInput = document.getElementById('sat-rfc-input');
 			const btnGoToSat = document.getElementById('btn-go-to-sat');
 
-			// Populate RFC input if already in local storage
+			// Populate RFC input if already in local storage (guard: modal may not exist)
 			const storedRfc = localStorage.getItem('citizen_rfc');
-			if (storedRfc) {
+			if (rfcInput && storedRfc) {
 				rfcInput.value = storedRfc;
 			}
 
 			const openSatModal = () => {
-				satModal.classList.remove('hidden');
+				if (satModal) satModal.classList.remove('hidden');
 			};
 
 			const closeSatModal = () => {
-				satModal.classList.add('hidden');
+				if (satModal) satModal.classList.add('hidden');
 			};
 
 			if (btnSat) {
@@ -810,6 +821,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			if (btnSaveRfc) {
 				btnSaveRfc.addEventListener('click', () => {
+					if (!rfcInput) return;
 					const rfc = rfcInput.value.trim().toUpperCase();
 					if (rfc.length < 12 || rfc.length > 13) {
 						window.showToast("RFC debe tener 12 o 13 caracteres", "error");
@@ -818,8 +830,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					localStorage.setItem('citizen_rfc', rfc);
 					window.showToast("RFC configurado exitosamente", "success");
 					closeSatModal();
-					
-					// Automatically proceed to submit
 					setTimeout(() => {
 						window.location.href = "/ciudadano/tramite?id=sat";
 					}, 600);
@@ -827,18 +837,18 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			}
 
 			if (btnGoToSat) {
-				btnGoToSat.addEventListener('click', () => {
-					closeSatModal();
-				});
+				btnGoToSat.addEventListener('click', closeSatModal);
 			}
 
 			// Count on load
 			const reqs = getRequests();
-			if (reqs.length > 0) {
-				document.getElementById('badge-inbox-count').textContent = reqs.length;
-				document.getElementById('badge-inbox-count').classList.remove('hidden');
-				document.getElementById('badge-inbox-count').classList.add('inline-flex');
+			const badgeEl = document.getElementById('badge-inbox-count');
+			if (reqs.length > 0 && badgeEl) {
+				badgeEl.textContent = reqs.length;
+				badgeEl.classList.remove('hidden');
+				badgeEl.classList.add('inline-flex');
 			}
 		}
+		}); // end DOMContentLoaded
 	</script>
 </Layout>

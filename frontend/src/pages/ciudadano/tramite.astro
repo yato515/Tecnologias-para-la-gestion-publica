@@ -114,9 +114,13 @@ import Layout from '../../layouts/Layout.astro';
 							Para evitar pedirle documentos físicos cada vez que realice un trámite, suba su Identificación Oficial y Comprobante de Domicilio una sola vez. Al terminar se le dará un Token para iniciar todos sus trámites.
 						</p>
 						<div class="pt-2">
-							<a href="/ciudadano?tab=folder" class="inline-block px-6 py-2.5 bg-yuc-gold hover:bg-yuc-gold-light text-slate-950 font-black rounded-lg shadow-sm transition-colors text-sm font-display border border-yuc-gold">
+							<button 
+								type="button"
+								onclick="window.location.href='/ciudadano?tab=folder'"
+								class="inline-block px-6 py-2.5 bg-yuc-green hover:bg-yuc-green-light text-white font-black rounded-lg shadow-sm transition-colors text-sm font-display cursor-pointer"
+							>
 								Ir a Mi Expediente Digital
-							</a>
+							</button>
 						</div>
 					</div>
 
