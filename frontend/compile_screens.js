@@ -28,17 +28,16 @@ const pagesConfig = [
     {path: "index.html", title: "1. Portal de Bienvenida (Landing / Selector)", desc: "Pantalla de inicio del portal de trámites del Gobierno de Yucatán, que redirige al ciudadano o al servidor público."},
     {path: "ciudadano/registro/index.html", title: "2. Portal Ciudadano - Registro y Privacidad (Consentimiento)", desc: "Paso 1 del Onboarding: Creación de cuenta ciudadana con aceptación obligatoria de términos de intercambio de datos interdependencias."},
     {path: "ciudadano/login/index.html", title: "3. Portal Ciudadano - Acceso / Login", desc: "Acceso seguro para el ciudadano mediante correo y validación de CURP con formato oficial."},
-    {path: "ciudadano/index.html", title: "4. Portal Ciudadano - Catálogo de Servicios y Bandeja", desc: "Paso 2: Catálogo con búsqueda libre (SAT, SSP licencias/placas, pasaportes, INE) y alertas de redirección fiscal."},
-    {path: "ciudadano/tramite/index.html", title: "5. Portal Ciudadano - Formulario y Asistente IA", desc: "Formulario de trámite y asistente chatbot interactivo con IA que responde dudas de requisitos."},
-    {path: "ciudadano/subida/index.html", title: "6. Portal Ciudadano - Recepción de Requisitos (Subida Drag-and-Drop)", desc: "Paso 3: Interfaz limpia drag-and-drop con simulador de escaneo algorítmico y validaciones automáticas de documentos."},
-    {path: "ciudadano/exito/index.html", title: "7. Portal Ciudadano - Cierre y Comprobante (Token)", desc: "Paso 4: Pantalla de éxito con descarga de acuse PDF firmado digitalmente y emisión de Token de seguimiento único."},
-    {path: "ciudadano/tracker/index.html", title: "8. Portal Ciudadano - Tracker y Timeline de Consulta", desc: "Paso 5: Buscador central por Token o Folio, timeline de 3 estados (Recibido, En revisión, Aprobado/Declinado) y comentarios."},
-    {path: "gestor/index.html", title: "9. Panel Gestor - Acceso / Login", desc: "Inicio de sesión seguro para funcionarios estatales, con selector de roles (Revisor o Aprobador)."},
-    {path: "gestor/dashboard/index.html", title: "10. Panel Gestor - Mesa de Trabajo (Mesa Ciudadana)", desc: "Mesa de trabajo principal: tarjetas/islas que exponen los datos y validaciones algorítmicas de cada expediente de forma ágil."},
-    {path: "gestor/vencidas/index.html", title: "11. Panel Gestor - Solicitudes Vencidas (Monitoreo)", desc: "Vista de monitoreo y eficiencia enfocada en folios que superan el Plazo Máximo de Atención, destacando plazos con alertas rojas."},
-    {path: "gestor/cola/index.html", title: "12. Panel Gestor - Cola de Solicitudes", desc: "Tabla operativa de expedientes con filtros detallados y exportación a formato Excel (CSV)."},
-    {path: "gestor/solicitud/index.html", title: "13. Panel Gestor - Dictamen, Firma y Plantillas", desc: "Ficha del trámite para validación de requisitos, modales de rechazo con plantillas, y lienzo de firma digital para aprobadores."},
-    {path: "gestor/audit/index.html", title: "14. Panel Gestor - Logs de Seguridad y Auditoría", desc: "Bitácora inalterable de accesos y transiciones de estados para transparencia y auditorías regulatorias."}
+    {path: "ciudadano/index.html", title: "4. Portal Ciudadano - Catálogo de Servicios, Bandeja y Expediente", desc: "Paso 2: Catálogo con búsqueda libre (SAT, SSP licencias/placas, pasaportes, INE), bandeja de trámites y expediente digital único."},
+    {path: "ciudadano/tramite/index.html", title: "5. Portal Ciudadano - Validación de Requisitos por Token y Asistente", desc: "Formulario de validación de requisitos mediante Token del Expediente Único y chatbot asistente para resolver dudas de trámites."},
+    {path: "ciudadano/exito/index.html", title: "6. Portal Ciudadano - Cierre y Comprobante (Token)", desc: "Paso 3: Pantalla de éxito con descarga de acuse PDF firmado digitalmente y emisión de Token de seguimiento único."},
+    {path: "ciudadano/tracker/index.html", title: "7. Portal Ciudadano - Tracker y Timeline de Consulta", desc: "Paso 4: Buscador central por Token o Folio, timeline de 3 estados (Recibido, En revisión, Aprobado/Declinado) y comentarios."},
+    {path: "gestor/index.html", title: "8. Panel Gestor - Acceso / Login", desc: "Inicio de sesión seguro para funcionarios estatales, con selector de roles (Revisor o Aprobador)."},
+    {path: "gestor/dashboard/index.html", title: "9. Panel Gestor - Mesa de Trabajo (Mesa Ciudadana)", desc: "Mesa de trabajo principal: tarjetas/islas que exponen los datos y validaciones algorítmicas de cada expediente de forma ágil."},
+    {path: "gestor/vencidas/index.html", title: "10. Panel Gestor - Solicitudes Vencidas (Monitoreo)", desc: "Vista de monitoreo y eficiencia enfocada en folios que superan el Plazo Máximo de Atención, destacando plazos con alertas rojas."},
+    {path: "gestor/cola/index.html", title: "11. Panel Gestor - Cola de Solicitudes", desc: "Tabla operativa de expedientes con filtros detallados y exportación a formato Excel (CSV)."},
+    {path: "gestor/solicitud/index.html", title: "12. Panel Gestor - Dictamen, Firma y Plantillas", desc: "Ficha del trámite para validación de requisitos, modales de rechazo con plantillas, y lienzo de firma digital para aprobadores."},
+    {path: "gestor/audit/index.html", title: "13. Panel Gestor - Logs de Seguridad y Auditoría", desc: "Bitácora inalterable de accesos y transiciones de estados para transparencia y auditorías regulatorias."}
 ];
 
 const bodyBlocks = [];
@@ -57,8 +56,9 @@ for (const config of pagesConfig) {
       // Remove scripts
       bodyInner = bodyInner.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
       
+      const screenId = config.path.replace('/index.html', '').replace('index.html', '').replace(/\//g, '-') || 'home';
       const block = `
-      <div class="screen-wrapper">
+      <div class="screen-wrapper" id="screen-${screenId}">
           <div class="screen-title">${config.title}</div>
           <p class="screen-desc">${config.desc}</p>
           <div class="screen-frame">
@@ -360,6 +360,87 @@ const compiledHtml = `<!DOCTYPE html>
                     });
                 }
             }
+        });
+
+        // Intercept navigation links for offline catalog
+        document.querySelectorAll('.screen-wrapper a, .screen-wrapper button').forEach(el => {
+            el.addEventListener('click', (e) => {
+                let href = el.getAttribute('href');
+                if (!href && el.tagName === 'BUTTON') {
+                    const parentAnchor = el.closest('a');
+                    if (parentAnchor) href = parentAnchor.getAttribute('href');
+                }
+                
+                if (href) {
+                    if (href.includes('tab=folder')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-ciudadano');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                            const tabFolder = target.querySelector('#tab-btn-folder');
+                            if (tabFolder) tabFolder.click();
+                        }
+                    } else if (href.includes('tab=inbox')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-ciudadano');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                            const tabInbox = target.querySelector('#tab-btn-inbox');
+                            if (tabInbox) tabInbox.click();
+                        }
+                    } else if (href === '/ciudadano' || href === '/ciudadano/') {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-ciudadano');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                            const tabCatalog = target.querySelector('#tab-btn-catalog');
+                            if (tabCatalog) tabCatalog.click();
+                        }
+                    } else if (href.includes('/ciudadano/tracker')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-ciudadano-tracker');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (href.includes('/ciudadano/tramite')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-ciudadano-tramite');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (href === '/gestor' || href === '/gestor/') {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-gestor');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (href.includes('/gestor/cola')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-gestor-cola');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (href.includes('/gestor/dashboard')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-gestor-dashboard');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (href.includes('/gestor/audit')) {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-gestor-audit');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } else if (href === '/' || href === '/index.html') {
+                        e.preventDefault();
+                        const target = document.getElementById('screen-home');
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                }
+            });
         });
     </script>
 </body>

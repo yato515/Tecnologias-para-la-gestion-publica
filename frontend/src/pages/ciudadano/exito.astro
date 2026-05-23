@@ -3,13 +3,13 @@ import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout title="Trámite Enviado Exitosamente - In óolal Yucatan">
-	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-bg-dark transition-colors relative overflow-hidden">
+	<div class="min-h-[calc(100vh-13rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 relative overflow-hidden">
 		
 		<!-- Decorative Background Details -->
 		<div class="absolute top-0 right-0 w-96 h-96 bg-yuc-green/5 rounded-full blur-3xl pointer-events-none"></div>
 		<div class="absolute bottom-0 left-0 w-96 h-96 bg-yuc-gold/5 rounded-full blur-3xl pointer-events-none"></div>
 
-		<div class="max-w-2xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-8 sm:p-10 relative z-10 text-center space-y-8">
+		<div class="max-w-2xl w-full bg-white border border-slate-200 rounded-2xl shadow-sm p-8 sm:p-10 relative z-10 text-center space-y-8">
 			
 			<!-- Success Animation Header -->
 			<div class="space-y-3">
@@ -19,8 +19,8 @@ import Layout from '../../layouts/Layout.astro';
 						<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0110 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.746 3.746 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0114 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
 					</svg>
 				</div>
-				<h2 class="text-3xl font-black text-slate-800 dark:text-white font-display">¡Envío Exitoso!</h2>
-				<p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+				<h2 class="text-3xl font-black text-slate-800 font-display">¡Envío Exitoso!</h2>
+				<p class="text-xs text-slate-500 max-w-md mx-auto">
 					Su solicitud ha sido recibida y registrada por el sistema de automatización gubernamental In óolal Yucatan del Estado de Yucatán.
 				</p>
 			</div>
@@ -29,21 +29,21 @@ import Layout from '../../layouts/Layout.astro';
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				
 				<!-- Folio Card -->
-				<div class="bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-slate-850 p-5 rounded-2xl">
+				<div class="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl">
 					<span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Folio Oficial de Registro</span>
-					<span id="lbl-success-folio" class="text-xl font-bold font-mono text-slate-800 dark:text-white">TRM-2026-00000</span>
+					<span id="lbl-success-folio" class="text-xl font-bold font-mono text-slate-800">TRM-2026-00000</span>
 					<p class="text-[10px] text-slate-400 mt-2">Identificador único del trámite</p>
 				</div>
 
 				<!-- Token Card (Pantalla Grande) -->
 				<div class="bg-yuc-green/5 border border-yuc-green/20 p-5 rounded-2xl relative group">
-					<span class="text-[9px] font-extrabold text-yuc-green dark:text-yuc-green-light uppercase tracking-widest block mb-1">Token de Seguimiento</span>
+					<span class="text-[9px] font-extrabold text-yuc-green uppercase tracking-widest block mb-1">Token de Seguimiento</span>
 					<div class="flex justify-center items-center gap-2">
-						<span id="lbl-success-token" class="text-2xl font-black font-mono text-yuc-green dark:text-yuc-green-light tracking-wide">TK-000000</span>
+						<span id="lbl-success-token" class="text-2xl font-black font-mono text-yuc-green-dark tracking-wide">TK-000000</span>
 						<button 
 							type="button" 
 							id="btn-copy-token" 
-							class="p-1.5 text-slate-400 hover:text-yuc-green dark:hover:text-yuc-green-light rounded hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
+							class="p-1.5 text-slate-400 hover:text-yuc-green rounded hover:bg-slate-100 transition-colors cursor-pointer"
 							title="Copiar Token"
 						>
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
@@ -57,7 +57,7 @@ import Layout from '../../layouts/Layout.astro';
 			</div>
 
 			<!-- PDF Download and QR Preview Container -->
-			<div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-slate-50/50 dark:bg-slate-950/20 flex flex-col md:flex-row items-center gap-6 text-left">
+			<div class="border border-slate-200 rounded-2xl p-6 bg-slate-50/50 flex flex-col md:flex-row items-center gap-6 text-left">
 				
 				<!-- QR Mockup -->
 				<div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm shrink-0">
@@ -90,8 +90,8 @@ import Layout from '../../layouts/Layout.astro';
 
 				<div class="space-y-3 flex-grow">
 					<div>
-						<h4 class="font-bold text-sm text-slate-800 dark:text-white font-display">Acuse del Expediente Digital Único</h4>
-						<p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+						<h4 class="font-bold text-sm text-slate-800 font-display">Acuse del Expediente Digital Único</h4>
+						<p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
 							Se ha compilado un acuse oficial en formato PDF firmado digitalmente que acredita el cumplimiento de entrega de requisitos estatales.
 						</p>
 					</div>
@@ -99,9 +99,9 @@ import Layout from '../../layouts/Layout.astro';
 					<button 
 						type="button" 
 						id="btn-download-receipt" 
-						class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm flex items-center gap-2 border border-slate-750"
+						class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-all shadow-sm flex items-center gap-2 border border-slate-250 cursor-pointer"
 					>
-						<svg class="w-4 h-4 text-yuc-gold" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+						<svg class="w-4 h-4 text-yuc-gold-dark" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
 						<span>Descargar Acuse Recibo (PDF)</span>
 					</button>
 				</div>
@@ -109,17 +109,17 @@ import Layout from '../../layouts/Layout.astro';
 			</div>
 
 			<!-- Redirections -->
-			<div class="pt-6 border-t border-slate-150 dark:border-slate-800 flex flex-col sm:flex-row gap-4 sm:justify-end">
+			<div class="pt-6 border-t border-slate-150 flex flex-col sm:flex-row gap-4 sm:justify-end">
 				<a 
 					href="/ciudadano" 
-					class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-350 text-xs font-bold rounded-xl transition-all border border-slate-250/50 dark:border-slate-750/50 text-center"
+					class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all border border-slate-250 text-center"
 				>
 					Volver a Mi Cuenta
 				</a>
 				<a 
 					id="lnk-go-tracker"
 					href="/ciudadano/tracker" 
-					class="px-6 py-2.5 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-extrabold rounded-xl shadow-md transition-all text-center"
+					class="px-6 py-2.5 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-extrabold rounded-xl shadow-sm transition-all text-center"
 				>
 					Ir al Rastrear Estado
 				</a>
@@ -161,7 +161,7 @@ import Layout from '../../layouts/Layout.astro';
 
 				let pdfText = "data:text/plain;charset=utf-8,";
 				pdfText += `=========================================================================\n`;
-				pdfText += `       GOBIERNO DEL ESTADO DE YUCATÁN - VENTANILLA ÚNICA DIGITAL\n`;
+				pdfText += `       GOBIERNO DEL ESTADO DE YUCATÁN - COMPROBANTE OFICIAL DE ENTREGA\n`;
 				pdfText += `              COMPROBANTE OFICIAL DE ENTREGA DE EXPEDIENTE\n`;
 				pdfText += `=========================================================================\n\n`;
 				pdfText += `DATOS DE LA SOLICITUD:\n`;
@@ -181,7 +181,7 @@ import Layout from '../../layouts/Layout.astro';
 				pdfText += `=========================================================================\n`;
 				pdfText += `Este acuse constituye el comprobante digital visual del trámite.\n`;
 				pdfText += `Puede verificar el estado de su trámite ingresando su Token de seguimiento\n`;
-				pdfText += `en la dirección: http://localhost:4321/ciudadano/tracker\n`;
+				pdfText += `in the address: http://localhost:4321/ciudadano/tracker\n`;
 				pdfText += `=========================================================================\n`;
 
 				const encodedUri = encodeURI(pdfText);
