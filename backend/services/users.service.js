@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase.service.js';
+import { supabase, supabaseAdmin } from '../config/supabase.service.js';
 
 export const UsersService = {
   getAll: async () => {
@@ -20,14 +20,21 @@ export const UsersService = {
     return data;
   },
 
-  // id debe ser el UUID del usuario ya registrado en auth.users
-  create: async ({ id, nombre_completo, curp, telefono, rol, dependencia_id }) => {
-    const { data, error } = await supabase
+  // Hackathon: ya no requiere id de auth.users, se autogenera por la BD
+  create: async ({ id, nombre_completo, curp, email, password, rol, dependencia_id }) => {
+    const insertData = { nombre_completo, curp, email, password, rol, dependencia_id };
+    if (id) insertData.id = id; // Solo si se pasa un id explícito
+    
+    const { data, error } = await supabaseAdmin
       .from('perfiles')
-      .insert([{ id, nombre_completo, curp, telefono, rol, dependencia_id }])
+      .insert([insertData])
       .select()
       .single();
-    if (error) throw error;
+    if (error) {
+      console.error("\n🔴 ERROR NATIVO DE SUPABASE AL INSERTAR:");
+      console.error(JSON.stringify(error, null, 2));
+      throw error;
+    }
     return data;
   },
 

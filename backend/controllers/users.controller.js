@@ -74,30 +74,20 @@ export const UsersController = {
       const existing = await UsersService.getByCurp(curp);
       if (existing) return res.status(200).json({ success: true, data: existing });
 
-      // Si el formulario no envía contraseña separada, usamos la CURP como contraseña por defecto
-      const contraseñaSegura = password || curp; 
-
-      // 1. Crear la cuenta real en Supabase Autenticación
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
-        password: contraseñaSegura,
-      });
-
-      if (authError || !authData.user) {
-        return res.status(400).json({ success: false, message: authError.message });
-      }
-
-      // 2. Insertar en tu tabla 'perfiles' usando el ID real que generó Supabase Auth
+      // Hackathon: Insertar directo en tabla perfiles sin Supabase Auth
       const newUser = await UsersService.create({
-        id: authData.user.id, 
         nombre_completo,
         curp,
+        email,
+        password: password || curp,
         rol: 'ciudadano'
       });
 
       return res.status(201).json({ success: true, data: newUser });
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message });
+      console.error("\n🔴 ERROR ATRAPADO EN EL CONTROLADOR:");
+      console.error(error.message || error);
+      return res.status(500).json({ success: false, message: error.message || 'Error interno' });
     }
   },
 
