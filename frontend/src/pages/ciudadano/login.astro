@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Iniciar Sesión - Portal Ciudadano">
@@ -97,20 +98,18 @@ import Layout from '../../layouts/Layout.astro';
 		</div>
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		const form = document.getElementById('login-form');
 		const curpInput = document.getElementById('curp');
 		const curpError = document.getElementById('curp-error');
 
-		form.addEventListener('submit', (e) => {
+		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const curp = curpInput.value.trim().toUpperCase();
 			const email = document.getElementById('email').value.trim();
 
-			// Clean errors
 			curpError.classList.add('hidden');
 
-			// Basic CURP validation (18 chars, letters and numbers)
 			const curpRegex = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
 			if (curp.length !== 18) {
 				curpError.textContent = "El CURP debe tener exactamente 18 caracteres.";
@@ -118,7 +117,6 @@ import Layout from '../../layouts/Layout.astro';
 				window.showToast("Corrija el CURP para continuar", "error");
 				return;
 			}
-			
 			if (!curpRegex.test(curp)) {
 				curpError.textContent = "Formato de CURP inválido (Ej: AAAA000000HDFXX000).";
 				curpError.classList.remove('hidden');
@@ -126,16 +124,28 @@ import Layout from '../../layouts/Layout.astro';
 				return;
 			}
 
-			// Save session in localStorage
+			// Intentar login contra el backend
+			try {
+				const res = await fetch(`${API_URL}/api/users/login`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ curp, email })
+				});
+				const json = await res.json();
+				if (json.success && json.data) {
+					localStorage.setItem('citizen_id', json.data.id);
+					localStorage.setItem('citizen_nombre', json.data.nombre_completo || '');
+				}
+			} catch (_) {
+				// Backend no disponible, continúa con sesión local
+			}
+
 			localStorage.setItem('citizen_curp', curp);
 			localStorage.setItem('citizen_email', email);
 			localStorage.setItem('citizen_logged', 'true');
 
 			window.showToast("¡Sesión iniciada con éxito!", "success");
-
-			setTimeout(() => {
-				window.location.href = '/ciudadano';
-			}, 800);
+			setTimeout(() => { window.location.href = '/ciudadano'; }, 800);
 		});
 	</script>
 </Layout>

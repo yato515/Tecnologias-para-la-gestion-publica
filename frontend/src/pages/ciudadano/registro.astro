@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Registro y Consentimiento de Privacidad - Portal Ciudadano">
@@ -136,22 +137,20 @@ import Layout from '../../layouts/Layout.astro';
 		</div>
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		const form = document.getElementById('register-form');
 		const curpInput = document.getElementById('curp');
 		const curpError = document.getElementById('curp-error');
 		const consentCheck = document.getElementById('privacy-consent');
 
-		form.addEventListener('submit', (e) => {
+		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const curp = curpInput.value.trim().toUpperCase();
 			const email = document.getElementById('email').value.trim();
 			const fullname = document.getElementById('fullname').value.trim();
 
-			// Clean error
 			curpError.classList.add('hidden');
 
-			// Basic CURP validation (18 chars, letters and numbers)
 			const curpRegex = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
 			if (curp.length !== 18) {
 				curpError.textContent = "El CURP debe tener exactamente 18 caracteres.";
@@ -159,31 +158,40 @@ import Layout from '../../layouts/Layout.astro';
 				window.showToast("Corrija el CURP para continuar", "error");
 				return;
 			}
-			
 			if (!curpRegex.test(curp)) {
 				curpError.textContent = "Formato de CURP inválido (Ej: AAAA000000HDFXX000).";
 				curpError.classList.remove('hidden');
 				window.showToast("CURP con formato inválido", "error");
 				return;
 			}
-
-			// Validate consent
 			if (!consentCheck.checked) {
 				window.showToast("Debe aceptar expresamente el intercambio de datos gubernamentales.", "error");
 				return;
 			}
 
-			// Save session in localStorage
+			// Registrar en el backend
+			try {
+				const res = await fetch(`${API_URL}/api/users/register`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ curp, email, nombre_completo: fullname })
+				});
+				const json = await res.json();
+				if (json.success && json.data) {
+					localStorage.setItem('citizen_id', json.data.id);
+					localStorage.setItem('citizen_nombre', json.data.nombre_completo || fullname);
+				}
+			} catch (_) {
+				// Backend no disponible, continúa con sesión local
+			}
+
 			localStorage.setItem('citizen_curp', curp);
 			localStorage.setItem('citizen_email', email);
 			localStorage.setItem('citizen_fullname', fullname);
 			localStorage.setItem('citizen_logged', 'true');
 
 			window.showToast("¡Registro y consentimiento completados!", "success");
-
-			setTimeout(() => {
-				window.location.href = '/ciudadano';
-			}, 800);
+			setTimeout(() => { window.location.href = '/ciudadano'; }, 800);
 		});
 	</script>
 </Layout>

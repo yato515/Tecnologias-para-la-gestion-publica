@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
 <Layout title="Buscador y Tracker de Trámites - In óolal Yucatan">
@@ -217,7 +218,7 @@ import Layout from '../../layouts/Layout.astro';
 
 	</div>
 
-	<script is:inline>
+	<script is:inline define:vars={{ API_URL }}>
 		// Setup Search and Track Action
 		const form = document.getElementById('tracker-search-form');
 		const inputQuery = document.getElementById('txt-tracker-query');
@@ -233,15 +234,35 @@ import Layout from '../../layouts/Layout.astro';
 			inputQuery.value = activeFolio;
 		}
 
-		const executeTrackingSearch = (queryStr) => {
+		const executeTrackingSearch = async (queryStr) => {
 			const query = queryStr.trim().toUpperCase();
 			if (!query) return;
 
-			const localRequests = localStorage.getItem('civicflow_requests') || '[]';
-			const requests = JSON.parse(localRequests);
+			// Intentar buscar en la API primero
+			let req = null;
+			try {
+				const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${query}`);
+				const json = await res.json();
+				if (json.success && json.data) {
+					const s = json.data;
+					req = {
+						folio: s.folio || s.id,
+						name: s.tramite?.nombre || 'Trámite',
+						dept: s.dependencia?.nombre || '-',
+						date: (s.created_at || '').split('T')[0],
+						status: s.estado || 'recibido',
+						citizen_fullname: s.ciudadano?.nombre_completo || 'N/A',
+						token: s.token || '-',
+						comments: s.notas || ''
+					};
+				}
+			} catch (_) {}
 
-			// Find by Folio OR by Token
-			const req = requests.find(r => r.folio === query || r.token === query);
+			// Fallback a localStorage si no está en DB
+			if (!req) {
+				const localRequests = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
+				req = localRequests.find(r => r.folio === query || r.token === query);
+			}
 
 			if (!req) {
 				workspace.classList.add('hidden');
@@ -372,14 +393,13 @@ import Layout from '../../layouts/Layout.astro';
 		};
 
 		// Submit Search Handler
-		form.addEventListener('submit', (e) => {
+		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			const q = inputQuery.value.trim().toUpperCase();
 			if(q) {
-				// update search params in address bar without reload
 				const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?folio=' + q;
 				window.history.pushState({path:newurl}, '', newurl);
-				executeTrackingSearch(q);
+				await executeTrackingSearch(q);
 			}
 		});
 
