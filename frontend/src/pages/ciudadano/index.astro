@@ -350,21 +350,41 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 	<script is:inline define:vars={{ API_URL }}>
 		// Protect page access
-		const token = localStorage.getItem('jwt_token');
+		const logged = localStorage.getItem('citizen_logged');
 		const overlay = document.getElementById('login-required-overlay');
 		const content = document.getElementById('hub-content');
 
-		if (!token) {
+		if (logged !== 'true') {
 			window.location.href = '/ciudadano/login';
 		} else {
+			// Remove seed/mock data if present (one-time migration to clean state)
+			const token = localStorage.getItem('jwt_token');
+			if (!token || token === 'mock-jwt-token-demo' || token === 'N/A') {
+				localStorage.removeItem('civicflow_dossier');
+			} else {
+				const _sd = JSON.parse(localStorage.getItem('civicflow_dossier') || '[]');
+				if (_sd.some(d => d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf')) localStorage.removeItem('civicflow_dossier');
+			}
+			const _sr = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
+			if (_sr.some(r => r.folio === 'TRM-2026-00104')) localStorage.removeItem('civicflow_requests');
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
 			
-			const tokenVal = localStorage.getItem('jwt_token') || 'N/A';
 			const tokenEl = document.getElementById('lbl-token');
-			tokenEl.textContent = tokenVal;
+			if (token && token !== 'mock-jwt-token-demo') {
+				tokenEl.textContent = token;
+				tokenEl.title = "Ver completo (Haga clic)";
+			} else {
+				tokenEl.textContent = "N/A (No generado)";
+				tokenEl.title = "Sube tus documentos en tu expediente o realiza un trámite para generar tu token";
+			}
 			tokenEl.addEventListener('click', () => {
-				alert("Token JWT Completo:\n\n" + tokenVal);
+				const currentT = localStorage.getItem('jwt_token');
+				if (currentT && currentT !== 'mock-jwt-token-demo') {
+					alert("Token de Expediente Completo:\n\n" + currentT);
+				} else {
+					alert("No tienes un token generado aún. Se creará automáticamente cuando subas tu primer trámite o cargues un archivo en tu expediente digital.");
+				}
 			});
 
 			// Enable tabs
@@ -478,15 +498,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				filterCatalog();
 			});
 
-			const defaultDossier = [
-				{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "ine_ciudadano_yuc.pdf", status: "Cargado", date: "2026-05-18" },
-				{ id: "dom", name: "Comprobante de Domicilio", file: "comprobante_luz_merida.pdf", status: "Cargado", date: "2026-05-18" },
-				{ id: "acta", name: "Acta de Nacimiento Certificada", file: "acta_nacimiento_cert.pdf", status: "Cargado", date: "2026-05-18" },
-				{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
-			];
-
 			const getDossier = () => {
 				const local = localStorage.getItem('civicflow_dossier');
+				const defaultDossier = [
+					{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "", status: "Pendiente", date: "-" },
+					{ id: "domicilio", name: "Comprobante de Domicilio", file: "", status: "Pendiente", date: "-" },
+					{ id: "acta", name: "Acta de Nacimiento Certificada", file: "", status: "Pendiente", date: "-" },
+					{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
+				];
 				if (!local) {
 					localStorage.setItem('civicflow_dossier', JSON.stringify(defaultDossier));
 					return defaultDossier;
@@ -498,6 +517,23 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const grid = document.getElementById('dossier-grid');
 				const dossier = getDossier();
 				grid.innerHTML = '';
+
+				if (dossier.length === 0) {
+					document.getElementById('lbl-dossier-progress').textContent = '0%';
+					document.getElementById('bar-dossier-progress').style.width = '0%';
+					grid.innerHTML = `
+						<div class="col-span-2 py-16 flex flex-col items-center gap-4 bg-white border border-slate-200 rounded-xl">
+							<div class="w-16 h-16 rounded-full bg-yuc-green/10 text-yuc-green flex items-center justify-center">
+								<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+							</div>
+							<div class="text-center space-y-2">
+								<p class="text-slate-800 font-bold text-sm font-display">Tu expediente digital está vacío</p>
+								<p class="text-slate-400 text-xs max-w-xs">Sube tus documentos una sola vez y se vincularán automáticamente a cada trámite.</p>
+							</div>
+						</div>
+					`;
+					return;
+				}
 
 				let loadedCount = 0;
 				
@@ -581,12 +617,22 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						// File input upload action
 						document.getElementById(`upload-${doc.id}`).addEventListener('change', (e) => {
 							if (e.target.files.length > 0) {
-								const fileName = e.target.files[0].name;
+								const file = e.target.files[0];
+								if (file.type !== "application/pdf" && !file.name.endsWith(".pdf")) {
+									window.showToast("Solo se permiten archivos PDF", "error");
+									e.target.value = "";
+									return;
+								}
+								
+								const curp = localStorage.getItem('citizen_curp') || 'XMOCK';
+								const timestamp = Date.now();
+								const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
 								const currentDate = new Date().toISOString().split('T')[0];
 								
+
 								const newDossier = dossier.map(d => {
 									if (d.id === doc.id) {
-										return { ...d, status: 'Cargado', file: fileName, date: currentDate };
+										return { ...d, status: 'Cargado', file: uniqueName, date: currentDate };
 									}
 									return d;
 								});
@@ -602,6 +648,34 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const progress = Math.round((loadedCount / dossier.length) * 100);
 				document.getElementById('lbl-dossier-progress').textContent = `${progress}%`;
 				document.getElementById('bar-dossier-progress').style.width = `${progress}%`;
+
+				// Token Generation on Completion
+				if (loadedCount === dossier.length && loadedCount > 0) {
+					let currentToken = localStorage.getItem('jwt_token');
+					if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
+						currentToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
+						localStorage.setItem('jwt_token', currentToken);
+						
+						const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+						const currentFiles = {};
+						dossier.forEach(d => { if(d.status==='Cargado') currentFiles[d.id] = d.file; });
+						tokensDict[currentToken] = currentFiles;
+						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
+						
+						const tokenEl = document.getElementById('lbl-token');
+						if(tokenEl) {
+							tokenEl.textContent = currentToken;
+							tokenEl.title = "Ver completo (Haga clic)";
+						}
+						window.showToast(`¡Expediente completo! Se ha generado tu Token de Expediente: ${currentToken}`, "success");
+					} else {
+						// Update existing token's files just in case
+						const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+						if (!tokensDict[currentToken]) tokensDict[currentToken] = {};
+						dossier.forEach(d => { if(d.status==='Cargado') tokensDict[currentToken][d.id] = d.file; });
+						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
+					}
+				}
 			};
 
 			// Full Folder download
@@ -633,24 +707,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				window.showToast("Expediente completo (ZIP) descargado", "success");
 			});
 
-			const defaultRequests = [
-				{
-					folio: "TRM-2026-00104",
-					name: "Acreditación de Productor Henequenero",
-					dept: "Desarrollo Rural",
-					date: "2026-04-12",
-					status: "Aprobado"
-				}
-			];
-
 			const getRequests = () => {
-				const local = localStorage.getItem('civicflow_requests');
-				if (!local) {
-					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
-					return defaultRequests;
-				}
-				return JSON.parse(local);
-			};
+					const local = localStorage.getItem('civicflow_requests');
+					if (!local) return [];
+					return JSON.parse(local);
+				};
 
 			const renderInbox = async () => {
 				const tbody = document.getElementById('inbox-tbody');
@@ -682,7 +743,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					} catch (_) {}
 				}
 
-				const requests = apiRequests.length > 0 ? apiRequests : getRequests();
+				const storedRequests = getRequests();
+				const requests = apiRequests.length > 0 ? apiRequests : storedRequests;
 
 				tbody.innerHTML = '';
 				
@@ -808,8 +870,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			// Count on load
 			const reqs = getRequests();
-			document.getElementById('badge-inbox-count').textContent = reqs.length;
-			if(reqs.length > 0) {
+			if (reqs.length > 0) {
+				document.getElementById('badge-inbox-count').textContent = reqs.length;
 				document.getElementById('badge-inbox-count').classList.remove('hidden');
 				document.getElementById('badge-inbox-count').classList.add('inline-flex');
 			}
