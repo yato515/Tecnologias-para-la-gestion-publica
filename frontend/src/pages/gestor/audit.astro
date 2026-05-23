@@ -21,6 +21,7 @@ import Layout from '../../layouts/Layout.astro';
 			<!-- Submenu -->
 			<div class="flex gap-6 text-sm border-t border-yuc-gold/20 pt-1">
 				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Mesa de Trabajo</a>
+				<a href="/gestor/cola" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Bandeja de Entrada</a>
 				<a href="/gestor/vencidas" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Solicitudes Vencidas</a>
 				<a href="/gestor/audit" class="pb-3 border-b-2 border-yuc-gold text-yuc-gold font-bold transition-all">Logs de Auditoría</a>
 				<a href="#" id="tab-admin-audit" class="hidden pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
@@ -88,7 +89,7 @@ import Layout from '../../layouts/Layout.astro';
 			document.getElementById('lbl-gestor-role-audit').textContent = gestorRole;
 			if (gestorRole.toLowerCase() === 'aprobador') {
 				document.getElementById('tab-admin-audit').classList.remove('hidden');
-				document.getElementById('tab-admin-audit').href = '/gestor/dashboard';
+				document.getElementById('tab-admin-audit').href = '/gestor/dashboard?tab=admin';
 			}
 			document.getElementById('btn-gestor-logout-audit').addEventListener('click', () => {
 				localStorage.removeItem('gestor_logged');

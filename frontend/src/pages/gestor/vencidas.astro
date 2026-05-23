@@ -115,7 +115,7 @@ import Layout from '../../layouts/Layout.astro';
 			document.getElementById('lbl-gestor-role-venc').textContent = gestorRole;
 			if (gestorRole.toLowerCase() === 'aprobador') {
 				document.getElementById('tab-admin-venc').classList.remove('hidden');
-				document.getElementById('tab-admin-venc').href = '/gestor/dashboard';
+				document.getElementById('tab-admin-venc').href = '/gestor/dashboard?tab=admin';
 			}
 			
 			document.getElementById('btn-gestor-logout').addEventListener('click', () => {

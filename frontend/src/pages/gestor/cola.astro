@@ -111,8 +111,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			document.getElementById('lbl-gestor-role-cola').textContent = gestorRole;
 			if (gestorRole.toLowerCase() === 'aprobador') {
 				document.getElementById('tab-admin-cola').classList.remove('hidden');
-				document.getElementById('tab-admin-cola').href = '/gestor/dashboard';
+				document.getElementById('tab-admin-cola').href = '/gestor/dashboard?tab=admin';
 			}
+
 			document.getElementById('btn-gestor-logout-cola').addEventListener('click', () => {
 				localStorage.removeItem('gestor_logged');
 				localStorage.removeItem('gestor_email');

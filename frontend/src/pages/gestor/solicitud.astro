@@ -3,25 +3,40 @@ import Layout from '../../layouts/Layout.astro';
 const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 ---
 
-<Layout title="Detalle de Solicitud">
+<Layout title="Detalle de Solicitud - Panel Gestor">
 	
 	<!-- Manager Sub-navigation header -->
-	<div class="bg-slate-900 text-white transition-colors border-b border-slate-800">
+	<div class="bg-yuc-green-dark text-white transition-colors border-b border-yuc-gold/30">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-6 gap-4">
 				<div>
-					<a href="/gestor/cola" class="text-xs font-bold text-yuc-gold hover:underline flex items-center gap-1.5 mb-1">
+					<a href="/gestor/dashboard" class="text-xs font-bold text-yuc-gold hover:underline flex items-center gap-1.5 mb-1">
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-						<span>Volver a la cola</span>
+						<span>Volver a la Mesa de Trabajo</span>
 					</a>
-					<h1 class="text-2xl font-black font-display">Expediente del Ciudadano</h1>
-					<p class="text-xs text-slate-400 mt-0.5">Folio: <span id="lbl-solicitud-folio" class="font-mono font-bold text-white">...</span></p>
+					<h1 class="text-2xl font-black font-display mt-1">Expediente del Ciudadano</h1>
+					<p class="text-xs text-slate-350 mt-1">Folio: <span id="lbl-solicitud-folio" class="font-mono font-bold text-yuc-gold">...</span></p>
 				</div>
 				<div class="flex items-center gap-3">
 					<span id="lbl-solicitud-status-badge" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300">
 						...
 					</span>
 				</div>
+			</div>
+
+			<!-- Submenu to match dashboard.astro, for consistent UX -->
+			<div class="flex gap-6 text-sm border-t border-yuc-gold/20 pt-1">
+				<a href="/gestor/dashboard" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Mesa de Trabajo</a>
+				<a href="/gestor/cola" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Bandeja de Entrada</a>
+				<a href="/gestor/vencidas" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+					<span>Solicitudes Vencidas</span>
+					<span id="badge-vencidas-count" class="hidden px-1.5 py-0.5 rounded-full bg-red-600 text-white font-extrabold text-[9px]">0</span>
+				</a>
+				<a href="/gestor/audit" class="pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all">Logs de Auditoría</a>
+				<a href="/gestor/dashboard?tab=admin" id="tab-admin" class="hidden pb-3 border-b-2 border-transparent text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+					<svg class="w-4 h-4 text-yuc-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+					<span>Administrar Cuentas</span>
+				</a>
 			</div>
 		</div>
 	</div>
@@ -30,12 +45,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 		
 		<!-- Protected route check overlay -->
-		<div id="gestor-overlay" class="hidden bg-yellow-50 dark:bg-slate-900 border border-yellow-200 dark:border-slate-800 rounded-2xl p-8 text-center max-w-lg mx-auto space-y-6 shadow-xl">
-			<div class="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-950/30 text-yellow-600 dark:text-yellow-500 flex items-center justify-center mx-auto">
+		<div id="gestor-overlay" class="hidden bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center max-w-lg mx-auto space-y-6 shadow-xl">
+			<div class="w-16 h-16 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mx-auto">
 				<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
 			</div>
-			<h3 class="text-xl font-bold text-slate-800 dark:text-white">Acceso Denegado</h3>
-			<a href="/gestor" class="inline-block px-6 py-3 bg-slate-900 text-white rounded-xl shadow-md text-sm">Ir al Acceso Gestor</a>
+			<h3 class="text-xl font-bold text-slate-800">Acceso Denegado</h3>
+			<p class="text-sm text-slate-500">Inicie sesión como funcionario público para ingresar a esta pantalla.</p>
+			<a href="/gestor" class="inline-block px-6 py-3 bg-yuc-green hover:bg-yuc-green-light text-white font-bold rounded-xl shadow-md text-sm">Ir al Acceso Gestor</a>
 		</div>
 
 		<!-- Request workspace -->
@@ -45,37 +61,37 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			<div class="lg:col-span-2 space-y-6">
 				
 				<!-- Citizen Profile Card -->
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
-					<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display border-b border-slate-100 dark:border-slate-850 pb-3">Datos del Ciudadano</h3>
+				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+					<h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider font-display border-b border-slate-100 pb-3">Datos del Ciudadano</h3>
 					
 					<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
 						<div>
 							<p class="text-slate-400 text-[10px] font-bold uppercase">Nombre Completo</p>
-							<p id="lbl-citizen-name" class="font-semibold text-slate-800 dark:text-white mt-1">...</p>
+							<p id="lbl-citizen-name" class="font-semibold text-slate-800 mt-1">...</p>
 						</div>
 						<div>
 							<p class="text-slate-400 text-[10px] font-bold uppercase">CURP</p>
-							<p id="lbl-citizen-curp" class="font-mono font-bold text-slate-800 dark:text-white mt-1">...</p>
+							<p id="lbl-citizen-curp" class="font-mono font-bold text-slate-800 mt-1">...</p>
 						</div>
 						<div>
 							<p class="text-slate-400 text-[10px] font-bold uppercase">Correo Electrónico</p>
-							<p id="lbl-citizen-email" class="text-slate-700 dark:text-slate-350 mt-1">...</p>
+							<p id="lbl-citizen-email" class="text-slate-700 mt-1">...</p>
 						</div>
 						<div>
 							<p class="text-slate-400 text-[10px] font-bold uppercase">Teléfono de Contacto</p>
-							<p id="lbl-citizen-phone" class="text-slate-700 dark:text-slate-350 mt-1">...</p>
+							<p id="lbl-citizen-phone" class="text-slate-700 mt-1">...</p>
 						</div>
 						<div class="sm:col-span-2">
 							<p class="text-slate-400 text-[10px] font-bold uppercase">Domicilio Manifestado</p>
-							<p id="lbl-citizen-address" class="text-slate-700 dark:text-slate-350 mt-1">...</p>
+							<p id="lbl-citizen-address" class="text-slate-700 mt-1">...</p>
 						</div>
 					</div>
 				</div>
 
 				<!-- Citizen History Card (Compact) -->
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
-					<div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-850 pb-3">
-						<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display">Historial de Trámites</h3>
+				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+					<div class="flex items-center justify-between border-b border-slate-100 pb-3">
+						<h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider font-display">Historial de Trámites</h3>
 						<button id="btn-open-history-modal" class="text-[10px] font-bold text-yuc-gold hover:text-yuc-gold-dark uppercase tracking-wider flex items-center gap-1">
 							Ver Completo <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
 						</button>
@@ -87,48 +103,48 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				</div>
 
 				<!-- Attached Documents Card -->
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6">
-					<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display border-b border-slate-100 dark:border-slate-850 pb-3">Expediente de Documentos Adjuntos</h3>
+				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+					<h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider font-display border-b border-slate-100 pb-3">Expediente de Documentos Adjuntos</h3>
 					
 					<div class="space-y-4">
 						
 						<!-- File 1: INE -->
-						<div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 							<div class="flex items-start gap-3">
 								<div class="w-9 h-9 rounded-lg bg-yuc-green/10 text-yuc-green flex items-center justify-center shrink-0">
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-xs">Identificación Oficial (INE)</h4>
+									<h4 class="font-bold text-xs text-slate-800">Identificación Oficial (INE)</h4>
 									<p id="lbl-file-ine-name" class="text-[10px] text-slate-400 font-mono mt-0.5">ine.pdf</p>
 								</div>
 							</div>
 							<div class="flex items-center gap-2">
-								<button class="btn-check-doc px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-emerald-500 hover:text-white">
+								<button class="btn-check-doc px-3 py-1.5 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-emerald-500 hover:text-white">
 									Validar
 								</button>
-								<button class="btn-flag-doc px-3 py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-red-500 hover:text-white">
+								<button class="btn-flag-doc px-3 py-1.5 bg-red-500/10 text-red-600 border border-red-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-red-500 hover:text-white">
 									Observar
 								</button>
 							</div>
 						</div>
 
 						<!-- File 2: Comprobante Domicilio -->
-						<div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 							<div class="flex items-start gap-3">
 								<div class="w-9 h-9 rounded-lg bg-yuc-green/10 text-yuc-green flex items-center justify-center shrink-0">
 									<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path></svg>
 								</div>
 								<div>
-									<h4 class="font-bold text-xs">Comprobante de Domicilio</h4>
+									<h4 class="font-bold text-xs text-slate-800">Comprobante de Domicilio</h4>
 									<p id="lbl-file-dom-name" class="text-[10px] text-slate-400 font-mono mt-0.5">comprobante.pdf</p>
 								</div>
 							</div>
 							<div class="flex items-center gap-2">
-								<button class="btn-check-doc px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-emerald-500 hover:text-white">
+								<button class="btn-check-doc px-3 py-1.5 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-emerald-500 hover:text-white">
 									Validar
 								</button>
-								<button class="btn-flag-doc px-3 py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-red-500 hover:text-white">
+								<button class="btn-flag-doc px-3 py-1.5 bg-red-500/10 text-red-600 border border-red-500/20 text-[10px] font-bold rounded-lg transition-colors hover:bg-red-500 hover:text-white">
 									Observar
 								</button>
 							</div>
@@ -143,16 +159,16 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			<div class="lg:col-span-1 space-y-6">
 				
 				<!-- Action panel card -->
-				<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6 sticky top-24">
+				<div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 sticky top-24">
 					
-					<div class="border-b border-slate-100 dark:border-slate-850 pb-3">
-						<h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider font-display">Dictamen de Trámite</h3>
+					<div class="border-b border-slate-100 pb-3">
+						<h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider font-display">Dictamen de Trámite</h3>
 						<span class="text-[10px] text-slate-400 mt-1 block">Usuario activo: <span id="lbl-role-status" class="font-bold text-yuc-gold">...</span></span>
 					</div>
 
 					<div class="space-y-4" id="action-buttons-container">
 						
-						<!-- REVISOR ACTION: Marcar como revisado (only visible for status 'Recibido') -->
+						<!-- REVISOR ACTION: Marcar como revisado (only visible for status 'Recibido' when role is Revisor) -->
 						<button 
 							id="btn-mark-reviewed" 
 							class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-yuc-green hover:bg-yuc-green-light text-white font-extrabold rounded-xl text-xs shadow-md transition-all hidden"
@@ -163,14 +179,14 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 						<!-- APROBADOR ACTION: Panel de Firma Canvas (only visible for status 'En revisión' or 'Recibido' when role is Aprobador) -->
 						<div id="approver-sign-panel" class="space-y-3 hidden">
-							<label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Dibuje su firma electrónica sobre el recuadro:</label>
-							<div class="border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 rounded-xl overflow-hidden shadow-inner">
+							<label class="block text-xs font-bold text-slate-700 uppercase">Dibuje su firma electrónica sobre el recuadro:</label>
+							<div class="border border-slate-200 bg-slate-50 rounded-xl overflow-hidden shadow-inner">
 								<!-- Interactive signature canvas -->
 								<canvas id="signature-canvas" width="280" height="130" class="cursor-crosshair block w-full"></canvas>
 							</div>
 							<div class="flex justify-between items-center text-[10px]">
-								<button id="btn-clear-canvas" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase">Limpiar Recuadro</button>
-								<span class="text-slate-400 font-medium">Firma Autógrafa Simple</span>
+								<button id="btn-clear-canvas" class="text-slate-400 hover:text-slate-600 font-bold uppercase">Limpiar Recuadro</button>
+								<span class="text-slate-450 font-medium">Firma Autógrafa Simple</span>
 							</div>
 							<button 
 								id="btn-dictaminate-approve" 
@@ -184,7 +200,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						<!-- Correction needed trigger -->
 						<button 
 							id="btn-trigger-correction"
-							class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white border border-amber-500/20 text-xs font-bold rounded-xl transition-all"
+							class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-500/20 text-xs font-bold rounded-xl transition-all"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
 							<span>Solicitar Corrección</span>
@@ -193,7 +209,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						<!-- Rejection trigger -->
 						<button 
 							id="btn-trigger-reject"
-							class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-500 hover:bg-red-50 hover:text-white border border-red-500/20 text-xs font-bold rounded-xl transition-all"
+							class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-650 hover:bg-red-600 hover:text-white border border-red-500/20 text-xs font-bold rounded-xl transition-all"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
 							<span>Rechazar Trámite</span>
@@ -203,11 +219,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 					<!-- Correction Form Overlay Box (Toggled by button) -->
 					<div id="correction-input-box" class="hidden p-4 rounded-xl bg-amber-500/5 border border-amber-500/15 space-y-3">
-						<label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Observación para el ciudadano:</label>
-						<textarea id="txt-correction-comment" rows="3" class="w-full p-2 border border-slate-200 dark:border-slate-800 rounded-lg text-xs bg-white dark:bg-slate-900" placeholder="Escriba qué documento debe corregir..."></textarea>
+						<label class="block text-xs font-bold text-slate-700 uppercase">Observación para el ciudadano:</label>
+						<textarea id="txt-correction-comment" rows="3" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white text-slate-900" placeholder="Escriba qué documento debe corregir..."></textarea>
 						<div class="flex gap-2">
-							<button id="btn-submit-correction" class="px-3 py-1.5 bg-amber-500 text-white rounded font-bold text-xs">Enviar</button>
-							<button id="btn-cancel-correction" class="px-3 py-1.5 bg-slate-200 text-slate-700 rounded font-bold text-xs">Cancelar</button>
+							<button id="btn-submit-correction" class="px-3 py-1.5 bg-amber-500 text-white rounded font-bold text-xs hover:bg-amber-600 transition-colors">Enviar</button>
+							<button id="btn-cancel-correction" class="px-3 py-1.5 bg-slate-200 text-slate-700 rounded font-bold text-xs hover:bg-slate-300 transition-colors">Cancelar</button>
 						</div>
 					</div>
 
@@ -219,21 +235,21 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 	</div>
 
 	<!-- FULL HISTORY MODAL -->
-	<div id="history-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-		<div class="bg-slate-900 border border-yuc-gold/30 max-w-3xl w-full rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+	<div id="history-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+		<div class="bg-white border border-slate-200 max-w-3xl w-full rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
 			<div class="h-1 bg-yuc-gold w-full"></div>
-			<div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-900 z-10 relative">
-				<h3 class="text-lg font-bold text-white font-display flex items-center gap-2">
+			<div class="p-5 border-b border-slate-200 flex justify-between items-center bg-white z-10 relative">
+				<h3 class="text-lg font-bold text-slate-800 font-display flex items-center gap-2">
 					<svg class="w-5 h-5 text-yuc-gold" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 					Historial Completo del Ciudadano
 				</h3>
-				<button id="btn-close-history-modal" class="text-slate-400 hover:text-white">&times;</button>
+				<button id="btn-close-history-modal" class="text-slate-450 hover:text-slate-700 font-bold text-xl">&times;</button>
 			</div>
 
-			<div class="p-5 bg-slate-800/30 border-b border-slate-800 flex flex-wrap gap-4 items-end">
+			<div class="p-5 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 items-end">
 				<div>
-					<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Año</label>
-					<select id="filter-year" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white text-xs focus:ring-1 focus:ring-yuc-gold focus:outline-none">
+					<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Año</label>
+					<select id="filter-year" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-800 text-xs focus:ring-1 focus:ring-yuc-gold focus:outline-none">
 						<option value="all">Todos</option>
 						<option value="2026">2026</option>
 						<option value="2025">2025</option>
@@ -241,8 +257,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					</select>
 				</div>
 				<div>
-					<label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Mes</label>
-					<select id="filter-month" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-white text-xs focus:ring-1 focus:ring-yuc-gold focus:outline-none">
+					<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mes</label>
+					<select id="filter-month" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-800 text-xs focus:ring-1 focus:ring-yuc-gold focus:outline-none">
 						<option value="all">Todos</option>
 						<option value="0">Enero</option>
 						<option value="1">Febrero</option>
@@ -263,7 +279,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			<div class="overflow-y-auto p-5 flex-1 custom-scrollbar">
 				<div class="overflow-x-auto">
 					<table class="w-full text-left text-sm whitespace-nowrap">
-						<thead class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
+						<thead class="text-[10px] uppercase tracking-wider text-slate-500 border-b border-slate-200">
 							<tr>
 								<th class="pb-3 font-bold">Folio</th>
 								<th class="pb-3 font-bold">Trámite</th>
@@ -271,9 +287,9 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								<th class="pb-3 font-bold">Estado</th>
 							</tr>
 						</thead>
-						<tbody id="tbl-history-body" class="divide-y divide-slate-800 text-slate-300 text-xs">
+						<tbody id="tbl-history-body" class="divide-y divide-slate-150 text-slate-750 text-xs">
 							<tr>
-								<td colspan="4" class="py-8 text-center text-slate-500">Buscando registros...</td>
+								<td colspan="4" class="py-8 text-center text-slate-400">Buscando registros...</td>
 							</tr>
 						</tbody>
 					</table>
@@ -283,55 +299,55 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 	</div>
 
 	<!-- REJECTION TEMPLATE MODAL OVERLAY (Initially Hidden) -->
-	<div id="rejection-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-		<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 transform scale-95 transition-transform duration-300">
+	<div id="rejection-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+		<div class="bg-white border border-slate-200 max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6 transform scale-95 transition-transform duration-300">
 			
-			<div class="flex justify-between items-center pb-3 border-b border-slate-100 dark:border-slate-850">
-				<h3 class="text-lg font-bold text-slate-800 dark:text-white font-display">Rechazar Solicitud de Trámite</h3>
-				<button id="btn-close-reject-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">&times;</button>
+			<div class="flex justify-between items-center pb-3 border-b border-slate-100">
+				<h3 class="text-lg font-bold text-slate-800 font-display">Rechazar Solicitud de Trámite</h3>
+				<button id="btn-close-reject-modal" class="text-slate-450 hover:text-slate-700 font-bold text-xl">&times;</button>
 			</div>
 
 			<div class="space-y-4">
-				<label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Seleccione una Plantilla de Rechazo Predefinida:</label>
+				<label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Seleccione una Plantilla de Rechazo Predefinida:</label>
 				
 				<div class="grid grid-cols-1 gap-2.5">
 					<button 
 						type="button" 
-						class="btn-reject-template p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-red-500/50 bg-slate-50 dark:bg-slate-950/20 text-left text-xs transition-colors"
+						class="btn-reject-template p-3 rounded-lg border border-slate-200 hover:border-red-500/50 bg-slate-50 text-left text-xs transition-colors"
 						data-comment="Documentación ilegible: Los archivos escaneados de Identificación Oficial o Comprobante de Domicilio no cuentan con la resolución necesaria para validar sellos o firmas oficiales."
 					>
-						<strong class="block text-slate-800 dark:text-slate-200 font-bold mb-1">1. Documentación ilegible o borrosa</strong>
-						<span class="text-[10px] text-slate-400 block leading-tight">Archivos no legibles para cotejo oficial.</span>
+						<strong class="block text-slate-800 font-bold mb-1">1. Documentación ilegible o borrosa</strong>
+						<span class="text-[10px] text-slate-500 block leading-tight">Archivos no legibles para cotejo oficial.</span>
 					</button>
 
 					<button 
 						type="button" 
-						class="btn-reject-template p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-red-500/50 bg-slate-50 dark:bg-slate-950/20 text-left text-xs transition-colors"
+						class="btn-reject-template p-3 rounded-lg border border-slate-200 hover:border-red-500/50 bg-slate-50 text-left text-xs transition-colors"
 						data-comment="Fuera de competencia territorial: El domicilio manifestado por el solicitante corresponde a una demarcación municipal no adscrita a las competencias de esta oficina estatal."
 					>
-						<strong class="block text-slate-800 dark:text-slate-200 font-bold mb-1">2. Fuera de competencia territorial</strong>
-						<span class="text-[10px] text-slate-400 block leading-tight">El domicilio no pertenece al estado de Yucatán.</span>
+						<strong class="block text-slate-800 font-bold mb-1">2. Fuera de competencia territorial</strong>
+						<span class="text-[10px] text-slate-500 block leading-tight">El domicilio no pertenece al estado de Yucatán.</span>
 					</button>
 
 					<button 
 						type="button" 
-						class="btn-reject-template p-3 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-red-500/50 bg-slate-50 dark:bg-slate-950/20 text-left text-xs transition-colors"
+						class="btn-reject-template p-3 rounded-lg border border-slate-200 hover:border-red-500/50 bg-slate-50 text-left text-xs transition-colors"
 						data-comment="Solicitud duplicada: Se detectó una solicitud previa con el mismo CURP y para el mismo ejercicio fiscal en estado Aprobado o En revisión."
 					>
-						<strong class="block text-slate-800 dark:text-slate-200 font-bold mb-1">3. Solicitud duplicada</strong>
-						<span class="text-[10px] text-slate-400 block leading-tight">Folio ya registrado previamente para este ciudadano.</span>
+						<strong class="block text-slate-800 font-bold mb-1">3. Solicitud duplicada</strong>
+						<span class="text-[10px] text-slate-500 block leading-tight">Folio ya registrado previamente para este ciudadano.</span>
 					</button>
 				</div>
 
 				<div class="space-y-1.5 pt-2">
-					<label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">Comentario final de Rechazo (se envía al correo):</label>
-					<textarea id="txt-reject-comment" rows="3" class="w-full p-2.5 border border-slate-200 dark:border-slate-800 rounded-lg text-xs bg-white dark:bg-slate-900" placeholder="Seleccione una plantilla anterior o escriba aquí..."></textarea>
+					<label class="block text-xs font-bold text-slate-700 uppercase">Comentario final de Rechazo (se envía al correo):</label>
+					<textarea id="txt-reject-comment" rows="3" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white text-slate-900" placeholder="Seleccione una plantilla anterior o escriba aquí..."></textarea>
 				</div>
 			</div>
 
-			<div class="flex justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-850">
-				<button id="btn-cancel-reject-modal" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-200">Cancelar</button>
-				<button id="btn-submit-reject" class="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-500">Dictaminar Rechazo</button>
+			<div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+				<button id="btn-cancel-reject-modal" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors">Cancelar</button>
+				<button id="btn-submit-reject" class="px-4 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-500 transition-colors">Dictaminar Rechazo</button>
 			</div>
 
 		</div>
@@ -343,56 +359,32 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 		if (gestorLogged !== 'true') {
 			window.location.href = '/gestor';
 		} else {
-<<<<<<< HEAD
-            const init = async () => {
-			    const params = new URLSearchParams(window.location.search);
-			    const folio = params.get('id');
-=======
-			const params = new URLSearchParams(window.location.search);
-			
-			// Helper para actualizar estado en el servidor
-			async function actualizarEstadoEnServidor(estadoNuevo, notas) {
-				const targetId = req.id || req.folio;
-				if (!targetId) return false;
-				try {
-					const res = await fetch(`${API_URL}/api/gestores/solicitudes/${targetId}/estado`, {
-						method: 'PATCH',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							estado_nuevo: estadoNuevo,
-							notas: notas,
-							usuario_id: localStorage.getItem('gestor_id') || 'demo-gestor-id',
-							ip: '192.168.1.104',
-							correo_destinatario: req.citizen_email || null,
-							nombre_destinatario: req.citizen_fullname || null
-						})
-					});
-					const data = await res.json();
-					return data.success;
-				} catch (e) {
-					console.warn("No se pudo sincronizar el cambio de estado con el servidor:", e);
-					return false;
+			const init = async () => {
+				const params = new URLSearchParams(window.location.search);
+				const folio = params.get('id');
+
+				const role = localStorage.getItem('gestor_role') || 'Revisor';
+				const userEmail = localStorage.getItem('gestor_email') || 'N/A';
+				document.getElementById('lbl-role-status').textContent = `${role} (${userEmail})`;
+
+				// Show admin tab if user is Aprobador
+				if (role.toLowerCase() === 'aprobador') {
+					document.getElementById('tab-admin').classList.remove('hidden');
 				}
-			}
-			const folio = params.get('id');
->>>>>>> f02364ec11e3236f39429ffa33b48e0143c3a4a8
 
-			    const role = localStorage.getItem('gestor_role') || 'Revisor';
-                const userEmail = localStorage.getItem('gestor_email');
-			    document.getElementById('lbl-role-status').textContent = `${role} (${userEmail})`;
+				// Load request from Backend
+				const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${folio}`);
+				const json = await res.json();
 
-                // Load request from Backend
-                const res = await fetch(`${API_URL}/api/tramites/solicitudes/folio/${folio}`);
-                const json = await res.json();
-
-<<<<<<< HEAD
-			    if (!json.success || !json.data) {
-				    document.getElementById('solicitud-workspace').classList.add('hidden');
-				    window.showToast("Folio no encontrado en base de datos", "error");
-                    return;
-			    }
-			    const req = json.data;
-                const reqId = req.id;
+				if (!json.success || !json.data) {
+					document.getElementById('solicitud-workspace').classList.add('hidden');
+					window.showToast("Folio no encontrado en base de datos", "error");
+					return;
+				}
+				
+				const req = json.data;
+				const reqId = req.id;
+				const ciudadanoId = req.ciudadano_id || req.ciudadano?.id;
 
 				const statusMap = {
 					'recibido': 'Recibido',
@@ -402,14 +394,6 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					'rechazado': 'Rechazado'
 				};
 				const displayStatus = statusMap[req.estado] || req.estado;
-=======
-			if (reqIdx === -1) {
-				document.getElementById('solicitud-workspace').classList.add('hidden');
-				window.showToast("Folio no encontrado en base de datos", "error");
-			} else {
-				const req = requests[reqIdx];
-				const ciudadanoId = req.ciudadano_id; // Added citizen ID extraction
->>>>>>> f02364ec11e3236f39429ffa33b48e0143c3a4a8
 
 				// Fill labels
 				document.getElementById('lbl-solicitud-folio').textContent = req.folio;
@@ -425,11 +409,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				// Set status badge
 				const statusBadge = document.getElementById('lbl-solicitud-status-badge');
 				statusBadge.textContent = displayStatus;
-				let badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
-				if (req.estado === 'en_revision') badgeClass = 'bg-amber-500/15 text-amber-500 border border-amber-500/20';
-				else if (req.estado === 'aprobado') badgeClass = 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/20';
-				else if (req.estado === 'documentacion_incompleta') badgeClass = 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
-				else if (req.estado === 'rechazado') badgeClass = 'bg-red-500/15 text-red-500 border border-red-500/20';
+				let badgeClass = 'bg-slate-100 text-slate-700';
+				if (req.estado === 'en_revision') badgeClass = 'bg-amber-100 text-amber-705 border border-amber-200';
+				else if (req.estado === 'aprobado') badgeClass = 'bg-emerald-100 text-emerald-700 border border-emerald-250';
+				else if (req.estado === 'documentacion_incompleta') badgeClass = 'bg-orange-100 text-orange-700 border border-orange-200';
+				else if (req.estado === 'rechazado') badgeClass = 'bg-red-100 text-red-700 border border-red-200';
 				else if (req.estado === 'recibido') badgeClass = 'bg-yuc-green/15 text-yuc-green border border-yuc-green/20';
 				statusBadge.className = `px-3.5 py-1.5 rounded-full text-xs font-bold ${badgeClass}`;
 
@@ -437,13 +421,13 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const btnReview = document.getElementById('btn-mark-reviewed');
 				const signPanel = document.getElementById('approver-sign-panel');
 
-				if (role === 'Revisor' && req.estado === 'recibido') {
+				if (role.toLowerCase() === 'revisor' && req.estado === 'recibido') {
 					btnReview.classList.remove('hidden');
-				} else if (role === 'Aprobador' && (req.estado === 'en_revision' || req.estado === 'recibido')) {
+				} else if (role.toLowerCase() === 'aprobador' && (req.estado === 'en_revision' || req.estado === 'recibido')) {
 					signPanel.classList.remove('hidden');
 				}
 
-				// Doc Review Checklist mock behavior
+				// Doc Review Checklist behavior
 				const btnChecks = document.querySelectorAll('.btn-check-doc');
 				const btnFlags = document.querySelectorAll('.btn-flag-doc');
 
@@ -451,7 +435,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					btn.addEventListener('click', (e) => {
 						e.preventDefault();
 						const row = btn.parentElement;
-						row.innerHTML = `<span class="text-[10px] font-extrabold text-emerald-500 flex items-center gap-1">✓ DOCUMENTO CORRECTO</span>`;
+						row.innerHTML = `<span class="text-[10px] font-extrabold text-emerald-600 flex items-center gap-1">✓ DOCUMENTO CORRECTO</span>`;
 						window.showToast("Documento validado para expediente", "success");
 					});
 				});
@@ -460,7 +444,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					btn.addEventListener('click', (e) => {
 						e.preventDefault();
 						const row = btn.parentElement;
-						row.innerHTML = `<span class="text-[10px] font-extrabold text-red-500 flex items-center gap-1">⚠️ DOCUMENTO CON INCONSISTENCIA</span>`;
+						row.innerHTML = `<span class="text-[10px] font-extrabold text-red-650 flex items-center gap-1">⚠️ DOCUMENTO CON OBSERVACIONES</span>`;
 						// Auto trigger correction drawer
 						document.getElementById('btn-trigger-correction').click();
 						document.getElementById('txt-correction-comment').value = "Se detectó que el archivo INE/Comprobante de domicilio no es legible o requiere actualización.";
@@ -468,7 +452,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					});
 				});
 
-                const updateEstadoBackend = async (estadoNuevo, notas) => {
+				const updateEstadoBackend = async (estadoNuevo, notas) => {
 					try {
 						const response = await fetch(`${API_URL}/api/gestores/solicitudes/${reqId}/estado`, {
 							method: 'PATCH',
@@ -476,8 +460,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 							body: JSON.stringify({
 								estado_nuevo: estadoNuevo,
 								notas: notas || '',
-								usuario_id: userEmail, // Using email as identifier for mock setup
-								ip: '192.168.1.104'
+								usuario_id: userEmail,
+								ip: '192.168.1.104',
+								correo_destinatario: req.campos_respuesta?.email || null,
+								nombre_destinatario: req.ciudadano?.nombre_completo || null
 							})
 						});
 						const j = await response.json();
@@ -491,41 +477,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 				// Revisor mark reviewed action
 				btnReview.addEventListener('click', async () => {
-<<<<<<< HEAD
 					const success = await updateEstadoBackend('en_revision', 'Revisión técnica de documentos completada. Se avanza expediente para firma y dictamen del Director.');
-                    if(success) {
-					    window.showToast("Marcar como revisado completado con éxito", "success");
-					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
-                    }
-=======
-					const prevStatus = req.status;
-					req.status = 'En revisión';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					const comment = "Revisión técnica de documentos completada. Se avanza expediente para firma y dictamen del Director.";
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: "Revisor",
-						estado_anterior: prevStatus,
-						estado_nuevo: 'En revisión',
-						comentario: comment,
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					// Llamar al backend
-					await actualizarEstadoEnServidor('en_revision', comment);
-
-					window.showToast("Marcar como revisado completado con éxito", "success");
-
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
->>>>>>> f02364ec11e3236f39429ffa33b48e0143c3a4a8
+					if(success) {
+						window.showToast("Marcar como revisado completado con éxito", "success");
+						setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+					}
 				});
 
 				// Correction Drawer handling
@@ -551,41 +507,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						return;
 					}
 
-<<<<<<< HEAD
 					const success = await updateEstadoBackend('documentacion_incompleta', `Corrección solicitada: ${comment}`);
-                    if(success) {
-					    window.showToast("Notificación enviada al ciudadano", "success");
-					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
-                    }
-=======
-					const prevStatus = req.status;
-					req.status = 'Documentación incompleta';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					const fullComment = `Corrección solicitada: ${comment}`;
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: role,
-						estado_anterior: prevStatus,
-						estado_nuevo: 'Documentación incompleta',
-						comentario: fullComment,
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					// Llamar al backend
-					await actualizarEstadoEnServidor('documentacion_incompleta', fullComment);
-
-					window.showToast("Notificación enviada al ciudadano", "success");
-					
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
->>>>>>> f02364ec11e3236f39429ffa33b48e0143c3a4a8
+					if(success) {
+						window.showToast("Notificación enviada al ciudadano", "success");
+						setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+					}
 				});
 
 				// Rejection modal trigger
@@ -621,41 +547,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						return;
 					}
 
-<<<<<<< HEAD
-                    const success = await updateEstadoBackend('rechazado', `Trámite rechazado de forma definitiva: ${comment}`);
-                    if(success) {
-					    window.showToast("Trámite rechazado definitivamente", "error");
-					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
-                    }
-=======
-					const prevStatus = req.status;
-					req.status = 'Rechazado';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					const fullComment = `Trámite rechazado de forma definitiva: ${comment}`;
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: role,
-						estado_anterior: prevStatus,
-						estado_nuevo: 'Rechazado',
-						comentario: fullComment,
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					// Llamar al backend
-					await actualizarEstadoEnServidor('rechazado', fullComment);
-
-					window.showToast("Trámite rechazado definitivamente", "error");
-
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
->>>>>>> f02364ec11e3236f39429ffa33b48e0143c3a4a8
+					const success = await updateEstadoBackend('rechazado', `Trámite rechazado de forma definitiva: ${comment}`);
+					if(success) {
+						window.showToast("Trámite rechazado definitivamente", "error");
+						setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+					}
 				});
 
 				// Approver Canvas Drawing signature logic
@@ -664,7 +560,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				let drawing = false;
 
 				// Styles for canvas signature line
-				ctx.strokeStyle = document.documentElement.classList.contains('dark') ? '#ffff00' : '#00382b';
+				ctx.strokeStyle = '#00382b';
 				ctx.lineWidth = 2.5;
 				ctx.lineCap = 'round';
 
@@ -713,45 +609,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 				// Approver dictaminate approval
 				document.getElementById('btn-dictaminate-approve').addEventListener('click', async () => {
-					// Verify canvas is signed (simple check if pixels altered)
-<<<<<<< HEAD
 					const success = await updateEstadoBackend('aprobado', "Trámite validado, firmado y aprobado con firma autógrafa digitalizada.");
-                    if(success) {
-					    window.showToast("Trámite aprobado y firmado digitalmente", "success");
-					    setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
-                    }
-				});
-
-			}; // End of init async function
-            init(); // Call the init function
-=======
-					const prevStatus = req.status;
-					req.status = 'Aprobado';
-					localStorage.setItem('civicflow_requests', JSON.stringify(requests));
-
-					const auditLogs = JSON.parse(localStorage.getItem('civicflow_audit_logs') || '[]');
-					const comment = "Trámite validado, firmado y aprobado con firma autógrafa digitalizada.";
-					auditLogs.push({
-						id: `LOG-${Math.floor(1000 + Math.random() * 9000)}`,
-						folio: folio,
-						user_id: localStorage.getItem('gestor_email'),
-						rol: "Aprobador",
-						estado_anterior: prevStatus,
-						estado_nuevo: 'Aprobado',
-						comentario: comment,
-						ip: "192.168.1.104",
-						timestamp: new Date().toLocaleString()
-					});
-					localStorage.setItem('civicflow_audit_logs', JSON.stringify(auditLogs));
-
-					// Llamar al backend
-					await actualizarEstadoEnServidor('aprobado', comment);
-
-					window.showToast("Trámite aprobado y firmado digitalmente", "success");
-
-					setTimeout(() => {
-						window.location.href = '/gestor/cola';
-					}, 800);
+					if(success) {
+						window.showToast("Trámite aprobado y firmado digitalmente", "success");
+						setTimeout(() => { window.location.href = '/gestor/cola'; }, 800);
+					}
 				});
 
 				// --- CITIZEN HISTORY LOGIC ---
@@ -760,7 +622,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				async function loadHistory() {
 					if(!ciudadanoId) return;
 					try {
-						const res = await fetch(`http://localhost:3000/api/gestores/ciudadano/${ciudadanoId}/historial`);
+						const res = await fetch(`${API_URL}/api/gestores/ciudadano/${ciudadanoId}/historial`);
 						const data = await res.json();
 						if(data.success) {
 							allHistory = data.data;
@@ -769,15 +631,15 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 						}
 					} catch (e) {
 						console.error("Error fetching history", e);
-						document.getElementById('compact-history-list').innerHTML = `<div class="text-xs text-red-400 py-2">Error al cargar historial</div>`;
+						document.getElementById('compact-history-list').innerHTML = `<div class="text-xs text-red-600 py-2 font-semibold">Error al cargar historial</div>`;
 					}
 				}
 
 				function getStatusBadgeClass(status) {
-					if (status === 'Aprobado') return 'bg-emerald-500/15 text-emerald-500 border border-emerald-500/20';
-					if (status === 'Rechazado') return 'bg-red-500/15 text-red-500 border border-red-500/20';
-					if (status === 'En revisión') return 'bg-amber-500/15 text-amber-500 border border-amber-500/20';
-					if (status === 'Documentación incompleta') return 'bg-orange-500/15 text-orange-500 border border-orange-500/20';
+					if (status === 'aprobado' || status === 'Aprobado') return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+					if (status === 'rechazado' || status === 'Rechazado') return 'bg-red-100 text-red-700 border border-red-200';
+					if (status === 'en_revision' || status === 'En revisión') return 'bg-amber-100 text-amber-705 border border-amber-200';
+					if (status === 'documentacion_incompleta' || status === 'Documentación incompleta') return 'bg-orange-100 text-orange-700 border border-orange-200';
 					return 'bg-yuc-green/15 text-yuc-green border border-yuc-green/20';
 				}
 
@@ -793,10 +655,10 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					recent.forEach(h => {
 						const d = new Date(h.created_at);
 						html += `
-							<div class="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/20 flex flex-col gap-1.5">
+							<div class="p-3 rounded-xl border border-slate-200 bg-slate-50 flex flex-col gap-1.5">
 								<div class="flex justify-between items-start">
-									<span class="font-bold text-xs text-slate-800 dark:text-white">${h.tramite?.nombre || 'Trámite'}</span>
-									<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(h.estado)}">${h.estado}</span>
+									<span class="font-bold text-xs text-slate-800">${h.tramite?.nombre || 'Trámite'}</span>
+									<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(h.estado)}">${statusMap[h.estado] || h.estado}</span>
 								</div>
 								<div class="flex justify-between items-center text-[10px] text-slate-500">
 									<span class="font-mono">${h.folio}</span>
@@ -829,12 +691,12 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					filtered.forEach(h => {
 						const d = new Date(h.created_at);
 						html += `
-							<tr class="hover:bg-slate-800/50 transition-colors">
+							<tr class="hover:bg-slate-50 transition-colors">
 								<td class="py-3 font-mono text-[10px]">${h.folio}</td>
-								<td class="py-3 font-medium text-white">${h.tramite?.nombre || 'Trámite'}</td>
-								<td class="py-3 text-slate-400">${d.toLocaleDateString()}</td>
+								<td class="py-3 font-medium text-slate-800">${h.tramite?.nombre || 'Trámite'}</td>
+								<td class="py-3 text-slate-650">${d.toLocaleDateString()}</td>
 								<td class="py-3">
-									<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(h.estado)}">${h.estado}</span>
+									<span class="px-2 py-0.5 rounded text-[10px] font-bold ${getStatusBadgeClass(h.estado)}">${statusMap[h.estado] || h.estado}</span>
 								</td>
 							</tr>
 						`;
@@ -855,8 +717,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 				// Trigger load
 				loadHistory();
-			}
->>>>>>> f02364ec11e3236f39429ffa33b48e0143c3a4a8
+			};
+			init();
 		}
 	</script>
 </Layout>
