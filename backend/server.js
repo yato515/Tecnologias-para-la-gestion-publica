@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import userRoutes from './routes/users.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import { verifyToken } from './middleware/auth.middleware.js';
 
 import userRoutes    from './routes/users.routes.js';
 import gestorRoutes  from './routes/gestores.js';
