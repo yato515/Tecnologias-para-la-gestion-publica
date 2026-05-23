@@ -2,7 +2,7 @@ import { supabase, supabaseAdmin } from '../config/supabase.service.js';
 import { EmailService } from '../services/email.service.js';
 
 const TRANSICIONES_VALIDAS = {
-  recibido:                  ['en_revision'],
+  recibido:                  ['en_revision', 'rechazado', 'documentacion_incompleta', 'aprobado'],
   en_revision:               ['documentacion_incompleta', 'aprobado', 'rechazado'],
   documentacion_incompleta:  ['en_revision'],
   aprobado:                  [],
@@ -20,7 +20,7 @@ export const GestorController = {
         .from('solicitudes')
         .select(`
           *,
-          ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp),
+          ciudadano:perfiles!ciudadano_id(id, nombre_completo),
           tramite:tramites_catalogo(nombre),
           dependencia:dependencias(nombre)
         `);
@@ -94,7 +94,7 @@ export const GestorController = {
 
       const selectFields = `
         *,
-        ciudadano:perfiles!ciudadano_id(id, nombre_completo, curp),
+        ciudadano:perfiles!ciudadano_id(id, nombre_completo),
         tramite:tramites_catalogo(nombre),
         dependencia:dependencias(nombre)
       `;
@@ -177,7 +177,7 @@ export const GestorController = {
       let query = client.from('solicitudes').select(`
         *,
         tramite:tramites_catalogo(nombre),
-        ciudadano:perfiles!ciudadano_id(nombre_completo, email)
+        ciudadano:perfiles!ciudadano_id(nombre_completo)
       `);
       query = isUUID ? query.eq('id', id) : query.eq('folio', id);
       query = query.limit(1);
@@ -206,15 +206,19 @@ export const GestorController = {
         .single();
       if (error) throw error;
 
-      // Insertar en audit_log
-      await supabase.from('audit_log').insert([{
-        solicitud_id: solicitud.id,
-        usuario_id,
-        estado_anterior: solicitud.estado,
-        estado_nuevo,
-        ip: ip || null,
-        notas: notas || null
-      }]);
+      // Insertar en audit_log (con try/catch por si usuario_id es email en lugar de uuid)
+      try {
+        await supabase.from('audit_log').insert([{
+          solicitud_id: solicitud.id,
+          usuario_id: (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(usuario_id)) ? usuario_id : null,
+          estado_anterior: solicitud.estado,
+          estado_nuevo,
+          ip: ip || null,
+          notas: notas || null
+        }]);
+      } catch (auditErr) {
+        console.warn("Advertencia: No se pudo registrar audit_log:", auditErr);
+      }
 
       // Enviar correo de confirmación de aprobación con Mailjet
       if (estado_nuevo === 'aprobado') {

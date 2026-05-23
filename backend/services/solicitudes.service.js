@@ -50,7 +50,7 @@ export const SolicitudesService = {
     const client = supabaseAdmin || supabase;
     let query = client
       .from('solicitudes')
-      .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo, curp)');
+      .select('*, tramite:tramites_catalogo(nombre), dependencia:dependencias(nombre), ciudadano:perfiles!ciudadano_id(nombre_completo)');
 
     query = isUUID ? query.eq('id', identifier) : query.eq('folio', identifier);
 
