@@ -124,6 +124,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				return;
 			}
 
+			let loginSuccess = false;
 			// Intentar login contra el backend
 			try {
 				const res = await fetch(`${API_URL}/api/auth/login`, {
@@ -136,17 +137,27 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					localStorage.setItem('jwt_token', json.token);
 					localStorage.setItem('citizen_id', json.user.id);
 					localStorage.setItem('citizen_nombre', json.user.nombre || '');
+					loginSuccess = true;
+				} else {
+					window.showToast(json.message || "Credenciales inválidas en el servidor.", "error");
+					return;
 				}
 			} catch (_) {
-				// Backend no disponible, continúa con sesión local
+				// Backend no disponible, continúa con sesión local (modo demo)
+				localStorage.setItem('jwt_token', 'mock-jwt-token-demo');
+				localStorage.setItem('citizen_id', 'demo-citizen-id');
+				localStorage.setItem('citizen_nombre', 'Ciudadano Demo');
+				loginSuccess = true;
 			}
 
-			localStorage.setItem('citizen_curp', curp);
-			localStorage.setItem('citizen_email', email);
-			localStorage.setItem('citizen_logged', 'true');
+			if (loginSuccess) {
+				localStorage.setItem('citizen_curp', curp);
+				localStorage.setItem('citizen_email', email);
+				localStorage.setItem('citizen_logged', 'true');
 
-			window.showToast("¡Sesión iniciada con éxito!", "success");
-			setTimeout(() => { window.location.href = '/ciudadano'; }, 800);
+				window.showToast("¡Sesión iniciada con éxito!", "success");
+				setTimeout(() => { window.location.href = '/ciudadano'; }, 800);
+			}
 		});
 	</script>
 </Layout>

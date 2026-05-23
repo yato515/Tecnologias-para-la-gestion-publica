@@ -95,6 +95,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			const password = document.getElementById('password').value;
 			const role = document.getElementById('role').value;
 
+			let loginSuccess = false;
 			try {
 				const res = await fetch(`${API_URL}/api/auth/login`, {
 					method: 'POST',
@@ -106,21 +107,29 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					localStorage.setItem('jwt_token_gestor', json.token);
 					localStorage.setItem('gestor_logged', 'true');
 					localStorage.setItem('gestor_email', json.user.email);
+					loginSuccess = true;
+				} else {
+					window.showToast(json.message || "Credenciales inválidas en el servidor.", "error");
+					return;
 				}
 			} catch (_) {
 				// Fallback local en desarrollo/modo demo
+				localStorage.setItem('jwt_token_gestor', 'mock-jwt-token-gestor-demo');
+				loginSuccess = true;
 			}
 
-			// Aseguramos persistencia local de rol y login para demo
-			localStorage.setItem('gestor_logged', 'true');
-			localStorage.setItem('gestor_email', email);
-			localStorage.setItem('gestor_role', role);
+			if (loginSuccess) {
+				// Aseguramos persistencia local de rol y login para demo
+				localStorage.setItem('gestor_logged', 'true');
+				localStorage.setItem('gestor_email', email);
+				localStorage.setItem('gestor_role', role);
 
-			window.showToast(`Bienvenido al sistema. Rol: ${role}`, "success");
+				window.showToast(`Bienvenido al sistema. Rol: ${role}`, "success");
 
-			setTimeout(() => {
-				window.location.href = '/gestor/dashboard';
-			}, 800);
+				setTimeout(() => {
+					window.location.href = '/gestor/dashboard';
+				}, 800);
+			}
 		});
 	</script>
 </Layout>
