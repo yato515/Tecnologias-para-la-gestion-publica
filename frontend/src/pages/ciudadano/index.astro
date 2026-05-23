@@ -466,6 +466,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 			// Header info
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
+			var token = localStorage.getItem('jwt_token');
 			var tokenEl = document.getElementById('lbl-token');
 			if (token && token !== 'mock-jwt-token-demo') {
 				tokenEl.textContent = token;
