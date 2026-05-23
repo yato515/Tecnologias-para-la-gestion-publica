@@ -629,19 +629,7 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 								const uniqueName = `${curp}_${doc.id}_${timestamp}.pdf`;
 								const currentDate = new Date().toISOString().split('T')[0];
 								
-								// Generate token if not exists
-								let currentToken = localStorage.getItem('jwt_token');
-								if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
-									currentToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
-									localStorage.setItem('jwt_token', currentToken);
-									
-									// Update visual display
-									const tokenEl = document.getElementById('lbl-token');
-									tokenEl.textContent = currentToken;
-									tokenEl.title = "Ver completo (Haga clic)";
-									window.showToast(`¡Primer archivo cargado! Se ha generado tu Token de Expediente: ${currentToken}`, "success");
-								}
-								
+
 								const newDossier = dossier.map(d => {
 									if (d.id === doc.id) {
 										return { ...d, status: 'Cargado', file: uniqueName, date: currentDate };
@@ -660,6 +648,34 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				const progress = Math.round((loadedCount / dossier.length) * 100);
 				document.getElementById('lbl-dossier-progress').textContent = `${progress}%`;
 				document.getElementById('bar-dossier-progress').style.width = `${progress}%`;
+
+				// Token Generation on Completion
+				if (loadedCount === dossier.length && loadedCount > 0) {
+					let currentToken = localStorage.getItem('jwt_token');
+					if (!currentToken || currentToken === 'N/A' || currentToken === 'mock-jwt-token-demo') {
+						currentToken = `TK-${Math.floor(100000 + Math.random() * 900000)}`;
+						localStorage.setItem('jwt_token', currentToken);
+						
+						const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+						const currentFiles = {};
+						dossier.forEach(d => { if(d.status==='Cargado') currentFiles[d.id] = d.file; });
+						tokensDict[currentToken] = currentFiles;
+						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
+						
+						const tokenEl = document.getElementById('lbl-token');
+						if(tokenEl) {
+							tokenEl.textContent = currentToken;
+							tokenEl.title = "Ver completo (Haga clic)";
+						}
+						window.showToast(`¡Expediente completo! Se ha generado tu Token de Expediente: ${currentToken}`, "success");
+					} else {
+						// Update existing token's files just in case
+						const tokensDict = JSON.parse(localStorage.getItem('civicflow_tokens') || '{}');
+						if (!tokensDict[currentToken]) tokensDict[currentToken] = {};
+						dossier.forEach(d => { if(d.status==='Cargado') tokensDict[currentToken][d.id] = d.file; });
+						localStorage.setItem('civicflow_tokens', JSON.stringify(tokensDict));
+					}
+				}
 			};
 
 			// Full Folder download
