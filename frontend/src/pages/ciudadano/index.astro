@@ -357,6 +357,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 		if (!token) {
 			window.location.href = '/ciudadano/login';
 		} else {
+			// Remove seed/mock data if present (one-time migration to clean state)
+			const _sd = JSON.parse(localStorage.getItem('civicflow_dossier') || '[]');
+			if (_sd.some(d => d.file === 'ine_ciudadano_yuc.pdf' || d.file === 'comprobante_luz_merida.pdf')) localStorage.removeItem('civicflow_dossier');
+			const _sr = JSON.parse(localStorage.getItem('civicflow_requests') || '[]');
+			if (_sr.some(r => r.folio === 'TRM-2026-00104')) localStorage.removeItem('civicflow_requests');
 			document.getElementById('lbl-curp').textContent = localStorage.getItem('citizen_curp') || 'N/A';
 			document.getElementById('lbl-email').textContent = localStorage.getItem('citizen_email') || 'N/A';
 			
@@ -478,26 +483,33 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				filterCatalog();
 			});
 
-			const defaultDossier = [
-				{ id: "ine", name: "Identificación Oficial Vigente (INE)", file: "ine_ciudadano_yuc.pdf", status: "Cargado", date: "2026-05-18" },
-				{ id: "dom", name: "Comprobante de Domicilio", file: "comprobante_luz_merida.pdf", status: "Cargado", date: "2026-05-18" },
-				{ id: "acta", name: "Acta de Nacimiento Certificada", file: "acta_nacimiento_cert.pdf", status: "Cargado", date: "2026-05-18" },
-				{ id: "curp", name: "Cédula CURP Oficial", file: "", status: "Pendiente", date: "-" }
-			];
-
 			const getDossier = () => {
-				const local = localStorage.getItem('civicflow_dossier');
-				if (!local) {
-					localStorage.setItem('civicflow_dossier', JSON.stringify(defaultDossier));
-					return defaultDossier;
-				}
-				return JSON.parse(local);
-			};
+					const local = localStorage.getItem('civicflow_dossier');
+					if (!local) return [];
+					return JSON.parse(local);
+				};
 
 			const renderDossier = () => {
 				const grid = document.getElementById('dossier-grid');
 				const dossier = getDossier();
 				grid.innerHTML = '';
+
+				if (dossier.length === 0) {
+					document.getElementById('lbl-dossier-progress').textContent = '0%';
+					document.getElementById('bar-dossier-progress').style.width = '0%';
+					grid.innerHTML = `
+						<div class="col-span-2 py-16 flex flex-col items-center gap-4 bg-white border border-slate-200 rounded-xl">
+							<div class="w-16 h-16 rounded-full bg-yuc-green/10 text-yuc-green flex items-center justify-center">
+								<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+							</div>
+							<div class="text-center space-y-2">
+								<p class="text-slate-800 font-bold text-sm font-display">Tu expediente digital está vacío</p>
+								<p class="text-slate-400 text-xs max-w-xs">Sube tus documentos una sola vez y se vincularán automáticamente a cada trámite.</p>
+							</div>
+						</div>
+					`;
+					return;
+				}
 
 				let loadedCount = 0;
 				
@@ -633,24 +645,11 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 				window.showToast("Expediente completo (ZIP) descargado", "success");
 			});
 
-			const defaultRequests = [
-				{
-					folio: "TRM-2026-00104",
-					name: "Acreditación de Productor Henequenero",
-					dept: "Desarrollo Rural",
-					date: "2026-04-12",
-					status: "Aprobado"
-				}
-			];
-
 			const getRequests = () => {
-				const local = localStorage.getItem('civicflow_requests');
-				if (!local) {
-					localStorage.setItem('civicflow_requests', JSON.stringify(defaultRequests));
-					return defaultRequests;
-				}
-				return JSON.parse(local);
-			};
+					const local = localStorage.getItem('civicflow_requests');
+					if (!local) return [];
+					return JSON.parse(local);
+				};
 
 			const renderInbox = async () => {
 				const tbody = document.getElementById('inbox-tbody');
@@ -682,7 +681,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 					} catch (_) {}
 				}
 
-				const requests = apiRequests.length > 0 ? apiRequests : getRequests();
+				const storedRequests = getRequests();
+				const requests = apiRequests.length > 0 ? apiRequests : storedRequests;
 
 				tbody.innerHTML = '';
 				
@@ -808,8 +808,8 @@ const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
 
 			// Count on load
 			const reqs = getRequests();
-			document.getElementById('badge-inbox-count').textContent = reqs.length;
-			if(reqs.length > 0) {
+			if (reqs.length > 0) {
+				document.getElementById('badge-inbox-count').textContent = reqs.length;
 				document.getElementById('badge-inbox-count').classList.remove('hidden');
 				document.getElementById('badge-inbox-count').classList.add('inline-flex');
 			}

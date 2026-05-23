@@ -60,20 +60,8 @@ import Layout from '../../layouts/Layout.astro';
 				<!-- Rendered dynamically by script depending on procedure -->
 			</div>
 
-			<!-- Quick Dossier Import Option -->
-			<div class="p-4 rounded-xl border border-yuc-green/20 bg-yuc-green/5 dark:bg-slate-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-				<div>
-					<h4 class="font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-						<svg class="w-4 h-4 text-yuc-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.25m9.75-4.875c.621 0 1.125.504 1.125 1.125V2.25M7.875 6h9.75c.621 0 1.125.504 1.125 1.125V18a1.125 1.125 0 01-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H18" /></svg>
-						<span>¿Desea importar desde su Expediente Digital?</span>
-					</h4>
-					<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Si ya tiene cargados sus documentos en su Expediente Personal, puede traerlos con un solo clic.</p>
-				</div>
-				<button type="button" id="btn-import-dossier" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm border border-yuc-green-light">
-					Importar de Expediente
-				</button>
-			</div>
-
+			<!-- Quick Dossier Import Option (rendered by JS) -->
+			<div id="dossier-import-section"></div>
 			<!-- Submit & Back Buttons -->
 			<div class="pt-6 border-t border-slate-150 dark:border-slate-800 flex justify-between gap-4">
 				<a href="/ciudadano" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg text-sm transition-all border border-slate-250/50 dark:border-slate-750/50 text-center">
@@ -259,28 +247,61 @@ import Layout from '../../layouts/Layout.astro';
 				});
 			};
 
-			// Import from dossier
-			document.getElementById('btn-import-dossier').addEventListener('click', () => {
+			// Import from dossier section (dynamic based on dossier state)
+			const renderDossierImportSection = () => {
 				const dossier = JSON.parse(localStorage.getItem('civicflow_dossier')) || [];
-				
-				let importedCount = 0;
-				currentTramite.docs.forEach(doc => {
-					// Find equivalent in dossier
-					const match = dossier.find(d => d.id === doc.id && d.status === 'Cargado');
-					if (match) {
-						uploadedFiles[doc.id] = match.file || `importado_${doc.id}.pdf`;
-						importedCount++;
-					}
-				});
+				const loadedDocs = dossier.filter(d => d.status === 'Cargado');
+				const section = document.getElementById('dossier-import-section');
 
-				if (importedCount > 0) {
-					renderSlots();
-					window.showToast(`Se importaron ${importedCount} documentos del expediente`, "success");
+				if (loadedDocs.length === 0) {
+					section.innerHTML = `
+						<div class="p-4 rounded-xl border border-amber-400/40 bg-amber-50 flex flex-col sm:flex-row sm:items-center gap-4">
+							<div class="flex items-start gap-3 flex-1">
+								<svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+								<div>
+									<p class="text-xs font-bold text-amber-800">No tienes documentos cargados en tu expediente digital.</p>
+									<p class="text-[10px] text-amber-700 mt-0.5">Sube tus documentos al expediente para importarlos automáticamente en cada trámite.</p>
+								</div>
+							</div>
+							<a href="/ciudadano" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm text-center">
+								Ir a Mi Expediente
+							</a>
+						</div>
+					`;
 				} else {
-					window.showToast("No se encontraron documentos equivalentes cargados en su expediente.", "warning");
+					section.innerHTML = `
+						<div class="p-4 rounded-xl border border-yuc-green/20 bg-yuc-green/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+							<div>
+								<h4 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">
+									<svg class="w-4 h-4 text-yuc-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H5.25m9.75-4.875c.621 0 1.125.504 1.125 1.125V2.25M7.875 6h9.75c.621 0 1.125.504 1.125 1.125V18a1.125 1.125 0 01-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H18" /></svg>
+									<span>Importar desde su Expediente Digital</span>
+								</h4>
+								<p class="text-[10px] text-slate-500 mt-0.5">${loadedDocs.length} documento(s) disponible(s) en su expediente.</p>
+							</div>
+							<button type="button" id="btn-import-dossier" class="px-4 py-2 bg-yuc-green hover:bg-yuc-green-light text-white text-xs font-bold rounded-lg transition-colors shrink-0 shadow-sm border border-yuc-green-light">
+								Importar de Expediente
+							</button>
+						</div>
+					`;
+					document.getElementById('btn-import-dossier').addEventListener('click', () => {
+						let importedCount = 0;
+						currentTramite.docs.forEach(doc => {
+							const match = loadedDocs.find(d => d.id === doc.id);
+							if (match) {
+								uploadedFiles[doc.id] = match.file || ('importado_' + doc.id + '.pdf');
+								importedCount++;
+							}
+						});
+						if (importedCount > 0) {
+							renderSlots();
+							window.showToast('Se importaron ' + importedCount + ' documentos del expediente', 'success');
+						} else {
+							window.showToast('No hay documentos equivalentes en su expediente para este trámite.', 'warning');
+						}
+					});
 				}
-			});
-
+			};
+			renderDossierImportSection();
 			// Initialize Slots
 			renderSlots();
 
